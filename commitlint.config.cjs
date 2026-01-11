@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   extends: ['@commitlint/config-conventional'],
   rules: {
     'type-enum': [
@@ -17,11 +17,10 @@ export default {
         'chore',
         'revert',
         'wip',
-        'release',
-      ],
+        'release'
+      ]
     ],
     'type-case': [2, 'always', 'lower-case'],
-    'type-empty': [2, 'never'],
-    'header-max-length': [2, 'always', 120],
-  },
+    'type-empty': [2, 'never']
+  }
 }
