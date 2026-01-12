@@ -18,6 +18,8 @@
         "@nuxtjs/seo": "^3.3.0",
         "@unhead/vue": "^2.0.19",
         "better-sqlite3": "^12.6.0",
+        "dayjs": "^1.11.19",
+        "fuse.js": "^7.1.0",
         "lint-staged": "^16.2.7",
         "nuxt": "^4.2.2",
       },
@@ -26,6 +28,7 @@
         "@commitlint/config-conventional": "^20.3.1",
         "@nuxt/eslint": "^1.12.1",
         "@playwright/test": "^1.57.0",
+        "@valibot/to-json-schema": "^1.5.0",
         "@vue/test-utils": "^2.4.6",
         "eslint": "^9.39.2",
         "happy-dom": "^20.1.0",
@@ -33,6 +36,7 @@
         "playwright-core": "^1.57.0",
         "prettier": "3.7.4",
         "typescript": "^5.9.3",
+        "valibot": "^1.2.0",
         "vitest": "^4.0.16",
         "vue-tsc": "^3.2.1",
       },
@@ -935,6 +939,8 @@
 
     "@unrs/resolver-binding-win32-x64-msvc": ["@unrs/resolver-binding-win32-x64-msvc@1.11.1", "", { "os": "win32", "cpu": "x64" }, "sha512-lrW200hZdbfRtztbygyaq/6jP6AKE8qQN2KvPcJ+x7wiD038YtnYtZ82IMNJ69GJibV7bwL3y9FgK+5w/pYt6g=="],
 
+    "@valibot/to-json-schema": ["@valibot/to-json-schema@1.5.0", "", { "peerDependencies": { "valibot": "^1.2.0" } }, "sha512-GE7DmSr1C2UCWPiV0upRH6mv0cCPsqYGs819fb6srCS1tWhyXrkGGe+zxUiwzn/L1BOfADH4sNjY/YHCuP8phQ=="],
+
     "@vercel/nft": ["@vercel/nft@0.30.4", "", { "dependencies": { "@mapbox/node-pre-gyp": "2.0.3", "@rollup/pluginutils": "5.3.0", "acorn": "8.15.0", "acorn-import-attributes": "1.9.5", "async-sema": "3.1.1", "bindings": "1.5.0", "estree-walker": "2.0.2", "glob": "10.5.0", "graceful-fs": "4.2.11", "node-gyp-build": "4.8.4", "picomatch": "4.0.3", "resolve-from": "5.0.0" }, "bin": { "nft": "out/cli.js" } }, "sha512-wE6eAGSXScra60N2l6jWvNtVK0m+sh873CpfZW4KI2v8EHuUQp+mSEi4T+IcdPCSEDgCdAS/7bizbhQlkjzrSA=="],
 
     "@vitejs/plugin-vue": ["@vitejs/plugin-vue@6.0.3", "", { "dependencies": { "@rolldown/pluginutils": "1.0.0-beta.53" }, "peerDependencies": { "vite": "7.3.0", "vue": "3.5.26" } }, "sha512-TlGPkLFLVOY3T7fZrwdvKpjprR3s4fxRln0ORDo1VQ7HHyxJwTlrjKU3kpVWTlaAjIEuCTokmjkZnr8Tpc925w=="],
@@ -1270,6 +1276,8 @@
     "csstype": ["csstype@3.2.3", "", {}, "sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ=="],
 
     "dargs": ["dargs@8.1.0", "", {}, "sha512-wAV9QHOsNbwnWdNW2FYvE1P56wtgSbM+3SZcdGiWQILwVjACCXDCI3Ai8QlCjMDB8YK5zySiXZYBiwGmNY3lnw=="],
+
+    "dayjs": ["dayjs@1.11.19", "", {}, "sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw=="],
 
     "db0": ["db0@0.3.4", "", {}, "sha512-RiXXi4WaNzPTHEOu8UPQKMooIbqOEyqA1t7Z6MsdxSCeb8iUC9ko3LcmsLmeUt2SM5bctfArZKkRQggKZz7JNw=="],
 

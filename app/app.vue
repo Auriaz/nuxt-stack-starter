@@ -16,12 +16,27 @@
     description,
     ogTitle: title,
     ogDescription: description,
-    // ogImage: '/og-image.png',
-    // twitterImage: '/og-image.png',
+    // ogImage: '/images/og-image.png',
+    // twitterImage: '/images/og-image.png',
     // twitterCard: 'summary_large_image',
     // ogType: 'website',
     // ogLocale: 'pl_PL'
   })
+
+  // Plausible Analytics - privacy-first analytics
+  // Działa tylko jeśli NUXT_PUBLIC_PLAUSIBLE_DOMAIN jest ustawione
+  const plausibleDomain = useRuntimeConfig().public.plausibleDomain
+  if (plausibleDomain) {
+    useHead({
+      script: [
+        {
+          src: 'https://plausible.io/js/script.js',
+          defer: true,
+          'data-domain': plausibleDomain,
+        },
+      ],
+    })
+  }
 </script>
 
 <template>

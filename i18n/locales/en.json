@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "home": "Home",
+    "offer": "Services",
+    "portfolio": "Portfolio",
+    "about": "About",
+    "contact": "Contact",
+    "blog": "Blog"
+  },
+  "common": {
+    "readMore": "Read more",
+    "learnMore": "Learn more",
+    "getStarted": "Get started",
+    "contactUs": "Contact us"
+  }
+}
