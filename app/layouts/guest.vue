@@ -6,8 +6,8 @@
       :ui="{
         container: 'max-w-full blur-none',
         root: [
-          'fixed bg-transparent border-none backdrop-blur-none top-0 z-50 transition-all duration-300 w-screen',
-        ],
+          'fixed bg-transparent border-none backdrop-blur-none top-0 z-50 transition-all duration-300 w-screen'
+        ]
       }"
     >
       <template #title>

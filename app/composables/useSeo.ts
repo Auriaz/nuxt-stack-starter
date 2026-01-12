@@ -31,7 +31,7 @@ export const usePageSeo = (meta: PageSeoMeta) => {
     ogType: meta.ogType || 'website',
     twitterCard: 'summary_large_image',
     twitterImage: ogImage,
-    robots: meta.noindex ? 'noindex,nofollow' : 'index,follow',
+    robots: meta.noindex ? 'noindex,nofollow' : 'index,follow'
   })
 
   // Canonical URL
@@ -39,9 +39,9 @@ export const usePageSeo = (meta: PageSeoMeta) => {
     link: [
       {
         rel: 'canonical',
-        href: currentUrl,
-      },
-    ],
+        href: currentUrl
+      }
+    ]
   })
 
   // Dodatkowe meta dla artykułów
@@ -50,13 +50,13 @@ export const usePageSeo = (meta: PageSeoMeta) => {
       articlePublishedTime: meta.publishedTime,
       articleModifiedTime: meta.modifiedTime,
       articleAuthor: meta.author,
-      ...(meta.tags ? { articleTag: meta.tags } : {}),
+      ...(meta.tags ? { articleTag: meta.tags } : {})
     } as Parameters<typeof useSeoMeta>[0])
   }
 
   return {
     siteUrl,
     currentUrl,
-    ogImage,
+    ogImage
   }
 }

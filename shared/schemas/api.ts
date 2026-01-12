@@ -5,13 +5,13 @@ export const ContactFormSchema = object({
   email: pipe(string(), email('Nieprawidłowy adres email')),
   phone: optional(string()),
   subject: pipe(string(), minLength(3, 'Temat musi mieć co najmniej 3 znaki')),
-  message: pipe(string(), minLength(10, 'Wiadomość musi mieć co najmniej 10 znaków')),
+  message: pipe(string(), minLength(10, 'Wiadomość musi mieć co najmniej 10 znaków'))
 })
 
 export const CreatePostRequestSchema = object({
   title: string(),
   content: string(),
-  authorId: string(),
+  authorId: string()
 })
 
 export const PostResponseSchema = object({
@@ -19,5 +19,5 @@ export const PostResponseSchema = object({
   title: string(),
   content: string(),
   authorId: string(),
-  createdAt: string(),
+  createdAt: string()
 })

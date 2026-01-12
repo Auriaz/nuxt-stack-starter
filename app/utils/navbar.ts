@@ -2,31 +2,31 @@ export const menuItems = [
   {
     label: 'Strona główna',
     to: '/',
-    icon: 'i-lucide-home',
+    icon: 'i-lucide-home'
   },
   {
     label: 'Oferta',
     to: '/oferta',
-    icon: 'i-lucide-briefcase',
+    icon: 'i-lucide-briefcase'
   },
   {
     label: 'Portfolio',
     to: '/portfolio',
-    icon: 'i-lucide-folder-kanban',
+    icon: 'i-lucide-folder-kanban'
   },
   {
     label: 'O nas',
     to: '/o-nas',
-    icon: 'i-lucide-users',
+    icon: 'i-lucide-users'
   },
   {
     label: 'Blog',
     to: '/blog',
-    icon: 'i-lucide-book-open',
+    icon: 'i-lucide-book-open'
   },
   {
     label: 'Kontakt',
     to: '/kontakt',
-    icon: 'i-lucide-mail',
-  },
+    icon: 'i-lucide-mail'
+  }
 ]

@@ -6,7 +6,7 @@ describe('SEO Utilities', () => {
       title: 'Test Title',
       description: 'Test Description',
       image: '/test-image.png',
-      noindex: false,
+      noindex: false
     }
 
     expect(meta.title).toBeTruthy()
@@ -18,7 +18,7 @@ describe('SEO Utilities', () => {
   it('should handle missing optional fields', () => {
     const meta = {
       title: 'Test Title',
-      description: 'Test Description',
+      description: 'Test Description'
     }
 
     expect(meta.title).toBeTruthy()

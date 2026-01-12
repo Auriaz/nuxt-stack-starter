@@ -1,15 +1,21 @@
 <script lang="ts" setup>
-  defineProps<{
-    src: string
-    name: string
-  }>()
+defineProps<{
+  src: string
+  name: string
+}>()
 </script>
 
 <template>
-  <u-card id="author-about" variant="soft" class="mt-16">
+  <u-card
+    id="author-about"
+    variant="soft"
+    class="mt-16"
+  >
     <template #header>
       <div class="flex flex-col gap-2">
-        <p class="text-highlight font-bold">O autorze</p>
+        <p class="text-highlight font-bold">
+          O autorze
+        </p>
         <slot name="body" />
       </div>
     </template>

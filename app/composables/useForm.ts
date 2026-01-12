@@ -103,6 +103,6 @@ export function useForm<T extends FormState = FormState>(options: UseFormOptions
     handleSubmit,
     reset,
     setError,
-    clearError,
+    clearError
   }
 }

@@ -1,44 +1,44 @@
 <script setup lang="ts">
-  interface Testimonial {
-    name: string
-    role: string
-    company?: string
-    content: string
-    avatar?: string
-  }
+interface Testimonial {
+  name: string
+  role: string
+  company?: string
+  content: string
+  avatar?: string
+}
 
-  interface Props {
-    title?: string
-    testimonials?: Testimonial[]
-  }
+interface Props {
+  title?: string
+  testimonials?: Testimonial[]
+}
 
-  const props = withDefaults(defineProps<Props>(), {
-    title: 'Co mówią o nas',
-    testimonials: () => [
-      {
-        name: 'Jan Kowalski',
-        role: 'CEO',
-        company: 'Firma XYZ',
-        content:
+const props = withDefaults(defineProps<Props>(), {
+  title: 'Co mówią o nas',
+  testimonials: () => [
+    {
+      name: 'Jan Kowalski',
+      role: 'CEO',
+      company: 'Firma XYZ',
+      content:
           'Nuxt Base Starter pozwolił nam szybko rozpocząć projekt. Wszystko działa out-of-the-box.',
-        avatar: undefined,
-      },
-      {
-        name: 'Anna Nowak',
-        role: 'Lead Developer',
-        company: 'Tech Solutions',
-        content: 'Świetna dokumentacja i struktura. Idealne rozwiązanie dla naszego zespołu.',
-        avatar: undefined,
-      },
-      {
-        name: 'Piotr Wiśniewski',
-        role: 'Product Manager',
-        company: 'Startup Inc',
-        content: 'Zaoszczędziliśmy tygodnie pracy dzięki gotowym komponentom i konfiguracji.',
-        avatar: undefined,
-      },
-    ],
-  })
+      avatar: undefined
+    },
+    {
+      name: 'Anna Nowak',
+      role: 'Lead Developer',
+      company: 'Tech Solutions',
+      content: 'Świetna dokumentacja i struktura. Idealne rozwiązanie dla naszego zespołu.',
+      avatar: undefined
+    },
+    {
+      name: 'Piotr Wiśniewski',
+      role: 'Product Manager',
+      company: 'Startup Inc',
+      content: 'Zaoszczędziliśmy tygodnie pracy dzięki gotowym komponentom i konfiguracji.',
+      avatar: undefined
+    }
+  ]
+})
 </script>
 
 <template>
@@ -51,7 +51,11 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <UCard v-for="(testimonial, index) in props.testimonials" :key="index" class="h-full">
+        <UCard
+          v-for="(testimonial, index) in props.testimonials"
+          :key="index"
+          class="h-full"
+        >
           <template #header>
             <div class="flex items-center gap-4">
               <UAvatar
@@ -60,7 +64,11 @@
                 :alt="testimonial.name"
                 size="md"
               />
-              <UAvatar v-else :alt="testimonial.name" size="md">
+              <UAvatar
+                v-else
+                :alt="testimonial.name"
+                size="md"
+              >
                 {{ testimonial.name.charAt(0) }}
               </UAvatar>
               <div>
@@ -75,7 +83,9 @@
             </div>
           </template>
 
-          <p class="text-muted">"{{ testimonial.content }}"</p>
+          <p class="text-muted">
+            "{{ testimonial.content }}"
+          </p>
         </UCard>
       </div>
     </UContainer>

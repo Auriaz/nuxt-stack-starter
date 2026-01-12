@@ -1,5 +1,8 @@
 <template>
-  <h3 :id="props.id" class="text-xl font-semibold text-gray-800 dark:text-gray-200 my-3">
+  <h3
+    :id="props.id"
+    class="text-xl font-semibold text-gray-800 dark:text-gray-200 my-3"
+  >
     <a
       v-if="props.id && generate"
       :href="`${props.id}`"
@@ -12,15 +15,15 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, useRuntimeConfig } from '#imports'
+import { computed, useRuntimeConfig } from '#imports'
 
-  const props = defineProps<{ id?: string }>()
+const props = defineProps<{ id?: string }>()
 
-  const { headings } = useRuntimeConfig().public.mdc
-  const generate = computed(
-    () =>
-      props.id &&
-      ((typeof headings?.anchorLinks === 'boolean' && headings?.anchorLinks === true) ||
-        (typeof headings?.anchorLinks === 'object' && headings?.anchorLinks?.h3))
-  )
+const { headings } = useRuntimeConfig().public.mdc
+const generate = computed(
+  () =>
+    props.id
+    && ((typeof headings?.anchorLinks === 'boolean' && headings?.anchorLinks === true)
+      || (typeof headings?.anchorLinks === 'object' && headings?.anchorLinks?.h3))
+)
 </script>

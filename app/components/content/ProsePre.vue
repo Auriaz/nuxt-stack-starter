@@ -5,15 +5,24 @@
     <div
       class="flex items-center rounded-t-lg px-4 py-2 text-gray-500 dark:text-gray-400 bg-slate-950 p-2 rounded-lg"
     >
-      <div v-if="language" class="text-sm">
+      <div
+        v-if="language"
+        class="text-sm"
+      >
         <span>{{ language }} /</span>
       </div>
 
-      <div v-if="filename" class="text-sm">
+      <div
+        v-if="filename"
+        class="text-sm"
+      >
         {{ filename }}
       </div>
 
-      <div v-if="meta" class="text-sm text-gray-400">
+      <div
+        v-if="meta"
+        class="text-sm text-gray-400"
+      >
         {{ meta }}
       </div>
 
@@ -37,48 +46,48 @@
 </template>
 
 <script setup lang="ts">
-  defineProps({
-    code: {
-      type: String,
-      default: '',
-    },
-    language: {
-      type: String,
-      default: null,
-    },
-    filename: {
-      type: String,
-      default: null,
-    },
-    highlights: {
-      type: Array as () => number[],
-      default: () => [],
-    },
-    meta: {
-      type: String,
-      default: null,
-    },
-    class: {
-      type: String,
-      default: null,
-    },
-  })
-
-  const copyCode = () => {
-    const codeElement = document.querySelector('pre code')
-    if (codeElement) {
-      navigator.clipboard
-        .writeText(codeElement.textContent || '')
-        .then(() => {
-          // TODO: Użyj toast notification zamiast alert
-
-          alert('Code copied to clipboard!')
-        })
-        .catch(() => {
-          // Cicho zignoruj błąd kopiowania
-        })
-    }
+defineProps({
+  code: {
+    type: String,
+    default: ''
+  },
+  language: {
+    type: String,
+    default: null
+  },
+  filename: {
+    type: String,
+    default: null
+  },
+  highlights: {
+    type: Array as () => number[],
+    default: () => []
+  },
+  meta: {
+    type: String,
+    default: null
+  },
+  class: {
+    type: String,
+    default: null
   }
+})
+
+const copyCode = () => {
+  const codeElement = document.querySelector('pre code')
+  if (codeElement) {
+    navigator.clipboard
+      .writeText(codeElement.textContent || '')
+      .then(() => {
+        // TODO: Użyj toast notification zamiast alert
+
+        alert('Code copied to clipboard!')
+      })
+      .catch(() => {
+        // Cicho zignoruj błąd kopiowania
+      })
+  }
+}
 </script>
 
 <style scoped>

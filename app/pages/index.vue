@@ -1,20 +1,20 @@
 <script setup lang="ts">
-  definePageMeta({
-    layout: 'default',
-  })
+definePageMeta({
+  layout: 'default'
+})
 
-  const title = 'Nuxt Base Starter - Solidna podkładka pod strony internetowe'
-  const description =
-    'Profesjonalny starter Nuxt 4 z gotowymi komponentami, SEO baseline, i18n i pełną konfiguracją. Idealny fundament dla Twojego projektu.'
+const title = 'Nuxt Base Starter - Solidna podkładka pod strony internetowe'
+const description
+  = 'Profesjonalny starter Nuxt 4 z gotowymi komponentami, SEO baseline, i18n i pełną konfiguracją. Idealny fundament dla Twojego projektu.'
 
-  useSeoMeta({
-    title,
-    description,
-    ogTitle: title,
-    ogDescription: description,
-    ogType: 'website',
-    twitterCard: 'summary_large_image',
-  })
+useSeoMeta({
+  title,
+  description,
+  ogTitle: title,
+  ogDescription: description,
+  ogType: 'website',
+  twitterCard: 'summary_large_image'
+})
 </script>
 
 <template>

@@ -5,12 +5,12 @@ export default defineContentConfig({
   collections: {
     content: defineCollection({
       type: 'page',
-      source: '**/*.md',
+      source: '**/*.md'
     }),
     blog: defineCollection({
       type: 'page',
       source: 'blog/**/*.md',
-      schema: BlogPostSchema,
-    }),
-  },
+      schema: BlogPostSchema
+    })
+  }
 })

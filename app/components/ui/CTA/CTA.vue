@@ -1,30 +1,30 @@
 <script setup lang="ts">
-  interface Props {
-    title?: string
-    description?: string
-    primaryText?: string
-    primaryTo?: string
-    secondaryText?: string
-    secondaryTo?: string
-    variant?: 'default' | 'centered' | 'banner'
-  }
+interface Props {
+  title?: string
+  description?: string
+  primaryText?: string
+  primaryTo?: string
+  secondaryText?: string
+  secondaryTo?: string
+  variant?: 'default' | 'centered' | 'banner'
+}
 
-  const props = withDefaults(defineProps<Props>(), {
-    title: 'Gotowy do rozpoczęcia?',
-    description: 'Zacznij swój projekt już dziś z Nuxt Base Starter.',
-    primaryText: 'Zacznij teraz',
-    primaryTo: '/kontakt',
-    secondaryText: 'Dowiedz się więcej',
-    secondaryTo: '/oferta',
-    variant: 'default',
-  })
+const props = withDefaults(defineProps<Props>(), {
+  title: 'Gotowy do rozpoczęcia?',
+  description: 'Zacznij swój projekt już dziś z Nuxt Base Starter.',
+  primaryText: 'Zacznij teraz',
+  primaryTo: '/kontakt',
+  secondaryText: 'Dowiedz się więcej',
+  secondaryTo: '/oferta',
+  variant: 'default'
+})
 </script>
 
 <template>
   <section
     :class="[
       'py-16 md:py-24',
-      props.variant === 'banner' ? 'bg-primary text-primary-foreground' : 'bg-muted/50',
+      props.variant === 'banner' ? 'bg-primary text-primary-foreground' : 'bg-muted/50'
     ]"
   >
     <UContainer>
@@ -33,19 +33,19 @@
           'flex flex-col gap-6',
           props.variant === 'centered' || props.variant === 'banner'
             ? 'text-center items-center'
-            : 'lg:flex-row lg:items-center lg:justify-between',
+            : 'lg:flex-row lg:items-center lg:justify-between'
         ]"
       >
         <div
           :class="[
             'flex-1',
-            props.variant === 'centered' || props.variant === 'banner' ? 'max-w-2xl mx-auto' : '',
+            props.variant === 'centered' || props.variant === 'banner' ? 'max-w-2xl mx-auto' : ''
           ]"
         >
           <h2
             :class="[
               'text-2xl md:text-3xl font-bold mb-3',
-              props.variant === 'banner' ? 'text-primary-foreground' : '',
+              props.variant === 'banner' ? 'text-primary-foreground' : ''
             ]"
           >
             {{ props.title }}
@@ -53,7 +53,7 @@
           <p
             :class="[
               'text-lg',
-              props.variant === 'banner' ? 'text-primary-foreground/90' : 'text-muted',
+              props.variant === 'banner' ? 'text-primary-foreground/90' : 'text-muted'
             ]"
           >
             {{ props.description }}
@@ -65,7 +65,7 @@
             'flex flex-col sm:flex-row gap-4',
             props.variant === 'centered' || props.variant === 'banner'
               ? 'justify-center'
-              : 'shrink-0',
+              : 'shrink-0'
           ]"
         >
           <UButton

@@ -1,22 +1,22 @@
 <script lang="ts" setup>
-  const isScrolled = ref(false)
-  // const { clear: clearUserSession, loggedIn, user } = useUserSession()
+const isScrolled = ref(false)
+// const { clear: clearUserSession, loggedIn, user } = useUserSession()
 
-  onMounted(() => {
-    const handleScroll = () => {
-      isScrolled.value = window.scrollY > 50
-    }
+onMounted(() => {
+  const handleScroll = () => {
+    isScrolled.value = window.scrollY > 50
+  }
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('scroll', handleScroll, { passive: true })
 
-    onUnmounted(() => {
-      window.removeEventListener('scroll', handleScroll)
-    })
+  onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll)
   })
+})
 
-  // const handleLogout = async () => {
-  //   await clearUserSession()
-  // }
+// const handleLogout = async () => {
+//   await clearUserSession()
+// }
 </script>
 
 <template>
@@ -28,9 +28,9 @@
       root: [
         'fixed top-0 z-50 transition-all duration-300 w-screen',
         'border-none',
-        isScrolled ? 'bg-background/90 backdrop-blur-md shadow-lg shadow-primary/5' : '',
+        isScrolled ? 'bg-background/90 backdrop-blur-md shadow-lg shadow-primary/5' : ''
       ].join(' '),
-      center: isScrolled ? 'bg-transparent' : '',
+      center: isScrolled ? 'bg-transparent' : ''
     }"
   >
     <template #title>
@@ -45,7 +45,10 @@
       <div class="hidden md:flex items-center gap-2 mr-5">
         <ColorModeButton />
 
-        <USeparator orientation="vertical" class="h-6" />
+        <USeparator
+          orientation="vertical"
+          class="h-6"
+        />
         <!-- Auth Buttons / User Menu - Desktop -->
         <div class="hidden md:flex items-center gap-2">
           <!-- Guest: Login/Register Buttons
@@ -158,7 +161,10 @@
       >
         <!-- Navigation Menu -->
         <div class="flex-1 overflow-y-auto -mx-4 px-4">
-          <Navbar orientation="vertical" class="w-full" />
+          <Navbar
+            orientation="vertical"
+            class="w-full"
+          />
         </div>
 
         <!-- Footer Actions -->

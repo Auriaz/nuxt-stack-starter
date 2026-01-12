@@ -7,7 +7,7 @@ export const AuthorSchema = object({
   description: optional(string()),
   email: optional(string()),
   to: optional(string()),
-  target: optional(string()),
+  target: optional(string())
 })
 
 export const UserSchema = object({
@@ -16,5 +16,5 @@ export const UserSchema = object({
   avatar: ImageSchema,
   description: optional(string()),
   to: optional(string()),
-  target: optional(string()),
+  target: optional(string())
 })

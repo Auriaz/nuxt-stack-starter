@@ -12,15 +12,15 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxt/test-utils',
     '@nuxtjs/i18n',
-    '@nuxtjs/seo',
+    '@nuxtjs/seo'
   ],
 
   imports: {
-    dirs: ['shared/types', 'shared/utils'],
+    dirs: ['shared/types', 'shared/utils']
   },
 
   devtools: {
-    enabled: true,
+    enabled: true
   },
 
   css: ['~/assets/css/main.css'],
@@ -29,13 +29,13 @@ export default defineNuxtConfig({
     url: process.env.NUXT_PUBLIC_SITE_URL || 'https://example.com',
     name: 'Base Starter',
     description: 'Nuxt Base Starter - solid foundation for web projects',
-    defaultLocale: 'pl',
+    defaultLocale: 'pl'
   },
 
   runtimeConfig: {
     public: {
-      plausibleDomain: process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN || '',
-    },
+      plausibleDomain: process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN || ''
+    }
   },
 
   routeRules: {
@@ -44,37 +44,37 @@ export default defineNuxtConfig({
     '/portfolio': { prerender: true },
     '/o-nas': { prerender: true },
     '/kontakt': { cache: false }, // SSR dla formularza
-    '/blog/**': { prerender: true },
+    '/blog/**': { prerender: true }
   },
 
   compatibilityDate: '2025-01-15',
 
   nitro: {
     prerender: {
-      routes: ['/sitemap.xml', '/robots.txt'],
-    },
+      routes: ['/sitemap.xml', '/robots.txt']
+    }
   },
 
   eslint: {
     config: {
       stylistic: {
         commaDangle: 'never',
-        braceStyle: '1tbs',
-      },
-    },
+        braceStyle: '1tbs'
+      }
+    }
   },
 
   i18n: {
     locales: [
       { code: 'pl', iso: 'pl-PL', file: 'pl.json', name: 'Polski' },
-      { code: 'en', iso: 'en-US', file: 'en.json', name: 'English' },
+      { code: 'en', iso: 'en-US', file: 'en.json', name: 'English' }
     ],
     defaultLocale: 'pl',
     strategy: 'prefix_except_default', // /oferta (PL), /en/offer (EN)
     langDir: 'locales',
     detectBrowserLanguage: {
       useCookie: true,
-      cookieKey: 'i18n_redirected',
-    },
-  },
+      cookieKey: 'i18n_redirected'
+    }
+  }
 })

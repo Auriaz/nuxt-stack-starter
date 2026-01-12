@@ -1,52 +1,52 @@
 <script setup lang="ts">
-  interface Feature {
-    title: string
-    description: string
-    icon: string
-  }
+interface Feature {
+  title: string
+  description: string
+  icon: string
+}
 
-  interface Props {
-    title?: string
-    description?: string
-    features?: Feature[]
-  }
+interface Props {
+  title?: string
+  description?: string
+  features?: Feature[]
+}
 
-  const props = withDefaults(defineProps<Props>(), {
-    title: 'Funkcje',
-    description: 'Wszystko czego potrzebujesz do rozpoczęcia projektu',
-    features: () => [
-      {
-        title: 'Nuxt 4',
-        description: 'Najnowsza wersja Nuxt z pełnym wsparciem dla TypeScript i Vue 3.',
-        icon: 'i-lucide-zap',
-      },
-      {
-        title: 'Nuxt UI',
-        description: 'Gotowe komponenty UI zgodne z najlepszymi praktykami design system.',
-        icon: 'i-lucide-palette',
-      },
-      {
-        title: 'SEO Ready',
-        description: 'Kompletna konfiguracja SEO z meta tags, sitemap i OpenGraph.',
-        icon: 'i-lucide-search',
-      },
-      {
-        title: 'i18n',
-        description: 'Wielojęzyczność out-of-the-box z obsługą PL i EN.',
-        icon: 'i-lucide-languages',
-      },
-      {
-        title: 'TypeScript',
-        description: 'Pełne wsparcie TypeScript dla bezpieczeństwa typów.',
-        icon: 'i-lucide-code',
-      },
-      {
-        title: 'Testy',
-        description: 'Konfiguracja testów: Vitest (unit/component) i Playwright (E2E).',
-        icon: 'i-lucide-check-circle',
-      },
-    ],
-  })
+const props = withDefaults(defineProps<Props>(), {
+  title: 'Funkcje',
+  description: 'Wszystko czego potrzebujesz do rozpoczęcia projektu',
+  features: () => [
+    {
+      title: 'Nuxt 4',
+      description: 'Najnowsza wersja Nuxt z pełnym wsparciem dla TypeScript i Vue 3.',
+      icon: 'i-lucide-zap'
+    },
+    {
+      title: 'Nuxt UI',
+      description: 'Gotowe komponenty UI zgodne z najlepszymi praktykami design system.',
+      icon: 'i-lucide-palette'
+    },
+    {
+      title: 'SEO Ready',
+      description: 'Kompletna konfiguracja SEO z meta tags, sitemap i OpenGraph.',
+      icon: 'i-lucide-search'
+    },
+    {
+      title: 'i18n',
+      description: 'Wielojęzyczność out-of-the-box z obsługą PL i EN.',
+      icon: 'i-lucide-languages'
+    },
+    {
+      title: 'TypeScript',
+      description: 'Pełne wsparcie TypeScript dla bezpieczeństwa typów.',
+      icon: 'i-lucide-code'
+    },
+    {
+      title: 'Testy',
+      description: 'Konfiguracja testów: Vitest (unit/component) i Playwright (E2E).',
+      icon: 'i-lucide-check-circle'
+    }
+  ]
+})
 </script>
 
 <template>
@@ -69,7 +69,10 @@
         >
           <div class="flex items-center gap-4 mb-4">
             <div class="p-3 rounded-lg bg-primary/10 text-primary">
-              <UIcon :name="feature.icon" class="w-6 h-6" />
+              <UIcon
+                :name="feature.icon"
+                class="w-6 h-6"
+              />
             </div>
             <h3 class="text-xl font-semibold">
               {{ feature.title }}

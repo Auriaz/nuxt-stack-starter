@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-  // No additional logic required for this component.
+// No additional logic required for this component.
 </script>
 
 <style scoped>

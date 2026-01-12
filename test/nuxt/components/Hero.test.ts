@@ -7,19 +7,19 @@ const HeroComponent = defineComponent({
   props: {
     title: {
       type: String,
-      default: 'Default Title',
+      default: 'Default Title'
     },
     description: {
       type: String,
-      default: 'Default Description',
-    },
+      default: 'Default Description'
+    }
   },
   template: `
     <section>
       <h1>{{ title }}</h1>
       <p>{{ description }}</p>
     </section>
-  `,
+  `
 })
 
 describe('Hero Component', () => {
@@ -33,8 +33,8 @@ describe('Hero Component', () => {
     const wrapper = mount(HeroComponent, {
       props: {
         title: 'Custom Title',
-        description: 'Custom Description',
-      },
+        description: 'Custom Description'
+      }
     })
     expect(wrapper.text()).toContain('Custom Title')
     expect(wrapper.text()).toContain('Custom Description')

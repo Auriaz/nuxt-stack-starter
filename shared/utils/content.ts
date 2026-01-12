@@ -6,7 +6,7 @@ export function formatDate(date: string | Date, locale = 'pl-PL'): string {
   return dateObj.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'long',
-    day: 'numeric',
+    day: 'numeric'
   })
 }
 
@@ -18,7 +18,7 @@ export function formatDateShort(date: string | Date, locale = 'pl-PL'): string {
   return dateObj.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'short',
-    day: 'numeric',
+    day: 'numeric'
   })
 }
 

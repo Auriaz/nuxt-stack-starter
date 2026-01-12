@@ -1,98 +1,98 @@
 <script setup lang="ts">
-  /* eslint-disable @typescript-eslint/ban-ts-comment */
-  // @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
-  // import type { BlogPostEntry } from '#shared/types/content'
-  import type { BlogCollectionItem } from '@nuxt/content'
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
+// import type { BlogPostEntry } from '#shared/types/content'
+import type { BlogCollectionItem } from '@nuxt/content'
 
-  const { path } = useRoute()
+const { path } = useRoute()
 
-  const { data: post } = await useAsyncData(path, () =>
-    queryCollection<BlogCollectionItem>('blog').path(path).first()
-  )
-  if (!post.value) {
-    throw createError({ statusCode: 404, statusMessage: 'Post not found', fatal: true })
+const { data: post } = await useAsyncData(path, () =>
+  queryCollection<BlogCollectionItem>('blog').path(path).first()
+)
+if (!post.value) {
+  throw createError({ statusCode: 404, statusMessage: 'Post not found', fatal: true })
+}
+
+const { data: surround } = await useAsyncData(`${path}-surround`, () => {
+  return queryCollectionItemSurroundings('blog', path, {
+    fields: ['description']
+  })
+})
+
+const { data: links } = await useAsyncData(`${path}-links`, async () => {
+  if (!post.value?.tags || !Array.isArray(post.value.tags)) {
+    return []
   }
-
-  const { data: surround } = await useAsyncData(`${path}-surround`, () => {
-    return queryCollectionItemSurroundings('blog', path, {
-      fields: ['description'],
+  const results = await queryCollection('blog').where('path', 'NOT LIKE', post.value.path).all()
+  // Sortuj po liczbie wspólnych tagów (najwięcej wspólnych tagów = wyżej)
+  const sorted = results
+    .map((item) => {
+      const commonTags = Array.isArray(item.tags)
+        ? item.tags.filter(tag => post.value.tags.includes(tag))
+        : []
+      return { item, commonTagsCount: commonTags.length }
     })
-  })
+    .sort((a, b) => b.commonTagsCount - a.commonTagsCount)
+    .slice(0, 5)
+    .map(({ item }) => item)
+  return sorted
+})
+const title = post.value.seo?.title || post.value.title
+const description = post.value.seo?.description || post.value.description
 
-  const { data: links } = await useAsyncData(`${path}-links`, async () => {
-    if (!post.value?.tags || !Array.isArray(post.value.tags)) {
-      return []
-    }
-    const results = await queryCollection('blog').where('path', 'NOT LIKE', post.value.path).all()
-    // Sortuj po liczbie wspólnych tagów (najwięcej wspólnych tagów = wyżej)
-    const sorted = results
-      .map((item) => {
-        const commonTags = Array.isArray(item.tags)
-          ? item.tags.filter((tag) => post.value.tags.includes(tag))
-          : []
-        return { item, commonTagsCount: commonTags.length }
-      })
-      .sort((a, b) => b.commonTagsCount - a.commonTagsCount)
-      .slice(0, 5)
-      .map(({ item }) => item)
-    return sorted
-  })
-  const title = post.value.seo?.title || post.value.title
-  const description = post.value.seo?.description || post.value.description
+useSeoMeta({
+  title,
+  ogTitle: title,
+  description,
+  ogDescription: description
+})
 
-  useSeoMeta({
-    title,
-    ogTitle: title,
-    description,
-    ogDescription: description,
-  })
+defineOgImageComponent('Blog', {
+  title: post.value.title,
+  description: post.value.description || ''
+})
 
-  defineOgImageComponent('Blog', {
-    title: post.value.title,
-    description: post.value.description || '',
-  })
+const config = useRuntimeConfig()
+const route = useRoute()
+const siteUrl = config.public.siteUrl || 'https://example.com'
+const currentUrl = `${siteUrl}${route.path}`
+const shareText = `${title} - ${description}`
 
-  const config = useRuntimeConfig()
-  const route = useRoute()
-  const siteUrl = config.public.siteUrl || 'https://example.com'
-  const currentUrl = `${siteUrl}${route.path}`
-  const shareText = `${title} - ${description}`
+const shareToTwitter = () => {
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(currentUrl)}`
+  window.open(url, '_blank', 'width=550,height=420')
+}
 
-  const shareToTwitter = () => {
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(currentUrl)}`
-    window.open(url, '_blank', 'width=550,height=420')
+const shareToFacebook = () => {
+  const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`
+  window.open(url, '_blank', 'width=550,height=420')
+}
+
+const shareToLinkedIn = () => {
+  const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`
+  window.open(url, '_blank', 'width=550,height=420')
+}
+
+const toast = useToast()
+
+const copyToClipboard = async () => {
+  try {
+    await navigator.clipboard.writeText(currentUrl)
+    toast.add({
+      title: 'Skopiowano',
+      description: 'Link został skopiowany do schowka',
+      color: 'success',
+      timeout: 3000
+    })
+  } catch {
+    toast.add({
+      title: 'Błąd',
+      description: 'Nie udało się skopiować linku',
+      color: 'error',
+      timeout: 3000
+    })
   }
-
-  const shareToFacebook = () => {
-    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`
-    window.open(url, '_blank', 'width=550,height=420')
-  }
-
-  const shareToLinkedIn = () => {
-    const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`
-    window.open(url, '_blank', 'width=550,height=420')
-  }
-
-  const toast = useToast()
-
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(currentUrl)
-      toast.add({
-        title: 'Skopiowano',
-        description: 'Link został skopiowany do schowka',
-        color: 'success',
-        timeout: 3000,
-      })
-    } catch {
-      toast.add({
-        title: 'Błąd',
-        description: 'Nie udało się skopiować linku',
-        color: 'error',
-        timeout: 3000,
-      })
-    }
-  }
+}
 </script>
 
 <template>
@@ -108,13 +108,19 @@
             <UBreadcrumb
               :items="[
                 { label: 'Blog', to: '/blog' },
-                { label: post?.title, to: post?.path },
+                { label: post?.title, to: post?.path }
               ]"
               class="flex-wrap"
             />
 
-            <time v-if="post?.date" class="text-muted text-sm flex items-center gap-1 shrink-0">
-              <UIcon name="i-lucide-calendar" class="w-4 h-4" />
+            <time
+              v-if="post?.date"
+              class="text-muted text-sm flex items-center gap-1 shrink-0"
+            >
+              <UIcon
+                name="i-lucide-calendar"
+                class="w-4 h-4"
+              />
               {{ formatDateShort(post.date, 'en') }}
             </time>
           </div>
@@ -150,11 +156,14 @@
         :src="post?.image?.src"
         :alt="post?.image?.alt"
         class="w-full h-auto rounded-lg"
-      />
+      >
     </UPageHeader>
     <UPage :ui="{ root: 'container mx-auto px-4 md:px-0' }">
       <UPageBody class="w-full">
-        <ContentRenderer v-if="post" :value="post" />
+        <ContentRenderer
+          v-if="post"
+          :value="post"
+        />
 
         <AuthorAbout
           :src="post?.authors?.[0]?.avatar?.src"
@@ -162,19 +171,25 @@
           :description="post?.authors?.[0]?.description"
         />
 
-        <USeparator v-if="surround?.length" class="my-8" />
+        <USeparator
+          v-if="surround?.length"
+          class="my-8"
+        />
 
         <UContentSurround :surround="surround" />
       </UPageBody>
 
-      <template v-if="post?.body?.toc?.links?.length" #right>
+      <template
+        v-if="post?.body?.toc?.links?.length"
+        #right
+      >
         <UPageAside class="hidden lg:block overflow-y-auto">
           <div class="sticky top-4 space-y-4 max-h-[calc(100vh-2rem)]">
             <!-- TOC -->
             <UCard
               :ui="{
                 container: 'pt-2 sm:pt-2 pb-2 sm:pb-2 lg:py-2 w-full',
-                body: 'pt-0 sm:pt-0 pb-0 sm:pb-0 lg:py-0 w-full',
+                body: 'pt-0 sm:pt-0 pb-0 sm:pb-0 lg:py-0 w-full'
               }"
               variant="soft"
             >
@@ -198,7 +213,9 @@
             <!-- Social Media -->
             <UCard variant="soft">
               <template #header>
-                <h3 class="text-sm font-semibold text-muted uppercase tracking-wide">Udostępnij</h3>
+                <h3 class="text-sm font-semibold text-muted uppercase tracking-wide">
+                  Udostępnij
+                </h3>
               </template>
               <div class="grid grid-cols-2 gap-2">
                 <UTooltip text="Udostępnij na Twitter / X">
@@ -245,7 +262,10 @@
             </UCard>
 
             <!-- Powiązane artykuły -->
-            <UCard v-if="links && links.length > 0" variant="soft">
+            <UCard
+              v-if="links && links.length > 0"
+              variant="soft"
+            >
               <template #header>
                 <h3 class="text-sm font-semibold text-muted uppercase tracking-wide">
                   Powiązane artykuły
@@ -261,7 +281,11 @@
                   :ui="{ item: '', container: 'gap-4 item-stretch!' }"
                   class="w-full"
                 >
-                  <NuxtLink :key="item.path" :to="item.path" class="block group">
+                  <NuxtLink
+                    :key="item.path"
+                    :to="item.path"
+                    class="block group"
+                  >
                     <div class="flex gap-3 hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors">
                       <div class="w-20 h-20 rounded overflow-hidden shrink-0 bg-muted">
                         <NuxtImg
@@ -275,7 +299,10 @@
                           v-else
                           class="w-full h-full bg-linear-to-br from-primary-500 to-primary-700 flex items-center justify-center"
                         >
-                          <UIcon name="i-lucide-file-text" class="w-8 h-8 text-white opacity-50" />
+                          <UIcon
+                            name="i-lucide-file-text"
+                            class="w-8 h-8 text-white opacity-50"
+                          />
                         </div>
                       </div>
                       <div class="flex-1 min-w-0">
@@ -284,7 +311,10 @@
                         >
                           {{ item.title }}
                         </h4>
-                        <p v-if="item.description" class="text-xs text-muted mt-1 line-clamp-2">
+                        <p
+                          v-if="item.description"
+                          class="text-xs text-muted mt-1 line-clamp-2"
+                        >
                           {{ item.description }}
                         </p>
                       </div>

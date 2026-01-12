@@ -6,5 +6,5 @@ export const PermissionSchema = picklist(['read', 'write', 'delete', 'publish'] 
 export const UserRoleSchema = object({
   userId: string(),
   role: RoleSchema,
-  permissions: array(PermissionSchema),
+  permissions: array(PermissionSchema)
 })

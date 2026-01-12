@@ -9,13 +9,13 @@
 </template>
 
 <script setup lang="ts">
-  defineProps({
-    src: {
-      type: String,
-      default: '',
-    },
-  })
-  const isDev = import.meta.dev
+defineProps({
+  src: {
+    type: String,
+    default: ''
+  }
+})
+const isDev = import.meta.dev
 </script>
 
 <style scoped>

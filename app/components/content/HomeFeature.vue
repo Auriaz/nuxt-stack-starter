@@ -15,10 +15,10 @@
 </template>
 
 <script setup lang="ts">
-  defineProps({
-    icon: {
-      type: String,
-      default: 'i-lucide-cursor-click',
-    },
-  })
+defineProps({
+  icon: {
+    type: String,
+    default: 'i-lucide-cursor-click'
+  }
+})
 </script>

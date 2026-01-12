@@ -1,21 +1,24 @@
 <script setup>
-  defineProps({
-    value: {
-      type: String,
-      required: true,
-    },
-    index: {
-      type: String,
-      required: true,
-    },
-  })
+defineProps({
+  value: {
+    type: String,
+    required: true
+  },
+  index: {
+    type: String,
+    required: true
+  }
+})
 
-  const open = ref(true)
+const open = ref(true)
 </script>
 
 <template>
   <div class="flex items-center py-0.5 group">
-    <span class="flex items-center space-x-2 text-primary-400 cursor-pointer" @click="open = !open">
+    <span
+      class="flex items-center space-x-2 text-primary-400 cursor-pointer"
+      @click="open = !open"
+    >
       <span>{{ index }}</span>
       <span>:</span>
     </span>
@@ -28,7 +31,10 @@
       leave-from-class="opacity-100 translate-x-0"
       leave-to-class="opacity-0 translate-x-2"
     >
-      <span v-if="open" class="pl-2 text-info-400">{{ value ? 'true' : 'false' }}</span>
+      <span
+        v-if="open"
+        class="pl-2 text-info-400"
+      >{{ value ? 'true' : 'false' }}</span>
     </transition>
   </div>
 </template>

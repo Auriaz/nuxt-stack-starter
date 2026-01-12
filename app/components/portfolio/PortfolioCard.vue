@@ -1,28 +1,28 @@
 <script setup lang="ts">
-  interface Props {
-    title: string
-    description: string
-    image?: string
-    category?: string
-    tags?: string[]
-    link?: string
-    featured?: boolean
-  }
+interface Props {
+  title: string
+  description: string
+  image?: string
+  category?: string
+  tags?: string[]
+  link?: string
+  featured?: boolean
+}
 
-  const props = withDefaults(defineProps<Props>(), {
-    image: undefined,
-    category: undefined,
-    tags: () => [],
-    link: undefined,
-    featured: false,
-  })
+const props = withDefaults(defineProps<Props>(), {
+  image: undefined,
+  category: undefined,
+  tags: () => [],
+  link: undefined,
+  featured: false
+})
 </script>
 
 <template>
   <UCard
     :class="[
       'h-full overflow-hidden transition-transform hover:scale-105',
-      props.featured ? 'lg:col-span-2 lg:row-span-2' : '',
+      props.featured ? 'lg:col-span-2 lg:row-span-2' : ''
     ]"
   >
     <template #header>
@@ -38,10 +38,19 @@
           v-else
           class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-700"
         >
-          <UIcon name="i-lucide-image" class="w-16 h-16 text-white opacity-50" />
+          <UIcon
+            name="i-lucide-image"
+            class="w-16 h-16 text-white opacity-50"
+          />
         </div>
-        <div v-if="props.category" class="absolute top-4 left-4">
-          <UBadge color="primary" variant="solid">
+        <div
+          v-if="props.category"
+          class="absolute top-4 left-4"
+        >
+          <UBadge
+            color="primary"
+            variant="solid"
+          >
             {{ props.category }}
           </UBadge>
         </div>
@@ -56,7 +65,10 @@
         {{ props.description }}
       </p>
 
-      <div v-if="props.tags && props.tags.length > 0" class="flex flex-wrap gap-2 mb-4">
+      <div
+        v-if="props.tags && props.tags.length > 0"
+        class="flex flex-wrap gap-2 mb-4"
+      >
         <UBadge
           v-for="(tag, index) in props.tags"
           :key="index"
@@ -68,9 +80,17 @@
         </UBadge>
       </div>
 
-      <UButton v-if="props.link" :to="props.link" variant="outline" size="sm">
+      <UButton
+        v-if="props.link"
+        :to="props.link"
+        variant="outline"
+        size="sm"
+      >
         Zobacz projekt
-        <UIcon name="i-lucide-arrow-right" class="w-4 h-4 ml-1" />
+        <UIcon
+          name="i-lucide-arrow-right"
+          class="w-4 h-4 ml-1"
+        />
       </UButton>
     </div>
   </UCard>

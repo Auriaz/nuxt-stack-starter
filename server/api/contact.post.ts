@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
   if (event.method !== 'POST') {
     throw createError({
       statusCode: 405,
-      statusMessage: 'Method Not Allowed',
+      statusMessage: 'Method Not Allowed'
     })
   }
 
@@ -26,27 +26,27 @@ export default defineEventHandler(async (event) => {
       name: validatedData.name,
       email: validatedData.email,
       subject: validatedData.subject,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date().toISOString()
     })
 
     // Symulacja opóźnienia (usuń w produkcji)
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    await new Promise(resolve => setTimeout(resolve, 500))
 
     return {
       success: true,
-      message: 'Wiadomość została wysłana pomyślnie. Skontaktujemy się z Tobą wkrótce.',
+      message: 'Wiadomość została wysłana pomyślnie. Skontaktujemy się z Tobą wkrótce.'
     }
   } catch (error) {
     // Obsługa błędów walidacji Valibot
     if (error instanceof v.ValiError) {
       // Użyj prostszego podejścia - zwróć pierwszy komunikat błędu lub wszystkie
-      const errorMessages = error.issues.map((issue) => issue.message || 'Validation error')
+      const errorMessages = error.issues.map(issue => issue.message || 'Validation error')
       const errorMessage = errorMessages.join(', ') || 'Validation Error'
 
       throw createError({
         statusCode: 400,
         statusMessage: errorMessage,
-        data: error.issues,
+        data: error.issues
       })
     }
 
@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
 
     throw createError({
       statusCode: 500,
-      statusMessage: 'Internal Server Error',
+      statusMessage: 'Internal Server Error'
     })
   }
 })

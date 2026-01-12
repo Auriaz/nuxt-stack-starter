@@ -2,7 +2,7 @@ import { object, string, optional, boolean, array, picklist } from 'valibot'
 
 export const ImageSchema = object({
   src: string(),
-  alt: optional(string()),
+  alt: optional(string())
 })
 
 export const SEOSchema = object({
@@ -14,5 +14,5 @@ export const SEOSchema = object({
   publishedTime: optional(string()),
   modifiedTime: optional(string()),
   author: optional(string()),
-  tags: optional(array(string())),
+  tags: optional(array(string()))
 })

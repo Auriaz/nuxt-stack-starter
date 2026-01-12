@@ -20,7 +20,7 @@
         :srclang="captionLang || 'pl'"
         :label="captionLabel || 'Polski'"
         default
-      />
+      >
       Twoja przeglądarka nie obsługuje odtwarzania filmów.
     </video>
     <iframe
@@ -54,80 +54,80 @@
 </template>
 
 <script setup lang="ts">
-  import { withTrailingSlash, withLeadingSlash, joinURL } from 'ufo'
-  import { useRuntimeConfig, computed } from '#imports'
+import { withTrailingSlash, withLeadingSlash, joinURL } from 'ufo'
+import { useRuntimeConfig, computed } from '#imports'
 
-  const props = defineProps({
-    src: {
-      type: String,
-      default: '',
-    },
-    width: {
-      type: [String, Number],
-      default: undefined,
-    },
-    height: {
-      type: [String, Number],
-      default: undefined,
-    },
-    controls: {
-      type: Boolean,
-      default: true,
-    },
-    autoplay: {
-      type: Boolean,
-      default: false,
-    },
-    loop: {
-      type: Boolean,
-      default: false,
-    },
-    muted: {
-      type: Boolean,
-      default: false,
-    },
-    poster: {
-      type: String,
-      default: undefined,
-    },
-    caption: {
-      type: String,
-      default: undefined,
-    },
-    captionLang: {
-      type: String,
-      default: 'pl',
-    },
-    captionLabel: {
-      type: String,
-      default: 'Polski',
-    },
-    youtubeId: {
-      type: String,
-      default: '',
-    },
-    vimeoId: {
-      type: String,
-      default: '',
-    },
-  })
+const props = defineProps({
+  src: {
+    type: String,
+    default: ''
+  },
+  width: {
+    type: [String, Number],
+    default: undefined
+  },
+  height: {
+    type: [String, Number],
+    default: undefined
+  },
+  controls: {
+    type: Boolean,
+    default: true
+  },
+  autoplay: {
+    type: Boolean,
+    default: false
+  },
+  loop: {
+    type: Boolean,
+    default: false
+  },
+  muted: {
+    type: Boolean,
+    default: false
+  },
+  poster: {
+    type: String,
+    default: undefined
+  },
+  caption: {
+    type: String,
+    default: undefined
+  },
+  captionLang: {
+    type: String,
+    default: 'pl'
+  },
+  captionLabel: {
+    type: String,
+    default: 'Polski'
+  },
+  youtubeId: {
+    type: String,
+    default: ''
+  },
+  vimeoId: {
+    type: String,
+    default: ''
+  }
+})
 
-  const refinedSrc = computed(() => {
-    if (!props.src) return ''
-    // Jeśli to już pełny URL (http/https), zwróć bez zmian
-    if (props.src.startsWith('http://') || props.src.startsWith('https://')) {
-      return props.src
-    }
-    // Jeśli zaczyna się od /, to ścieżka względna do public
-    if (props.src.startsWith('/') && !props.src.startsWith('//')) {
-      const _base = withLeadingSlash(withTrailingSlash(useRuntimeConfig().app.baseURL))
-      if (_base !== '/' && !props.src.startsWith(_base)) {
-        return joinURL(_base, props.src)
-      }
-      return props.src
+const refinedSrc = computed(() => {
+  if (!props.src) return ''
+  // Jeśli to już pełny URL (http/https), zwróć bez zmian
+  if (props.src.startsWith('http://') || props.src.startsWith('https://')) {
+    return props.src
+  }
+  // Jeśli zaczyna się od /, to ścieżka względna do public
+  if (props.src.startsWith('/') && !props.src.startsWith('//')) {
+    const _base = withLeadingSlash(withTrailingSlash(useRuntimeConfig().app.baseURL))
+    if (_base !== '/' && !props.src.startsWith(_base)) {
+      return joinURL(_base, props.src)
     }
     return props.src
-  })
+  }
+  return props.src
+})
 </script>
 
 <style scoped>
