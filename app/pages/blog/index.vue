@@ -42,7 +42,7 @@
 
 <template>
   <NuxtLayout name="default">
-    <UPage :ui="{ root: 'container mx-auto' }">
+    <UPage :ui="{ root: 'container mx-auto px-4 md:px-0' }">
       <UPageHeader title="Blog" description="Tutaj znajdziesz wszystkie posty z naszego bloga">
         <template #headline>
           <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 w-full">

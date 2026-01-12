@@ -19,6 +19,24 @@
     })
   })
 
+  const { data: links } = await useAsyncData(`${path}-links`, async () => {
+    if (!post.value?.tags || !Array.isArray(post.value.tags)) {
+      return []
+    }
+    const results = await queryCollection('blog').where('path', 'NOT LIKE', post.value.path).all()
+    // Sortuj po liczbie wspólnych tagów (najwięcej wspólnych tagów = wyżej)
+    const sorted = results
+      .map((item) => {
+        const commonTags = Array.isArray(item.tags)
+          ? item.tags.filter((tag) => post.value.tags.includes(tag))
+          : []
+        return { item, commonTagsCount: commonTags.length }
+      })
+      .sort((a, b) => b.commonTagsCount - a.commonTagsCount)
+      .slice(0, 5)
+      .map(({ item }) => item)
+    return sorted
+  })
   const title = post.value.seo?.title || post.value.title
   const description = post.value.seo?.description || post.value.description
 
@@ -33,65 +51,109 @@
     title: post.value.title,
     description: post.value.description || '',
   })
+
+  const config = useRuntimeConfig()
+  const route = useRoute()
+  const siteUrl = config.public.siteUrl || 'https://example.com'
+  const currentUrl = `${siteUrl}${route.path}`
+  const shareText = `${title} - ${description}`
+
+  const shareToTwitter = () => {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(currentUrl)}`
+    window.open(url, '_blank', 'width=550,height=420')
+  }
+
+  const shareToFacebook = () => {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`
+    window.open(url, '_blank', 'width=550,height=420')
+  }
+
+  const shareToLinkedIn = () => {
+    const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`
+    window.open(url, '_blank', 'width=550,height=420')
+  }
+
+  const toast = useToast()
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(currentUrl)
+      toast.add({
+        title: 'Skopiowano',
+        description: 'Link został skopiowany do schowka',
+        color: 'success',
+        timeout: 3000,
+      })
+    } catch {
+      toast.add({
+        title: 'Błąd',
+        description: 'Nie udało się skopiować linku',
+        color: 'error',
+        timeout: 3000,
+      })
+    }
+  }
 </script>
 
 <template>
   <NuxtLayout name="default">
-    <UPage class="flex flex-col lg:flex-row container mx-auto">
-      <UPageHeader :title="post?.title" :description="post?.description" class="py-8">
-        <template #headline>
-          <div class="flex flex-col gap-2 w-full mb-5">
-            <div class="flex items-center justify-between gap-2">
-              <UBreadcrumb
-                :items="[
-                  { label: 'Blog', to: '/blog' },
-                  { label: post?.title, to: post?.path },
-                ]"
+    <UPageHeader
+      :title="post?.title"
+      :description="post?.description"
+      class="container mx-auto py-4 md:py-8"
+    >
+      <template #headline>
+        <div class="flex flex-col gap-3 md:gap-2 w-full mb-5">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <UBreadcrumb
+              :items="[
+                { label: 'Blog', to: '/blog' },
+                { label: post?.title, to: post?.path },
+              ]"
+              class="flex-wrap"
+            />
+
+            <time v-if="post?.date" class="text-muted text-sm flex items-center gap-1 shrink-0">
+              <UIcon name="i-lucide-calendar" class="w-4 h-4" />
+              {{ formatDateShort(post.date, 'en') }}
+            </time>
+          </div>
+          <USeparator />
+
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <UAvatar
+                size="sm"
+                :src="post?.authors?.[0]?.avatar?.src"
+                :alt="post?.authors?.[0]?.avatar?.alt"
               />
-
-              <time v-if="post?.date" class="text-muted">
-                <UIcon name="i-lucide-calendar" />
-                {{ formatDateShort(post.date, 'en') }}
-              </time>
+              <span class="text-sm text-black dark:text-white">{{ post?.authors?.[0]?.name }}</span>
             </div>
-            <USeparator />
-
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <UAvatar
+            <div class="flex items-center flex-wrap gap-2">
+              <template v-if="post?.tags && Array.isArray(post.tags) && post.tags.length > 0">
+                <UBadge
+                  v-for="(tag, idx) in post.tags"
+                  :key="idx"
+                  :label="typeof tag === 'string' ? tag : String(tag)"
+                  variant="subtle"
                   size="sm"
-                  :src="post?.authors?.[0]?.avatar?.src"
-                  :alt="post?.authors?.[0]?.avatar?.alt"
                 />
-                <span class="text-sm text-black dark:text-white">{{
-                  post?.authors?.[0]?.name
-                }}</span>
-              </div>
-              <div class="flex items-center justify-end gap-2">
-                <template v-if="post?.tags && Array.isArray(post.tags) && post.tags.length > 0">
-                  <UBadge
-                    v-for="(tag, idx) in post.tags"
-                    :key="idx"
-                    :label="typeof tag === 'string' ? tag : String(tag)"
-                    variant="subtle"
-                    size="sm"
-                  />
-                </template>
-              </div>
+              </template>
             </div>
           </div>
-        </template>
+        </div>
+      </template>
 
-        <USeparator class="my-8" />
-        <img
-          v-if="post?.image?.src"
-          :src="post?.image?.src"
-          :alt="post?.image?.alt"
-          class="w-full h-auto"
-        />
-      </UPageHeader>
-
-      <UPageBody>
+      <USeparator class="my-4 md:my-8" />
+      <img
+        v-if="post?.image?.src"
+        :src="post?.image?.src"
+        :alt="post?.image?.alt"
+        class="w-full h-auto rounded-lg"
+      />
+    </UPageHeader>
+    <UPage :ui="{ root: 'container mx-auto px-4 md:px-0' }">
+      <UPageBody class="w-full">
         <ContentRenderer v-if="post" :value="post" />
 
         <AuthorAbout
@@ -100,19 +162,138 @@
           :description="post?.authors?.[0]?.description"
         />
 
-        <USeparator v-if="surround?.length" />
+        <USeparator v-if="surround?.length" class="my-8" />
 
         <UContentSurround :surround="surround" />
       </UPageBody>
 
       <template v-if="post?.body?.toc?.links?.length" #right>
-        <UPageAside>
-          <UContentToc
-            :links="post.body.toc.links"
-            highlight
-            highlight-color="primary"
-            color="primary"
-          />
+        <UPageAside class="hidden lg:block overflow-y-auto">
+          <div class="sticky top-4 space-y-4 max-h-[calc(100vh-2rem)]">
+            <!-- TOC -->
+            <UCard
+              :ui="{
+                container: 'pt-2 sm:pt-2 pb-2 sm:pb-2 lg:py-2 w-full',
+                body: 'pt-0 sm:pt-0 pb-0 sm:pb-0 lg:py-0 w-full',
+              }"
+              variant="soft"
+            >
+              <template #header>
+                <h3 class="text-sm font-semibold text-muted uppercase tracking-wide">
+                  Spis treści
+                </h3>
+              </template>
+
+              <div class="overflow-y-auto w-full">
+                <UContentToc
+                  :links="post.body.toc.links"
+                  highlight
+                  highlight-color="primary"
+                  color="primary"
+                  class="w-full"
+                />
+              </div>
+            </UCard>
+
+            <!-- Social Media -->
+            <UCard variant="soft">
+              <template #header>
+                <h3 class="text-sm font-semibold text-muted uppercase tracking-wide">Udostępnij</h3>
+              </template>
+              <div class="grid grid-cols-2 gap-2">
+                <UTooltip text="Udostępnij na Twitter / X">
+                  <UButton
+                    icon="i-simple-icons-x"
+                    color="neutral"
+                    variant="ghost"
+                    size="sm"
+                    block
+                    @click="shareToTwitter"
+                  />
+                </UTooltip>
+                <UTooltip text="Udostępnij na Facebook">
+                  <UButton
+                    icon="i-simple-icons-facebook"
+                    color="neutral"
+                    variant="ghost"
+                    size="sm"
+                    block
+                    @click="shareToFacebook"
+                  />
+                </UTooltip>
+                <UTooltip text="Udostępnij na LinkedIn">
+                  <UButton
+                    icon="i-simple-icons-linkedin"
+                    color="neutral"
+                    variant="ghost"
+                    size="sm"
+                    block
+                    @click="shareToLinkedIn"
+                  />
+                </UTooltip>
+                <UTooltip text="Kopiuj link">
+                  <UButton
+                    icon="i-lucide-link"
+                    color="neutral"
+                    variant="ghost"
+                    size="sm"
+                    block
+                    @click="copyToClipboard"
+                  />
+                </UTooltip>
+              </div>
+            </UCard>
+
+            <!-- Powiązane artykuły -->
+            <UCard v-if="links && links.length > 0" variant="soft">
+              <template #header>
+                <h3 class="text-sm font-semibold text-muted uppercase tracking-wide">
+                  Powiązane artykuły
+                </h3>
+              </template>
+
+              <div class="space-y-3">
+                <UCarousel
+                  v-slot="{ item }"
+                  :items="links"
+                  loop
+                  :autoplay="{ delay: 2000 }"
+                  :ui="{ item: '', container: 'gap-4 item-stretch!' }"
+                  class="w-full"
+                >
+                  <NuxtLink :key="item.path" :to="item.path" class="block group">
+                    <div class="flex gap-3 hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors">
+                      <div class="w-20 h-20 rounded overflow-hidden shrink-0 bg-muted">
+                        <NuxtImg
+                          v-if="item.image?.src"
+                          :src="item.image.src"
+                          :alt="item.image.alt || item.title"
+                          class="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                        <div
+                          v-else
+                          class="w-full h-full bg-linear-to-br from-primary-500 to-primary-700 flex items-center justify-center"
+                        >
+                          <UIcon name="i-lucide-file-text" class="w-8 h-8 text-white opacity-50" />
+                        </div>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <h4
+                          class="text-sm font-semibold line-clamp-2 group-hover:text-primary transition-colors"
+                        >
+                          {{ item.title }}
+                        </h4>
+                        <p v-if="item.description" class="text-xs text-muted mt-1 line-clamp-2">
+                          {{ item.description }}
+                        </p>
+                      </div>
+                    </div>
+                  </NuxtLink>
+                </UCarousel>
+              </div>
+            </UCard>
+          </div>
         </UPageAside>
       </template>
     </UPage>
