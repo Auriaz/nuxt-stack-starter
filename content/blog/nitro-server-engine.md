@@ -13,11 +13,11 @@ tags:
   - 'Deployment'
   - 'API'
 authors:
-  - name: 'Zespół Nuxt Base Starter'
+  - name: 'Adam Stankiewicz'
     avatar:
       src: 'https://avatars.githubusercontent.com/u/26349096?v=4'
-      alt: 'Zespół Nuxt Base Starter'
-    description: 'Zespół Nuxt Base Starter'
+      alt: 'Adam Stankiewicz'
+    description: 'Full-stack web developer passionate about building robust Nuxt and Vue applications.'
     to: 'https://github.com/Auriaz'
     target: '_blank'
 seo:
@@ -25,6 +25,11 @@ seo:
   description: 'Odkryj Nitro - nowoczesny silnik serwerowy Nuxt, który umożliwia deployment wszędzie: Node.js, serverless, edge i statyczne hostingi.'
   ogType: 'article'
 to: '/blog/nitro-server-engine'
+anchors:
+  - label: 'Blog'
+    to: '/blog'
+    icon: 'i-lucide-book'
+    target: '_self'
 ---
 
 # Nitro - Silnik serwerowy Nuxt, który zmienia zasady gry

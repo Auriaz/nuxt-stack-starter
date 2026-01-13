@@ -10,17 +10,26 @@ tags:
   - 'Starter'
   - 'Vue'
 authors:
-  - name: 'Zespół Nuxt Base Starter'
+  - name: 'Adam Stankiewicz'
     avatar:
       src: 'https://avatars.githubusercontent.com/u/26349096?v=4'
-      alt: 'Zespół Nuxt Base Starter'
-    description: 'Zespół Nuxt Base Starter'
+      alt: 'Adam Stankiewicz'
+    description: 'Full-stack web developer passionate about building robust Nuxt and Vue applications.'
     to: 'https://github.com/Auriaz'
     target: '_blank'
 seo:
   title: 'Witamy w Nuxt Base Starter - Pierwszy wpis'
   description: 'Poznaj możliwości Nuxt Base Starter i rozpocznij swój projekt już dziś.'
 to: '/blog/welcome'
+anchors:
+  - label: 'Youtube Video'
+    to: 'https://youtu.be/dElWGpSa0e8?si=sMstAympKrNTFVhY'
+    icon: 'i-lucide-youtube'
+    target: '_blank'
+  - label: 'Blog'
+    to: '/blog'
+    icon: 'i-lucide-book'
+    target: '_self'
 ---
 
 # Witamy w Nuxt Base Starter

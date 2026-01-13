@@ -3,8 +3,12 @@
 // @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
 // import type { BlogPostEntry } from '#shared/types/content'
 import type { BlogCollectionItem } from '@nuxt/content'
+import { defineArticle, definePerson } from 'nuxt-schema-org/schema'
+import app from '~/app.meta'
+import dayjs from 'dayjs'
 
 const { path } = useRoute()
+const { locale } = useI18n()
 
 const { data: post } = await useAsyncData(path, () =>
   queryCollection<BlogCollectionItem>('blog').path(path).first()
@@ -37,29 +41,55 @@ const { data: links } = await useAsyncData(`${path}-links`, async () => {
     .map(({ item }) => item)
   return sorted
 })
-const title = post.value.seo?.title || post.value.title
-const description = post.value.seo?.description || post.value.description
+
+useSchemaOrg([
+  defineArticle({
+    headline: post.value.title,
+    description: post.value.description,
+    image: post.value.image?.src,
+    datePublished: dayjs(post.value.date, 'YYYY-MM-DD').toDate().toISOString(),
+    dateModified: dayjs(post.value.date, 'YYYY-MM-DD').toDate().toISOString(),
+    keywords: post.value.tags?.join(', '),
+    author: definePerson({
+      name: post.value.authors?.[0]?.name,
+      url: post.value.authors?.[0]?.to,
+      image: post.value.authors?.[0]?.avatar?.src
+    }),
+    url: post.value.path,
+    publisher: definePerson({
+      name: app.author.name,
+      url: app.author.url,
+      image: app.author.image.url,
+      email: app.author.email
+    })
+  })
+])
 
 useSeoMeta({
-  title,
-  ogTitle: title,
-  description,
-  ogDescription: description
+  title: post.value.seo?.title || post.value.title,
+  ogTitle: post.value.seo?.title || post.value.title,
+  description: post.value.seo?.description || post.value.description,
+  ogDescription: post.value.seo?.description || post.value.description
 })
 
 defineOgImageComponent('Blog', {
-  title: post.value.title,
-  description: post.value.description || ''
+  ogType: 'article',
+  publishedTime: dayjs(post.value.date).toDate().toISOString(),
+  authors: post.value.authors,
+  image: post.value.image?.src,
+  title: post.value.seo?.title || post.value.title,
+  description: post.value.seo?.description || post.value.description,
+  tags: post.value.tags
 })
 
 const config = useRuntimeConfig()
 const route = useRoute()
 const siteUrl = config.public.siteUrl || 'https://example.com'
 const currentUrl = `${siteUrl}${route.path}`
-const shareText = `${title} - ${description}`
+const shareText = computed(() => `${post.value.title} - ${post.value.description}`)
 
 const shareToTwitter = () => {
-  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(currentUrl)}`
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText.value)}&url=${encodeURIComponent(currentUrl)}`
   window.open(url, '_blank', 'width=550,height=420')
 }
 
@@ -93,6 +123,14 @@ const copyToClipboard = async () => {
     })
   }
 }
+
+async function share() {
+  await navigator.share({
+    title: post.value.title,
+    text: post.value.description,
+    url: currentUrl
+  })
+}
 </script>
 
 <template>
@@ -121,7 +159,7 @@ const copyToClipboard = async () => {
                 name="i-lucide-calendar"
                 class="w-4 h-4"
               />
-              {{ formatDateShort(post.date, 'en') }}
+              {{ dayjs(post.date).locale(locale).format('DD.MM.YYYY').toString() }}
             </time>
           </div>
           <USeparator />
@@ -180,13 +218,13 @@ const copyToClipboard = async () => {
       </UPageBody>
 
       <template
-        v-if="post?.body?.toc?.links?.length"
         #right
       >
         <UPageAside class="hidden lg:block overflow-y-auto">
           <div class="sticky top-4 space-y-4 max-h-[calc(100vh-2rem)]">
-            <!-- TOC -->
+            <!-- Anchors -->
             <UCard
+              v-if="post?.body?.toc?.links?.length"
               :ui="{
                 container: 'pt-2 sm:pt-2 pb-2 sm:pb-2 lg:py-2 w-full',
                 body: 'pt-0 sm:pt-0 pb-0 sm:pb-0 lg:py-0 w-full'
@@ -194,7 +232,42 @@ const copyToClipboard = async () => {
               variant="soft"
             >
               <template #header>
-                <h3 class="text-sm font-semibold text-muted uppercase tracking-wide">
+                <h3 class="text-sm font-semibold text-muted uppercase tracking-wide flex items-center gap-2 justify-center">
+                  <UIcon
+                    name="i-lucide-anchor"
+                    class="w-4 h-4"
+                  />
+                  Kotwice
+                </h3>
+              </template>
+
+              <div class="overflow-y-auto w-full py-2">
+                <UPageAnchors
+                  v-if="post?.anchors"
+                  :links="post?.anchors.map(anchor => ({
+                    label: anchor.label,
+                    to: anchor.to,
+                    icon: anchor.icon,
+                    target: anchor.target
+                  }))"
+                />
+              </div>
+            </UCard>
+            <!-- TOC -->
+            <UCard
+              v-if="post?.body?.toc?.links?.length"
+              :ui="{
+                container: 'pt-2 sm:pt-2 pb-2 sm:pb-2 lg:py-2 w-full',
+                body: 'pt-0 sm:pt-0 pb-0 sm:pb-0 lg:py-0 w-full'
+              }"
+              variant="soft"
+            >
+              <template #header>
+                <h3 class="text-sm font-semibold text-muted uppercase tracking-wide flex items-center gap-2 justify-center">
+                  <UIcon
+                    name="i-lucide-book"
+                    class="w-4 h-4"
+                  />
                   Spis treści
                 </h3>
               </template>
@@ -204,6 +277,7 @@ const copyToClipboard = async () => {
                   :links="post.body.toc.links"
                   highlight
                   highlight-color="primary"
+                  title="Spis treści strony"
                   color="primary"
                   class="w-full"
                 />
@@ -213,18 +287,22 @@ const copyToClipboard = async () => {
             <!-- Social Media -->
             <UCard variant="soft">
               <template #header>
-                <h3 class="text-sm font-semibold text-muted uppercase tracking-wide">
+                <h3 class="text-sm font-semibold text-muted uppercase tracking-wide flex items-center gap-2 justify-center">
+                  <UIcon
+                    name="i-lucide-share-2"
+                    class="w-4 h-4"
+                  />
                   Udostępnij
                 </h3>
               </template>
-              <div class="grid grid-cols-2 gap-2">
+
+              <div class="flex justify-center gap-2">
                 <UTooltip text="Udostępnij na Twitter / X">
                   <UButton
                     icon="i-simple-icons-x"
                     color="neutral"
                     variant="ghost"
-                    size="sm"
-                    block
+                    size="md"
                     @click="shareToTwitter"
                   />
                 </UTooltip>
@@ -233,8 +311,7 @@ const copyToClipboard = async () => {
                     icon="i-simple-icons-facebook"
                     color="neutral"
                     variant="ghost"
-                    size="sm"
-                    block
+                    size="md"
                     @click="shareToFacebook"
                   />
                 </UTooltip>
@@ -243,8 +320,7 @@ const copyToClipboard = async () => {
                     icon="i-simple-icons-linkedin"
                     color="neutral"
                     variant="ghost"
-                    size="sm"
-                    block
+                    size="md"
                     @click="shareToLinkedIn"
                   />
                 </UTooltip>
@@ -253,9 +329,17 @@ const copyToClipboard = async () => {
                     icon="i-lucide-link"
                     color="neutral"
                     variant="ghost"
-                    size="sm"
-                    block
+                    size="md"
                     @click="copyToClipboard"
+                  />
+                </UTooltip>
+                <UTooltip text="Udostępnij przez narzędzia systemowe">
+                  <UButton
+                    icon="i-lucide-share-2"
+                    color="neutral"
+                    variant="ghost"
+                    size="md"
+                    @click="share"
                   />
                 </UTooltip>
               </div>
@@ -267,8 +351,12 @@ const copyToClipboard = async () => {
               variant="soft"
             >
               <template #header>
-                <h3 class="text-sm font-semibold text-muted uppercase tracking-wide">
-                  Powiązane artykuły
+                <h3 class="text-sm font-semibold text-muted uppercase tracking-wide flex items-center gap-2 justify-center">
+                  <UIcon
+                    name="i-lucide-link"
+                    class="w-4 h-4"
+                  />
+                  Powiązane posty
                 </h3>
               </template>
 

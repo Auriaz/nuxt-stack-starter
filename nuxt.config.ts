@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import appMeta from './app/app.meta'
+import { definePerson, defineImage } from 'nuxt-schema-org/schema'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - auto-importowane przez Nuxt
 export default defineNuxtConfig({
@@ -12,7 +14,8 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxt/test-utils',
     '@nuxtjs/i18n',
-    '@nuxtjs/seo'
+    '@nuxtjs/seo',
+    '@vueuse/nuxt'
   ],
 
   imports: {
@@ -26,9 +29,9 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   site: {
-    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://example.com',
-    name: 'Base Starter',
-    description: 'Nuxt Base Starter - solid foundation for web projects',
+    url: appMeta.url,
+    name: appMeta.name,
+    description: appMeta.description,
     defaultLocale: 'pl'
   },
 
@@ -76,5 +79,14 @@ export default defineNuxtConfig({
       useCookie: true,
       cookieKey: 'i18n_redirected'
     }
+  },
+  schemaOrg: {
+    identity: definePerson(appMeta.author),
+    publisher: definePerson(appMeta.author),
+    logo: defineImage({
+      url: appMeta.icon,
+      alt: appMeta.name
+    }),
+    sameAs: appMeta.sameAs
   }
 })

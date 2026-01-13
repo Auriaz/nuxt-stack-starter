@@ -9,5 +9,10 @@ export const BlogPostSchema = object({
   image: ImageSchema,
   authors: optional(array(AuthorSchema)),
   tags: optional(array(string())),
-  seo: optional(SEOSchema)
+  seo: optional(SEOSchema),
+  anchors: optional(array(object({
+    label: string(),
+    to: string(),
+    target: optional(string())
+  })))
 })

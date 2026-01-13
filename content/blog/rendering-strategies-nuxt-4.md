@@ -13,11 +13,11 @@ tags:
   - 'SEO'
   - 'Performance'
 authors:
-  - name: 'Zespół Nuxt Base Starter'
+  - name: 'Adam Stankiewicz'
     avatar:
       src: 'https://avatars.githubusercontent.com/u/26349096?v=4'
-      alt: 'Zespół Nuxt Base Starter'
-    description: 'Zespół Nuxt Base Starter'
+      alt: 'Adam Stankiewicz'
+    description: 'Full-stack web developer passionate about building robust Nuxt and Vue applications.'
     to: 'https://github.com/Auriaz'
     target: '_blank'
 seo:
@@ -25,6 +25,11 @@ seo:
   description: 'Zrozum różne strategie renderowania w Nuxt 4: Server-Side Rendering, Static Site Generation i Hybrid Rendering. Dowiedz się, kiedy użyć której strategii.'
   ogType: 'article'
 to: '/blog/rendering-strategies-nuxt-4'
+anchors:
+  - label: 'Blog'
+    to: '/blog'
+    icon: 'i-lucide-book'
+    target: '_self'
 ---
 
 # Strategie renderowania w Nuxt 4 - SSR, SSG i Hybrid Rendering

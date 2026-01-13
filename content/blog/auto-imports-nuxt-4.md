@@ -12,11 +12,11 @@ tags:
   - 'TypeScript'
   - 'Vue 3'
 authors:
-  - name: 'Zespół Nuxt Base Starter'
+  - name: 'Adam Stankiewicz'
     avatar:
       src: 'https://avatars.githubusercontent.com/u/26349096?v=4'
-      alt: 'Zespół Nuxt Base Starter'
-    description: 'Zespół Nuxt Base Starter'
+      alt: 'Adam Stankiewicz'
+    description: 'Full-stack web developer passionate about building robust Nuxt and Vue applications.'
     to: 'https://github.com/Auriaz'
     target: '_blank'
 seo:
@@ -24,6 +24,11 @@ seo:
   description: 'Poznaj jak Nuxt 4 automatycznie importuje komponenty, composables i utilities, eliminując potrzebę ręcznych importów i poprawiając Developer Experience.'
   ogType: 'article'
 to: '/blog/auto-imports-nuxt-4'
+anchors:
+  - label: 'Blog'
+    to: '/blog'
+    icon: 'i-lucide-book'
+    target: '_self'
 ---
 
 # Auto-imports w Nuxt 4 - Magia automatycznych importów

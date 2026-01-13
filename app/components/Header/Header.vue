@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
+// const { locale } = useI18n()
 const isScrolled = ref(false)
 // const { clear: clearUserSession, loggedIn, user } = useUserSession()
 
@@ -13,7 +16,9 @@ onMounted(() => {
     window.removeEventListener('scroll', handleScroll)
   })
 })
-
+const { data: navigation } = await useAsyncData('navigation', () => queryCollectionNavigation('content'))
+const { data: files } = await useAsyncData('search', () => queryCollectionSearchSections('content'), { server: false })
+const searchTerm = ref('')
 // const handleLogout = async () => {
 //   await clearUserSession()
 // }
@@ -49,6 +54,24 @@ onMounted(() => {
           orientation="vertical"
           class="h-6"
         />
+
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 w-full">
+          <UContentSearchButton
+            variant="subtle"
+            color="primary"
+            size="sm"
+          />
+          <ClientOnly>
+            <LazyUContentSearch
+              v-model:search-term="searchTerm"
+              shortcut="meta_k"
+              :color-mode="true"
+              :files="files"
+              :navigation="navigation"
+              :fuse="{ resultLimit: 42 }"
+            />
+          </ClientOnly>
+        </div>
         <!-- Auth Buttons / User Menu - Desktop -->
         <div class="hidden md:flex items-center gap-2">
           <!-- Guest: Login/Register Buttons
