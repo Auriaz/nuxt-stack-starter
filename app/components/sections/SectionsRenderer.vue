@@ -44,7 +44,8 @@ const getSpacingClasses = (section: Section) => {
   const classes: Record<string, string> = {
     sm: 'py-12 sm:py-16 md:py-20',
     md: 'py-16 sm:py-20 md:py-24 lg:py-28',
-    lg: 'py-20 sm:py-24 md:py-32 lg:py-40'
+    lg: 'py-20 sm:py-24 md:py-32 lg:py-40',
+    none: 'py-0'
   }
   return classes[spacing] || classes.md
 }
@@ -53,9 +54,9 @@ const getSpacingClasses = (section: Section) => {
 const getThemeClasses = (section: Section) => {
   const theme = section.theme || 'light'
   const classes: Record<string, string> = {
-    light: 'bg-background',
-    dark: 'bg-neutral-900 text-white',
-    brand: 'bg-primary text-primary-foreground'
+    light: 'bg-elevated/10 mb-20 rounded-2xl shadow-lg shadow-black/20 hover:shadow-primary-900/20 hover:shadow-xl transition-all duration-300',
+    dark: 'bg-elevated/10 text-white rounded-2xl mb-20 shadow-lg shadow-primary-900 hover:shadow-md transition-all duration-300',
+    brand: 'bg-elevated/10 mb-20'
   }
   return classes[theme] || classes.light
 }
@@ -184,7 +185,9 @@ const getSectionBase = (section: Section): SectionBase => {
           :section="section"
           :base="getSectionBase(section)"
           :props="section.props"
-        />
+        >
+          <slot />
+        </SectionsCTA>
 
         <!-- Pricing Section -->
         <SectionsPricing

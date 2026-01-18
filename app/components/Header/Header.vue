@@ -32,17 +32,17 @@ const searchTerm = ref('')
     mode="drawer"
     :ui="{
       container:
-        'max-w-full blur-none backdrop-blur-sm dark:bg-black/5 bg-white px-5 py-2  shadow-lg shadow-black hover:shadow-xl transition-all duration-300',
+        'max-w-full blur-none backdrop-blur-sm dark:bg-black/5 bg-white px-5 py-2  shadow-lg shadow-black/20 hover:shadow-primary-900/20 hover:shadow-xl transition-all duration-300',
       root: [
         'fixed top-0 z-50 transition-all duration-300 w-screen',
         'border-none',
-        isScrolled ? 'bg-background/90 backdrop-blur-md shadow-lg shadow-primary/5' : ''
+        isScrolled ? 'bg-background/90 backdrop-blur-md shadow-lg shadow-primary/10' : ''
       ].join(' '),
       center: isScrolled ? 'bg-transparent' : ''
     }"
   >
     <template #title>
-      <div class="flex items-center justify-center shrink-0 relative translate-y-1  md:translate-y-3 left-4 md:left-10 -translate-x-1/2">
+      <div class="flex items-center justify-center shrink-0 relative left-4 md:left-10 -translate-x-1/2">
         <Logo />
       </div>
     </template>

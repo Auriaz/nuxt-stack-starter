@@ -57,7 +57,8 @@ export const SectionBaseSchema = object({
   align: optional(picklist(['left', 'center'] as const)), // default: 'center'
   theme: optional(picklist(['light', 'dark', 'brand'] as const)), // default: 'light'
   container: optional(picklist(['default', 'wide', 'full'] as const)), // default: 'default'
-  spacing: optional(picklist(['sm', 'md', 'lg'] as const)), // default: 'md'
+  spacing: optional(picklist(['sm', 'md', 'lg', 'none'] as const)), // default: 'md'
+  reverse: optional(boolean()), // default: false
   background: optional(
     object({
       type: picklist(['none', 'gradient', 'image'] as const),
@@ -192,7 +193,7 @@ export const SectionFeaturesSchema = object({
   align: optional(picklist(['left', 'center'] as const)),
   theme: optional(picklist(['light', 'dark', 'brand'] as const)),
   container: optional(picklist(['default', 'wide', 'full'] as const)),
-  spacing: optional(picklist(['sm', 'md', 'lg'] as const)),
+  spacing: optional(picklist(['sm', 'md', 'lg', 'none'] as const)),
   background: optional(
     object({
       type: picklist(['none', 'gradient', 'image'] as const),
@@ -370,7 +371,8 @@ export const SectionCTASchema = object({
   align: optional(picklist(['left', 'center'] as const)),
   theme: optional(picklist(['light', 'dark', 'brand'] as const)),
   container: optional(picklist(['default', 'wide', 'full'] as const)),
-  spacing: optional(picklist(['sm', 'md', 'lg'] as const)),
+  spacing: optional(picklist(['sm', 'md', 'lg', 'none'] as const)),
+  reverse: optional(boolean()),
   background: optional(
     object({
       type: picklist(['none', 'gradient', 'image'] as const),
@@ -392,10 +394,10 @@ export const SectionCTASchema = object({
     })
   ),
   props: object({
-    actions: array(HeroActionSchema),
+    links: array(HeroActionSchema),
     highlight: optional(string()),
     note: optional(string()),
-    variant: optional(picklist(['default', 'centered', 'banner'] as const))
+    variant: optional(picklist(['outline', 'solid', 'soft', 'subtle', 'naked'] as const))
   })
 })
 

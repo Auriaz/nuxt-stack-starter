@@ -94,17 +94,26 @@ sections:
           answer: 'Wsparcie obejmuje pomoc techniczną, aktualizacje i konsultacje. W planie Premium otrzymujesz dedykowane wsparcie z priorytetem.'
 
   - type: 'cta'
-    id: 'cta'
-    title: 'Gotowy na start?'
-    description: 'Skontaktuj się z nami, aby omówić Twój projekt'
-    align: 'center'
-    spacing: 'lg'
-    props:
-      variant: 'centered'
-      actions:
-        - label: 'Skontaktuj się'
-          to: '/kontakt'
-          color: 'primary'
-          variant: 'solid'
-          size: 'lg'
+      id: 'cta'
+      title: 'Gotowy do rozpoczęcia?'
+      description: 'Zacznij swój projekt już dziś z Nuxt Base Starter'
+      align: 'center'
+      spacing: 'none'
+      theme: 'brand'
+      reverse: true
+      container: 'full'
+      props:
+        links:
+          - label: 'Kontakt'
+            to: '/kontakt'
+            color: 'primary'
+            variant: 'solid'
+            size: 'lg'
+          - label: 'Portfolio'
+            to: '/portfolio'
+            variant: 'outline'
+            size: 'lg'
+        variant: 'soft'
+        highlight: 'Bezpłatna konsultacja'
+        note: 'Odpowiemy w ciągu 24 godzin'
 ---

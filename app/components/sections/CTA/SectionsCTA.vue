@@ -13,19 +13,13 @@ const props = defineProps<Props>()
 const config = computed(() => ({
   title: props.base.title,
   description: props.base.description,
-  actions: props.props?.actions || [],
+  links: props.props?.links || [],
   highlight: props.props?.highlight,
   note: props.props?.note,
-  variant: props.props?.variant || 'default',
-  align: props.base.align || 'center'
+  variant: props.props?.variant,
+  align: props.base.align || 'center',
+  reverse: props.base.reverse || false
 }))
-
-const containerClasses = computed(() => {
-  if (config.value.variant === 'centered' || config.value.variant === 'banner') {
-    return 'text-center items-center max-w-2xl mx-auto'
-  }
-  return 'lg:flex-row lg:items-center lg:justify-between'
-})
 
 // Schema.org
 const ctaSchema = computed(() => {
@@ -42,66 +36,16 @@ if (ctaSchema.value) {
 </script>
 
 <template>
-  <div>
-    <div
-      :class="[
-        'flex flex-col gap-6',
-        containerClasses
-      ]"
-    >
-      <div class="flex-1">
-        <h2
-          :class="[
-            'text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight',
-            config.variant === 'banner' ? 'text-primary-foreground' : ''
-          ]"
-        >
-          {{ config.title }}
-        </h2>
-        <p
-          :class="[
-            'text-base sm:text-lg md:text-xl mb-4 sm:mb-6 leading-relaxed',
-            config.variant === 'banner' ? 'text-primary-foreground/90' : 'text-muted'
-          ]"
-        >
-          {{ config.description }}
-        </p>
-        <p
-          v-if="config.highlight"
-          class="text-sm sm:text-base font-semibold text-primary mb-4 sm:mb-6"
-        >
-          {{ config.highlight }}
-        </p>
-      </div>
-
-      <div
-        :class="[
-          'flex flex-col sm:flex-row gap-3 sm:gap-4',
-          config.variant === 'centered' || config.variant === 'banner'
-            ? 'justify-center'
-            : 'shrink-0'
-        ]"
-      >
-        <UButton
-          v-for="(action, index) in config.actions"
-          :key="index"
-          :to="action.to"
-          :target="action.target || '_self'"
-          :color="config.variant === 'banner' ? 'white' : action.color || 'primary'"
-          :variant="action.variant || 'solid'"
-          :size="action.size || 'lg'"
-          :icon="action.icon"
-        >
-          {{ action.label }}
-        </UButton>
-      </div>
-
-      <p
-        v-if="config.note"
-        class="text-sm text-muted text-center"
-      >
-        {{ config.note }}
-      </p>
-    </div>
-  </div>
+  <UPageCTA
+    :title="config.title"
+    :description="config.description"
+    :links="config.links"
+    :highlight="config.highlight"
+    :note="config.note"
+    :variant="config.variant"
+    :align="config.align"
+    :reverse="config.reverse"
+  >
+    <slot />
+  </UPageCTA>
 </template>

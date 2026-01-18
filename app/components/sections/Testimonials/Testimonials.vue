@@ -64,27 +64,11 @@ const props = withDefaults(defineProps<Props>(), {
                 :alt="testimonial.name"
                 size="md"
               />
-              <UAvatar
-                v-else
-                :alt="testimonial.name"
-                size="md"
-              >
-                {{ testimonial.name.charAt(0) }}
-              </UAvatar>
-              <div>
-                <p class="font-semibold">
-                  {{ testimonial.name }}
-                </p>
-                <p class="text-sm text-muted">
-                  {{ testimonial.role }}
-                  <span v-if="testimonial.company">, {{ testimonial.company }}</span>
-                </p>
-              </div>
             </div>
           </template>
 
           <p class="text-muted">
-            "{{ testimonial.content }}"
+            {{ testimonial.content }}
           </p>
         </UCard>
       </div>

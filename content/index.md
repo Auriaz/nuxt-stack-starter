@@ -152,10 +152,12 @@ sections:
     title: 'Gotowy do rozpoczęcia?'
     description: 'Zacznij swój projekt już dziś z Nuxt Base Starter'
     align: 'center'
-    spacing: 'lg'
+    spacing: 'none'
     theme: 'brand'
+    reverse: true
+    container: 'full'
     props:
-      actions:
+      links:
         - label: 'Kontakt'
           to: '/kontakt'
           color: 'primary'
@@ -165,7 +167,7 @@ sections:
           to: '/portfolio'
           variant: 'outline'
           size: 'lg'
-      variant: 'centered'
+      variant: 'soft'
       highlight: 'Bezpłatna konsultacja'
       note: 'Odpowiemy w ciągu 24 godzin'
 seo:

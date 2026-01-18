@@ -95,17 +95,26 @@ sections:
 
   # CTA - Kontakt
   - type: 'cta'
-    id: 'cta'
-    title: 'Chcesz z nami współpracować?'
-    description: 'Skontaktuj się z nami i dowiedz się, jak możemy pomóc w realizacji Twojego projektu.'
-    align: 'center'
-    spacing: 'lg'
-    props:
-      variant: 'centered'
-      actions:
-        - label: 'Skontaktuj się'
-          to: '/kontakt'
-          color: 'primary'
-          variant: 'solid'
-          size: 'lg'
+      id: 'cta'
+      title: 'Gotowy do rozpoczęcia?'
+      description: 'Zacznij swój projekt już dziś z Nuxt Base Starter'
+      align: 'center'
+      spacing: 'none'
+      theme: 'brand'
+      reverse: true
+      container: 'full'
+      props:
+        links:
+          - label: 'Kontakt'
+            to: '/kontakt'
+            color: 'primary'
+            variant: 'solid'
+            size: 'lg'
+          - label: 'Portfolio'
+            to: '/portfolio'
+            variant: 'outline'
+            size: 'lg'
+        variant: 'soft'
+        highlight: 'Bezpłatna konsultacja'
+        note: 'Odpowiemy w ciągu 24 godzin'
 ---
