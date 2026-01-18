@@ -41,17 +41,17 @@ const headerClasses = computed(() => ({
   <div>
     <div
       v-if="config.title || config.description"
-      :class="['mb-12', headerClasses]"
+      :class="['mb-8 sm:mb-12 md:mb-16', headerClasses]"
     >
       <h2
         v-if="config.title"
-        class="text-3xl md:text-4xl font-bold mb-4"
+        class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 md:mb-6"
       >
         {{ config.title }}
       </h2>
       <p
         v-if="config.description"
-        class="text-lg text-muted max-w-2xl mx-auto"
+        class="text-base sm:text-lg md:text-xl text-muted max-w-3xl mx-auto leading-relaxed"
       >
         {{ config.description }}
       </p>
@@ -59,7 +59,7 @@ const headerClasses = computed(() => ({
 
     <div
       v-if="config.layout === 'grid'"
-      :class="['grid gap-8', gridClasses]"
+      :class="['grid gap-6 sm:gap-8 md:gap-10 lg:gap-12', gridClasses]"
     >
       <FeatureCard
         v-for="(item, index) in config.items"

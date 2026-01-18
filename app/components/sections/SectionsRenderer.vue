@@ -31,8 +31,8 @@ const validatedSections = computed(() => {
 const getContainerClasses = (section: Section) => {
   const container = section.container || 'default'
   const classes: Record<string, string> = {
-    default: 'container mx-auto px-4',
-    wide: 'container mx-auto px-4 max-w-7xl',
+    default: 'container mx-auto px-4 sm:px-6 lg:px-8',
+    wide: 'container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl',
     full: 'w-full'
   }
   return classes[container] || classes.default
@@ -42,9 +42,9 @@ const getContainerClasses = (section: Section) => {
 const getSpacingClasses = (section: Section) => {
   const spacing = section.spacing || 'md'
   const classes: Record<string, string> = {
-    sm: 'py-12',
-    md: 'py-20',
-    lg: 'py-32'
+    sm: 'py-12 sm:py-16 md:py-20',
+    md: 'py-16 sm:py-20 md:py-24 lg:py-28',
+    lg: 'py-20 sm:py-24 md:py-32 lg:py-40'
   }
   return classes[spacing] || classes.md
 }

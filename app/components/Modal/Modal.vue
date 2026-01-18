@@ -7,11 +7,14 @@ export interface ModalProps {
   getArgs: () => unknown | undefined
   open: (arg?: unknown | undefined) => void
   close: () => void
+  layout?: 'default' | 'drawer' | 'overlay'
 }
 
 const currentArg = ref<unknown | undefined>()
 const isOpen = ref(false)
 const isMobile = computed(() => breakpoints.smaller('md').value)
+const isTablet = computed(() => breakpoints.between('md', 'lg').value)
+const isDesktop = computed(() => breakpoints.greaterOrEqual('lg').value)
 
 const emit = defineEmits<{
   (e: 'close'): void
@@ -26,6 +29,7 @@ const props = withDefaults(
     uiBoxVariants?: { [key: string]: unknown }
     description?: string | ((arg: unknown | undefined) => string | undefined)
     dismissible?: boolean
+    layout?: 'default' | 'drawer' | 'overlay'
   }>(),
   {
     dismissible: true
@@ -104,7 +108,7 @@ defineExpose<ModalProps>({
   </UDrawer>
 
   <UModal
-    v-else
+    v-else-if="!isMobile && layout === 'default'"
     v-model:open="isOpen"
     v-bind="metaVariants"
     :ui="{ footer: 'justify-end', ...uiBoxVariants }"
@@ -141,4 +145,51 @@ defineExpose<ModalProps>({
       </div>
     </template>
   </UModal>
+
+  <Transition
+    enter-active-class="transition-all duration-300 ease-out"
+    enter-from-class="opacity-0 -translate-y-4 scale-95"
+    enter-to-class="opacity-100 translate-y-0 scale-100"
+    leave-active-class="transition-all duration-200 ease-in"
+    leave-from-class="opacity-100 translate-y-0 scale-100"
+    leave-to-class="opacity-0 -translate-y-2 scale-95"
+  >
+    <div
+      v-if="!isMobile && isOpen && layout === 'overlay'"
+      class="absolute left-0 top-0 w-full z-50 flex items-start justify-center bg-elevated/50 backdrop-blur-md p-2 sm:p-4 md:p-6 rounded-lg gap-2 sm:gap-4 md:gap-6 shadow-lg"
+    >
+      <div
+        :class="[
+          'flex w-full max-w-7xl',
+          isTablet ? 'flex-col gap-4' : 'flex-row items-start justify-between gap-4 lg:gap-6 xl:gap-8'
+        ]"
+      >
+        <div
+          :class="[
+            'flex flex-col gap-2 sm:gap-4',
+            isTablet ? 'w-full items-center' : 'items-start justify-start',
+            isDesktop ? 'flex-1' : 'w-full'
+          ]"
+        >
+          <slot
+            name="body"
+            :arg="currentArg"
+          />
+        </div>
+
+        <div
+          :class="[
+            'flex flex-col gap-2 sm:gap-3',
+            isTablet ? 'w-full items-center max-w-full' : 'items-end justify-end shrink-0',
+            isDesktop ? 'w-auto' : 'w-full max-w-full'
+          ]"
+        >
+          <slot
+            name="footer"
+            :arg="currentArg"
+          />
+        </div>
+      </div>
+    </div>
+  </Transition>
 </template>

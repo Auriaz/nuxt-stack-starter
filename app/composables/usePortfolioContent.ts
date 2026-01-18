@@ -25,7 +25,7 @@ function mapProjectToCardProps(project: PortfolioProjectEntry): PortfolioCardPro
       src: project.coverImage?.src || '',
       alt: project.coverImage?.alt || project.title
     },
-    tags: project.technologies || project.tags || [],
+    tags: [...(project.tags || []), ...(project.technologies || [])],
     year: project.year,
     slug,
     featured: project.featured || false,

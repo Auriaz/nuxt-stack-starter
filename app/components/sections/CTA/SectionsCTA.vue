@@ -52,7 +52,7 @@ if (ctaSchema.value) {
       <div class="flex-1">
         <h2
           :class="[
-            'text-2xl md:text-3xl font-bold mb-3',
+            'text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight',
             config.variant === 'banner' ? 'text-primary-foreground' : ''
           ]"
         >
@@ -60,7 +60,7 @@ if (ctaSchema.value) {
         </h2>
         <p
           :class="[
-            'text-lg mb-4',
+            'text-base sm:text-lg md:text-xl mb-4 sm:mb-6 leading-relaxed',
             config.variant === 'banner' ? 'text-primary-foreground/90' : 'text-muted'
           ]"
         >
@@ -68,7 +68,7 @@ if (ctaSchema.value) {
         </p>
         <p
           v-if="config.highlight"
-          class="text-sm font-semibold text-primary mb-4"
+          class="text-sm sm:text-base font-semibold text-primary mb-4 sm:mb-6"
         >
           {{ config.highlight }}
         </p>
@@ -76,7 +76,7 @@ if (ctaSchema.value) {
 
       <div
         :class="[
-          'flex flex-col sm:flex-row gap-4',
+          'flex flex-col sm:flex-row gap-3 sm:gap-4',
           config.variant === 'centered' || config.variant === 'banner'
             ? 'justify-center'
             : 'shrink-0'

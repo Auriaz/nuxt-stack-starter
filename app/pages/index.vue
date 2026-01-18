@@ -28,8 +28,8 @@ useSeoMeta({
 
 <template>
   <NuxtLayout name="default">
-    <UPage :ui="{ root: 'container mx-auto px-4 md:px-0' }">
-      <UPageBody>
+    <UPage :ui="{ root: 'w-full min-h-screen' }">
+      <UPageBody class="p-0">
         <SectionsRenderer :sections="sections" />
       </UPageBody>
     </UPage>

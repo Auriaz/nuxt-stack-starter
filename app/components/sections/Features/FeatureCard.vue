@@ -25,14 +25,14 @@ const cardVariant = computed(() => {
 
 // Computed dla klas karty
 const cardClasses = computed(() => {
-  const base = 'h-full transition-all'
+  const base = 'h-full transition-all duration-300'
 
   if (props.variant === 'minimal') {
     return `${base} p-0`
   }
 
   if (props.variant === 'cards') {
-    return `${base} hover:shadow-lg`
+    return `${base} hover:shadow-xl hover:-translate-y-1 ring-1 ring-border/50 hover:ring-primary/20`
   }
 
   return `${base}`
@@ -41,9 +41,9 @@ const cardClasses = computed(() => {
 // Computed dla klas ikony
 const iconClasses = computed(() => {
   if (props.variant === 'minimal') {
-    return 'p-2 rounded-lg bg-primary/10 text-primary'
+    return 'p-2 sm:p-3 rounded-lg sm:rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110'
   }
-  return 'p-3 rounded-lg bg-primary/10 text-primary'
+  return 'p-3 sm:p-4 rounded-lg sm:rounded-xl bg-primary/10 text-primary transition-all duration-300 group-hover:bg-primary/20 group-hover:scale-110 ring-1 ring-primary/20'
 })
 </script>
 
@@ -54,19 +54,19 @@ const iconClasses = computed(() => {
   >
     <!-- Grid Layout -->
     <template v-if="layout === 'grid'">
-      <div class="flex items-start gap-4 mb-4">
+      <div class="flex items-start gap-3 sm:gap-4 mb-4 group">
         <div
           v-if="showIcon && feature.icon"
           :class="iconClasses"
         >
           <UIcon
             :name="feature.icon"
-            class="w-6 h-6"
+            class="w-5 h-5 sm:w-6 sm:h-6"
           />
         </div>
-        <div class="flex-1">
-          <div class="flex items-center gap-2 mb-2">
-            <h3 class="text-xl font-semibold">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-2 sm:mb-3 flex-wrap">
+            <h3 class="text-lg sm:text-xl md:text-2xl font-semibold leading-tight">
               {{ feature.title }}
             </h3>
             <UBadge
@@ -80,7 +80,7 @@ const iconClasses = computed(() => {
           </div>
           <p
             v-if="feature.description"
-            class="text-muted"
+            class="text-sm sm:text-base text-muted leading-relaxed"
           >
             {{ feature.description }}
           </p>

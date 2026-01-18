@@ -5,6 +5,9 @@
 const isScrolled = ref(false)
 // const { clear: clearUserSession, loggedIn, user } = useUserSession()
 
+// Globalny system filtrów
+const filters = useFilters()
+
 onMounted(() => {
   const handleScroll = () => {
     isScrolled.value = window.scrollY > 50
@@ -39,7 +42,7 @@ const searchTerm = ref('')
     }"
   >
     <template #title>
-      <div class="w-8 h-8 md:h-16 md:w-16 shrink-0 relative translate-y-3 left-10 -translate-x-1/2">
+      <div class="flex items-center justify-center shrink-0 relative translate-y-1  md:translate-y-3 left-4 md:left-10 -translate-x-1/2">
         <Logo />
       </div>
     </template>
@@ -48,6 +51,17 @@ const searchTerm = ref('')
 
     <template #right>
       <div class="hidden md:flex items-center gap-2 mr-5">
+        <!-- Przycisk filtrów (widoczny tylko gdy strona ma filtry) -->
+        <UButton
+          v-if="filters.hasFilters.value"
+          icon="i-lucide-filter"
+          variant="ghost"
+          color="primary"
+          size="sm"
+          :label="filters.isOpen.value ? 'Zamknij filtry' : 'Filtry'"
+          @click="filters.toggle"
+        />
+
         <ColorModeButton />
 
         <USeparator
@@ -176,6 +190,17 @@ const searchTerm = ref('')
           -->
         </div>
       </div>
+
+      <!-- Przycisk filtrów (mobile) -->
+      <UButton
+        v-if="filters.hasFilters.value"
+        icon="i-lucide-filter"
+        variant="ghost"
+        color="primary"
+        size="sm"
+        class="md:hidden"
+        @click="filters.toggle"
+      />
     </template>
 
     <template #body>

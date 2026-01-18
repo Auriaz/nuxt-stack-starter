@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
 import type { PortfolioProjectEntry } from '../types/content'
-
 /**
  * Filtry dla projektów portfolio
  */

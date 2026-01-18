@@ -7,8 +7,8 @@
     <div class="fixed inset-0 -z-10 pointer-events-none">
       <!-- @ts-expect-error - Vue ref type compatibility
 
-        <CanvasBackground :container="null" />
       -->
+      <CanvasBackground :container="null" />
     </div>
 
     <!-- Cockpit Grid Background - Enhanced -->

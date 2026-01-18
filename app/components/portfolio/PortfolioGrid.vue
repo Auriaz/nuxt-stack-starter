@@ -1,6 +1,15 @@
 <script setup lang="ts">
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
 import type { PortfolioCardProps } from '#shared/types/portfolio'
 import { getPortfolioTags, getPortfolioTechnologies, getPortfolioYears } from '#shared/utils/portfolio'
+import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
+
+const breakpoints = useBreakpoints(breakpointsTailwind)
+
+const isMobile = computed(() => breakpoints.smaller('md').value)
+const isTablet = computed(() => breakpoints.between('md', 'lg').value)
+const isDesktop = computed(() => breakpoints.greaterOrEqual('lg').value)
 
 interface Props {
   projects: PortfolioCardProps[]
@@ -13,11 +22,26 @@ const props = withDefaults(defineProps<Props>(), {
   layout: 'grid'
 })
 
+// Rejestracja filtrów w globalnym systemie
+const filters = useFilters()
+
+onMounted(() => {
+  if (props.showFilters) {
+    filters.register()
+  }
+})
+
+onUnmounted(() => {
+  if (props.showFilters) {
+    filters.unregister()
+  }
+})
+
 // Filtry
 const selectedTags = ref<string[]>([])
 const selectedTechnologies = ref<string[]>([])
 const selectedYear = ref<string | null>(null)
-const sortBy = ref<'newest' | 'oldest' | 'featured'>('newest')
+const sortBy = ref<{ label: string, value: 'newest' | 'oldest' | 'featured' }>({ label: 'Najnowsze', value: 'newest' })
 
 // Pobierz dostępne opcje filtrów
 const { data: availableTags } = await useAsyncData('portfolio-tags', getPortfolioTags)
@@ -32,7 +56,13 @@ const filteredProjects = computed(() => {
   if (selectedTags.value.length > 0) {
     result = result.filter((project) => {
       if (!project.tags || project.tags.length === 0) return false
-      return selectedTags.value.some(tag => project.tags.includes(tag))
+      // USelectMenu z multiple może zwracać obiekty lub stringi - normalizujemy do stringów
+      const selectedTagValues = selectedTags.value.map((tag) => {
+        if (typeof tag === 'string') return tag
+        if (typeof tag === 'object' && tag !== null && 'value' in tag) return tag.value
+        return String(tag)
+      })
+      return selectedTagValues.some(tag => project.tags?.includes(tag))
     })
   }
 
@@ -40,7 +70,13 @@ const filteredProjects = computed(() => {
   if (selectedTechnologies.value.length > 0) {
     result = result.filter((project) => {
       if (!project.tags || project.tags.length === 0) return false
-      return selectedTechnologies.value.some(tech => project.tags.includes(tech))
+      // USelectMenu z multiple może zwracać obiekty lub stringi - normalizujemy do stringów
+      const selectedTechValues = selectedTechnologies.value.map((tech) => {
+        if (typeof tech === 'string') return tech
+        if (typeof tech === 'object' && tech !== null && 'value' in tech) return tech.value
+        return String(tech)
+      })
+      return selectedTechValues.some(tech => project.tags?.includes(tech))
     })
   }
 
@@ -50,21 +86,21 @@ const filteredProjects = computed(() => {
   }
 
   // Sortowanie
-  if (sortBy.value === 'newest') {
+  if (sortBy.value.value === 'newest') {
     result.sort((a, b) => {
       if (!a.year || !b.year) return 0
       const yearA = parseInt(a.year, 10)
       const yearB = parseInt(b.year, 10)
       return yearB - yearA // Najnowsze pierwsze
     })
-  } else if (sortBy.value === 'oldest') {
+  } else if (sortBy.value.value === 'oldest') {
     result.sort((a, b) => {
       if (!a.year || !b.year) return 0
       const yearA = parseInt(a.year, 10)
       const yearB = parseInt(b.year, 10)
       return yearA - yearB // Najstarsze pierwsze
     })
-  } else if (sortBy.value === 'featured') {
+  } else if (sortBy.value.value === 'featured') {
     result.sort((a, b) => {
       if (a.featured && !b.featured) return -1
       if (!a.featured && b.featured) return 1
@@ -80,7 +116,7 @@ const resetFilters = () => {
   selectedTags.value = []
   selectedTechnologies.value = []
   selectedYear.value = null
-  sortBy.value = 'newest'
+  sortBy.value = { label: 'Najnowsze', value: 'newest' } as const
 }
 
 // Grid classes
@@ -94,118 +130,6 @@ const gridClasses = computed(() => {
 
 <template>
   <div class="portfolio-grid">
-    <!-- Filtry -->
-    <div
-      v-if="showFilters"
-      class="mb-8 space-y-4"
-    >
-      <div class="flex flex-wrap items-center gap-4">
-        <!-- Sortowanie -->
-        <USelectMenu
-          v-model="sortBy"
-          :options="[
-            { label: 'Najnowsze', value: 'newest' },
-            { label: 'Najstarsze', value: 'oldest' },
-            { label: 'Wyróżnione', value: 'featured' }
-          ]"
-          option-attribute="label"
-          value-attribute="value"
-          placeholder="Sortuj"
-        />
-
-        <!-- Filtry tagów -->
-        <USelectMenu
-          v-model="selectedTags"
-          :options="availableTags || []"
-          multiple
-          placeholder="Filtruj po tagach"
-          searchable
-        />
-
-        <!-- Filtry technologii -->
-        <USelectMenu
-          v-model="selectedTechnologies"
-          :options="availableTechnologies || []"
-          multiple
-          placeholder="Filtruj po technologiach"
-          searchable
-        />
-
-        <!-- Filtry roku -->
-        <USelectMenu
-          v-model="selectedYear"
-          :options="availableYears || []"
-          placeholder="Filtruj po roku"
-        />
-
-        <!-- Reset -->
-        <UButton
-          variant="ghost"
-          size="sm"
-          @click="resetFilters"
-        >
-          Resetuj
-        </UButton>
-      </div>
-
-      <!-- Aktywne filtry -->
-      <div
-        v-if="selectedTags.length > 0 || selectedTechnologies.length > 0 || selectedYear"
-        class="flex flex-wrap gap-2"
-      >
-        <UBadge
-          v-for="tag in selectedTags"
-          :key="`tag-${tag}`"
-          color="primary"
-          variant="soft"
-          size="sm"
-        >
-          {{ tag }}
-          <UButton
-            icon="i-lucide-x"
-            variant="ghost"
-            size="xs"
-            color="primary"
-            class="ml-1 -mr-1"
-            @click="selectedTags = selectedTags.filter(t => t !== tag)"
-          />
-        </UBadge>
-        <UBadge
-          v-for="tech in selectedTechnologies"
-          :key="`tech-${tech}`"
-          color="primary"
-          variant="soft"
-          size="sm"
-        >
-          {{ tech }}
-          <UButton
-            icon="i-lucide-x"
-            variant="ghost"
-            size="xs"
-            color="primary"
-            class="ml-1 -mr-1"
-            @click="selectedTechnologies = selectedTechnologies.filter(t => t !== tech)"
-          />
-        </UBadge>
-        <UBadge
-          v-if="selectedYear"
-          color="primary"
-          variant="soft"
-          size="sm"
-        >
-          {{ selectedYear }}
-          <UButton
-            icon="i-lucide-x"
-            variant="ghost"
-            size="xs"
-            color="primary"
-            class="ml-1 -mr-1"
-            @click="selectedYear = null"
-          />
-        </UBadge>
-      </div>
-    </div>
-
     <!-- Grid projektów -->
     <div
       v-if="filteredProjects.length > 0"
@@ -234,5 +158,87 @@ const gridClasses = computed(() => {
         Resetuj filtry
       </UButton>
     </div>
+
+    <!-- Globalny drawer filtrów (renderowany przez Teleport) -->
+    <FiltersDrawer
+      v-if="showFilters"
+      @reset="resetFilters"
+      @apply="() => {}"
+    >
+      <!-- Zawartość filtrów w drawerze -->
+      <div
+        :class="[
+          'flex w-full max-w-full',
+          isMobile ? 'flex-col gap-3' : '',
+          isTablet ? 'flex-row flex-wrap gap-3 md:gap-4' : '',
+          isDesktop ? 'flex-row flex-wrap gap-4 lg:gap-6' : ''
+        ]"
+      >
+        <UFormField
+          label="Sortowanie"
+          :orientation="isMobile ? 'vertical' : 'horizontal'"
+          class="w-full sm:w-auto sm:min-w-[160px] md:min-w-[180px] shrink-0"
+        >
+          <USelectMenu
+            v-model="sortBy"
+            :items="[
+              { label: 'Najnowsze', value: 'newest' },
+              { label: 'Najstarsze', value: 'oldest' },
+              { label: 'Wyróżnione', value: 'featured' }
+            ]"
+            option-attribute="label"
+            value-attribute="value"
+            placeholder="Sortuj"
+            class="w-full sm:w-auto min-w-[140px]"
+          />
+        </UFormField>
+
+        <UFormField
+          label="Tagi"
+          :orientation="isMobile ? 'vertical' : 'horizontal'"
+          class="w-full sm:w-auto sm:min-w-[160px] md:min-w-[180px] shrink-0"
+        >
+          <USelectMenu
+            v-model="selectedTags"
+            :items="(availableTags || []).map(tag => ({ label: tag, value: tag }))"
+            multiple
+            searchable
+            value-attribute="value"
+            placeholder="Tagi"
+            class="w-full sm:w-auto min-w-[140px]"
+          />
+        </UFormField>
+
+        <UFormField
+          label="Technologie"
+          :orientation="isMobile ? 'vertical' : 'horizontal'"
+          class="w-full sm:w-auto sm:min-w-[160px] md:min-w-[180px] shrink-0"
+        >
+          <USelectMenu
+            v-model="selectedTechnologies"
+            :items="(availableTechnologies || []).map(tech => ({ label: tech, value: tech }))"
+            multiple
+            searchable
+            value-attribute="value"
+            placeholder="Technologie"
+            class="w-full sm:w-auto min-w-[140px]"
+          />
+        </UFormField>
+
+        <UFormField
+          v-if="availableYears"
+          label="Rok"
+          :orientation="isMobile ? 'vertical' : 'horizontal'"
+          class="w-full sm:w-auto sm:min-w-[120px] md:min-w-[140px] shrink-0"
+        >
+          <USelectMenu
+            v-model="selectedYear"
+            :items="availableYears"
+            placeholder="Rok"
+            class="w-full sm:w-auto min-w-[100px]"
+          />
+        </UFormField>
+      </div>
+    </FiltersDrawer>
   </div>
 </template>

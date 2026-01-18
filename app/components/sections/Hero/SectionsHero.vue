@@ -28,7 +28,7 @@ const layoutClasses = computed(() => {
   const layout = config.value.layout
   switch (layout) {
     case 'split':
-      return 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center'
+      return 'grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 md:gap-12 lg:gap-16 items-center'
     case 'full-width':
       return 'relative'
     case 'centered':
@@ -80,37 +80,37 @@ if (heroSchema.value) {
     <div
       v-if="config.layout === 'full-width'"
       :style="backgroundImageStyle"
-      class="relative min-h-[600px] flex items-center"
+      class="relative min-h-[500px] sm:min-h-[600px] md:min-h-[700px] flex items-center"
     >
       <div class="absolute inset-0 bg-black/50" />
-      <div class="relative z-10 w-full">
+      <div class="relative z-10 w-full px-4 sm:px-6 lg:px-8">
         <div :class="layoutClasses">
           <UBadge
             v-if="config.eyebrow"
             color="primary"
             variant="soft"
-            class="mb-4"
+            class="mb-4 sm:mb-6 mx-auto w-fit"
           >
             {{ config.eyebrow }}
           </UBadge>
-          <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
+          <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 text-white leading-tight">
             {{ config.title }}
           </h1>
           <p
             v-if="config.subtitle"
-            class="text-xl md:text-2xl mb-4 text-white/90"
+            class="text-lg sm:text-xl md:text-2xl mb-3 sm:mb-4 text-white/90 font-medium"
           >
             {{ config.subtitle }}
           </p>
           <p
             v-if="config.description"
-            class="text-lg mb-8 text-white/80 max-w-2xl mx-auto"
+            class="text-base sm:text-lg mb-6 sm:mb-8 text-white/80 max-w-3xl mx-auto leading-relaxed"
           >
             {{ config.description }}
           </p>
           <div
             v-if="config.actions.length > 0"
-            class="flex flex-wrap gap-4 justify-center"
+            class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center"
           >
             <UButton
               v-for="(action, index) in config.actions"
@@ -121,6 +121,7 @@ if (heroSchema.value) {
               :variant="action.variant || 'solid'"
               :size="action.size || 'lg'"
               :icon="action.icon"
+              class="w-full sm:w-auto min-w-[200px] sm:min-w-0"
             >
               {{ action.label }}
             </UButton>
@@ -134,33 +135,33 @@ if (heroSchema.value) {
       v-else-if="config.layout === 'split'"
       :class="layoutClasses"
     >
-      <div :class="textOrder">
+      <div :class="[textOrder, 'flex flex-col justify-center']">
         <UBadge
           v-if="config.eyebrow"
           color="primary"
           variant="soft"
-          class="mb-4"
+          class="mb-4 w-fit"
         >
           {{ config.eyebrow }}
         </UBadge>
-        <h1 class="text-4xl md:text-5xl font-bold mb-6">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight">
           {{ config.title }}
         </h1>
         <p
           v-if="config.subtitle"
-          class="text-xl md:text-2xl mb-4 text-muted"
+          class="text-lg sm:text-xl md:text-2xl mb-3 sm:mb-4 text-muted font-medium"
         >
           {{ config.subtitle }}
         </p>
         <p
           v-if="config.description"
-          class="text-lg mb-8 text-muted"
+          class="text-base sm:text-lg mb-6 sm:mb-8 text-muted leading-relaxed"
         >
           {{ config.description }}
         </p>
         <div
           v-if="config.actions.length > 0"
-          class="flex flex-wrap gap-4"
+          class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4"
         >
           <UButton
             v-for="(action, index) in config.actions"
@@ -171,6 +172,7 @@ if (heroSchema.value) {
             :variant="action.variant || 'solid'"
             :size="action.size || 'lg'"
             :icon="action.icon"
+            class="w-full sm:w-auto"
           >
             {{ action.label }}
           </UButton>
@@ -178,13 +180,14 @@ if (heroSchema.value) {
       </div>
       <div
         v-if="config.image"
-        :class="imageOrder"
+        :class="[imageOrder, 'relative']"
       >
-        <div class="relative rounded-lg overflow-hidden">
+        <div class="relative rounded-xl lg:rounded-2xl overflow-hidden shadow-2xl ring-1 ring-border/50">
+          <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent z-10" />
           <NuxtImg
             :src="config.image.src"
             :alt="config.image.alt || config.title"
-            class="w-full h-full object-cover"
+            class="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
             loading="eager"
             format="webp"
           />
@@ -201,28 +204,28 @@ if (heroSchema.value) {
         v-if="config.eyebrow"
         color="primary"
         variant="soft"
-        class="mb-4"
+        class="mb-4 sm:mb-6 mx-auto w-fit"
       >
         {{ config.eyebrow }}
       </UBadge>
-      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
         {{ config.title }}
       </h1>
       <p
         v-if="config.subtitle"
-        class="text-xl md:text-2xl mb-4 text-muted"
+        class="text-lg sm:text-xl md:text-2xl mb-3 sm:mb-4 text-muted font-medium"
       >
         {{ config.subtitle }}
       </p>
       <p
         v-if="config.description"
-        class="text-lg mb-8 text-muted max-w-2xl mx-auto"
+        class="text-base sm:text-lg mb-6 sm:mb-8 text-muted max-w-3xl mx-auto leading-relaxed"
       >
         {{ config.description }}
       </p>
       <div
         v-if="config.actions.length > 0"
-        class="flex flex-wrap gap-4 justify-center"
+        class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-center"
       >
         <UButton
           v-for="(action, index) in config.actions"
@@ -233,6 +236,7 @@ if (heroSchema.value) {
           :variant="action.variant || 'solid'"
           :size="action.size || 'lg'"
           :icon="action.icon"
+          class="w-full sm:w-auto min-w-[200px] sm:min-w-0"
         >
           {{ action.label }}
         </UButton>

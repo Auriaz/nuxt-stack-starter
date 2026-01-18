@@ -29,17 +29,17 @@ const headerClasses = computed(() => ({
   <div>
     <div
       v-if="config.title || config.description"
-      :class="['mb-12', headerClasses]"
+      :class="['mb-8 sm:mb-12 md:mb-16', headerClasses]"
     >
       <h2
         v-if="config.title"
-        class="text-3xl md:text-4xl font-bold mb-4"
+        class="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4"
       >
         {{ config.title }}
       </h2>
       <p
         v-if="config.description"
-        class="text-lg text-muted max-w-2xl mx-auto"
+        class="text-base sm:text-lg text-muted max-w-2xl mx-auto"
       >
         {{ config.description }}
       </p>
@@ -48,7 +48,7 @@ const headerClasses = computed(() => ({
     <!-- Logos Variant -->
     <div
       v-if="config.variant === 'logos' && config.logos.length > 0"
-      class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center opacity-60 hover:opacity-100 transition-opacity"
+      class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 sm:gap-8 md:gap-10 items-center opacity-60 hover:opacity-100 transition-opacity duration-300"
     >
       <div
         v-for="(logo, index) in config.logos"
