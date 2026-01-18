@@ -1,5 +1,6 @@
 import { defineContentConfig, defineCollection } from '@nuxt/content'
 import { BlogPostSchema, PageSchema, PortfolioProjectSchema } from './shared/schemas/content'
+import { FooterConfigSchema } from './shared/schemas/footer'
 
 export default defineContentConfig({
   collections: {
@@ -21,6 +22,11 @@ export default defineContentConfig({
       type: 'page',
       source: 'portfolio/*.md',
       schema: PortfolioProjectSchema
+    }),
+    app: defineCollection({
+      type: 'data',
+      source: 'app/*.md',
+      schema: FooterConfigSchema
     })
   }
 })
