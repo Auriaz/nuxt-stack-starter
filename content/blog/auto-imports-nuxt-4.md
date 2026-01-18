@@ -3,7 +3,7 @@ title: 'Auto-imports w Nuxt 4 - Magia automatycznych importów'
 description: 'Poznaj jak Nuxt 4 automatycznie importuje komponenty, composables i utilities, eliminując potrzebę ręcznych importów i poprawiając Developer Experience.'
 date: 2025-01-20
 image:
-  src: '/blog/auto-imports-nuxt-4.png'
+  src: '/images/blog/auto-imports-nuxt-4.png'
   alt: 'Auto-imports w Nuxt 4'
 tags:
   - 'Nuxt'

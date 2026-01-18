@@ -15,7 +15,7 @@ export default {
     target: '_blank',
     to: 'https://github.com/Auriaz'
   },
-  url: 'https://github.com/Auriaz/nuxt-base-starter',
+  // url: 'https://github.com/Auriaz/nuxt-base-starter',
   icon: '/favicon.ico',
   contactEmail: 'a.stankiewicz7@gmail.com',
   sameAs: [

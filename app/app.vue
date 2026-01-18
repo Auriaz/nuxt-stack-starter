@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
-
 useHead({
   meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
   link: [{ rel: 'icon', href: '/favicon.ico' }],
@@ -27,7 +25,6 @@ useSeoMeta({
 
 defineOgImageComponent('Blog', {
   ogType: 'website',
-  publishedTime: dayjs().toDate().toISOString(),
   authors: [],
   image: '/images/og-image.png',
   title: title,

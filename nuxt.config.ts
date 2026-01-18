@@ -29,7 +29,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   site: {
-    url: appMeta.url,
+    // url: appMeta.url,
     name: appMeta.name,
     description: appMeta.description,
     defaultLocale: 'pl'

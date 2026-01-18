@@ -3,7 +3,7 @@ title: 'Strategie renderowania w Nuxt 4 - SSR, SSG i Hybrid Rendering'
 description: 'Zrozum różne strategie renderowania w Nuxt 4: Server-Side Rendering, Static Site Generation i Hybrid Rendering. Dowiedz się, kiedy użyć której strategii.'
 date: 2025-01-30
 image:
-  src: '/blog/rendering-strategies-nuxt-4.png'
+  src: '/images/blog/rendering-strategies-nuxt-4.png'
   alt: 'Strategie renderowania w Nuxt 4'
 tags:
   - 'Nuxt'

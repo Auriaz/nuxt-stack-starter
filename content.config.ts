@@ -1,15 +1,16 @@
 import { defineContentConfig, defineCollection } from '@nuxt/content'
-import { BlogPostSchema } from './shared/schemas/content'
+import { BlogPostSchema, PageSchema } from './shared/schemas/content'
 
 export default defineContentConfig({
   collections: {
-    content: defineCollection({
+    pages: defineCollection({
       type: 'page',
-      source: '**/*.md'
+      source: '*.md',
+      schema: PageSchema
     }),
     blog: defineCollection({
       type: 'page',
-      source: 'blog/**/*.md',
+      source: 'blog/*.md',
       schema: BlogPostSchema
     })
   }

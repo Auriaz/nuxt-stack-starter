@@ -1,17 +1,13 @@
 <script setup lang="ts">
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
-const { data: page } = await useAsyncData('blog', () => queryCollection('blog').first())
 const { data: posts } = await useAsyncData('blog-posts', () => queryCollection('blog').all())
 
-const title = computed(() => page.value?.seo?.title || page.value?.title)
-const description = computed(() => page.value?.seo?.description || page.value?.description)
-
 useSeoMeta({
-  title,
-  ogTitle: title,
-  description,
-  ogDescription: description
+  title: 'Blog',
+  ogTitle: 'Blog',
+  description: 'Tutaj znajdziesz wszystkie posty z naszego bloga',
+  ogDescription: 'Tutaj znajdziesz wszystkie posty z naszego bloga'
 })
 </script>
 

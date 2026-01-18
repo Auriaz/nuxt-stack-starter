@@ -1,41 +1,38 @@
 <script setup lang="ts">
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
+import type { PageEntry } from '#shared/types/content'
+import { getPageSections } from '#shared/utils/sections'
+
 definePageMeta({
   layout: 'default'
 })
 
-const title = 'Oferta - Nuxt Base Starter'
-const description
-  = 'Poznaj naszą ofertę i wybierz plan dopasowany do Twoich potrzeb. Profesjonalne rozwiązania webowe dla każdego projektu.'
+const { path } = useRoute()
+const { data: offerPage } = await useAsyncData('offer', () =>
+  queryCollection<PageEntry>('pages').path(path).first()
+)
 
+// Pobierz sekcje z page (z fallback do legacy formatu)
+const sections = computed(() => {
+  if (!offerPage.value) return []
+  return getPageSections(offerPage.value)
+})
+
+// SEO Meta
 useSeoMeta({
-  title,
-  description,
-  ogTitle: title,
-  ogDescription: description,
+  title: offerPage.value?.title || 'Oferta',
+  description: offerPage.value?.description || 'Nasza oferta',
   ogType: 'website'
 })
 </script>
 
 <template>
   <NuxtLayout name="default">
-    <!-- Page Header -->
-    <section class="py-16 bg-muted/50">
-      <UContainer>
-        <div class="text-center max-w-3xl mx-auto">
-          <h1 class="text-4xl md:text-5xl font-bold mb-6">
-            Nasza oferta
-          </h1>
-          <p class="text-lg text-muted">
-            {{ description }}
-          </p>
-        </div>
-      </UContainer>
-    </section>
-
-    <!-- Pricing Section -->
-    <SectionsPricing />
-
-    <!-- FAQ Section -->
-    <SectionsFAQ />
+    <UPage :ui="{ root: 'container mx-auto px-4 md:px-0' }">
+      <UPageBody>
+        <SectionsRenderer :sections="sections" />
+      </UPageBody>
+    </UPage>
   </NuxtLayout>
 </template>

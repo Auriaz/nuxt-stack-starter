@@ -3,7 +3,7 @@ title: 'Nitro - Silnik serwerowy Nuxt, który zmienia zasady gry'
 description: 'Odkryj Nitro - nowoczesny silnik serwerowy Nuxt, który umożliwia deployment wszędzie: Node.js, serverless, edge i statyczne hostingi.'
 date: 2025-01-25
 image:
-  src: '/blog/nitro-server-engine.png'
+  src: '/images/blog/nitro-server-engine.png'
   alt: 'Nitro - Silnik serwerowy Nuxt'
 tags:
   - 'Nuxt'

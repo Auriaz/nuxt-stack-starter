@@ -1,34 +1,37 @@
 <script setup lang="ts">
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
+import type { PageEntry } from '#shared/types/content'
+import { getPageSections } from '#shared/utils/sections'
+
 definePageMeta({
   layout: 'default'
 })
 
-const title = 'Nuxt Base Starter - Solidna podkładka pod strony internetowe'
-const description
-  = 'Profesjonalny starter Nuxt 4 z gotowymi komponentami, SEO baseline, i18n i pełną konfiguracją. Idealny fundament dla Twojego projektu.'
+const { path } = useRoute()
+const { data: page } = await useAsyncData('home', () =>
+  queryCollection<PageEntry>('pages').path(path).first()
+)
+
+// Pobierz sekcje z page (z fallback do legacy formatu)
+const sections = computed(() => {
+  if (!page.value) return []
+  return getPageSections(page.value)
+})
 
 useSeoMeta({
-  title,
-  description,
-  ogTitle: title,
-  ogDescription: description,
-  ogType: 'website',
-  twitterCard: 'summary_large_image'
+  title: page.value?.title || 'Nuxt Base Starter',
+  description: page.value?.description || 'Profesjonalny starter Nuxt 4 z gotowymi komponentami, SEO baseline, i18n i pełną konfiguracją. Idealny fundament dla Twojego projektu.',
+  ogType: 'website'
 })
 </script>
 
 <template>
   <NuxtLayout name="default">
-    <!-- Hero Section -->
-    <SectionsHero />
-
-    <!-- Features Section -->
-    <SectionsFeatures />
-
-    <!-- Testimonials Section -->
-    <SectionsTestimonials />
-
-    <!-- CTA Section -->
-    <UiCTA variant="centered" />
+    <UPage :ui="{ root: 'container mx-auto px-4 md:px-0' }">
+      <UPageBody>
+        <SectionsRenderer :sections="sections" />
+      </UPageBody>
+    </UPage>
   </NuxtLayout>
 </template>

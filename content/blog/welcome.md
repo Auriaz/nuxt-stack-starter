@@ -3,7 +3,7 @@ title: 'Witamy w Nuxt Base Starter'
 description: 'Pierwszy wpis na blogu - poznaj możliwości Nuxt Base Starter i rozpocznij swój projekt już dziś.'
 date: 2025-01-15
 image:
-  src: '/blog/welcome.jpg'
+  src: '/images/blog/welcome.jpg'
   alt: 'Nuxt Base Starter'
 tags:
   - 'Nuxt'
