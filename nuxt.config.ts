@@ -29,7 +29,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   site: {
-    // url: appMeta.url,
+    url: appMeta.url || 'https://example.com',
     name: appMeta.name,
     description: appMeta.description,
     defaultLocale: 'pl'
@@ -54,7 +54,8 @@ export default defineNuxtConfig({
 
   nitro: {
     prerender: {
-      routes: ['/sitemap.xml', '/robots.txt']
+      routes: ['/sitemap.xml', '/robots.txt'],
+      ignore: ['/__nuxt_content/content/query']
     }
   },
 

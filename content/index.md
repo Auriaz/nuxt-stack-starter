@@ -112,7 +112,7 @@ sections:
         - title: 'Projekt 1'
           description: 'Opis projektu 1'
           image:
-            src: '/images/portfolio/project_1.png'
+            src: '/portfolio/project_1.png'
             alt: 'Projekt 1'
           tags: ['Nuxt', 'Vue']
           to: '/portfolio/project-1'
@@ -120,7 +120,7 @@ sections:
         - title: 'Projekt 2'
           description: 'Opis projektu 2'
           image:
-            src: '/images/portfolio/project_2.png'
+            src: '/portfolio/project_2.png'
             alt: 'Projekt 2'
           tags: ['Laravel', 'PHP']
           to: '/portfolio/project-2'
