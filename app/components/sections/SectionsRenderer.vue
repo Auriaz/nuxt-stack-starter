@@ -193,6 +193,30 @@ const getSectionBase = (section: Section): SectionBase => {
           :base="getSectionBase(section)"
           :props="section.props"
         />
+
+        <!-- Contact Details Section -->
+        <SectionsContactDetails
+          v-else-if="section.type === 'contact-details'"
+          :section="section"
+          :base="getSectionBase(section)"
+          :props="section.props"
+        />
+
+        <!-- Contact Form Section -->
+        <SectionsContactForm
+          v-else-if="section.type === 'contact-form'"
+          :section="section"
+          :base="getSectionBase(section)"
+          :props="section.props"
+        />
+
+        <!-- Map Section -->
+        <SectionsMap
+          v-else-if="section.type === 'map'"
+          :section="section"
+          :base="getSectionBase(section)"
+          :props="section.props"
+        />
       </div>
     </section>
   </div>

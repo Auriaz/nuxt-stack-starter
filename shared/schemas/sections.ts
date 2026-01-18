@@ -43,7 +43,10 @@ export const SectionBaseSchema = object({
     'portfolio',
     'faq',
     'cta',
-    'pricing'
+    'pricing',
+    'contact-details',
+    'contact-form',
+    'map'
   ] as const),
   id: optional(string()), // Anchor ID (np. "hero-section")
   enabled: optional(boolean()), // default: true
@@ -445,6 +448,157 @@ export const SectionPricingSchema = object({
   })
 })
 
+// Contact Details Section
+export const SectionContactDetailsSchema = object({
+  type: literal('contact-details'),
+  id: optional(string()),
+  enabled: optional(boolean()),
+  title: optional(string()),
+  subtitle: optional(string()),
+  eyebrow: optional(string()),
+  description: optional(string()),
+  align: optional(picklist(['left', 'center'] as const)),
+  theme: optional(picklist(['light', 'dark', 'brand'] as const)),
+  container: optional(picklist(['default', 'wide', 'full'] as const)),
+  spacing: optional(picklist(['sm', 'md', 'lg'] as const)),
+  background: optional(
+    object({
+      type: picklist(['none', 'gradient', 'image'] as const),
+      gradient: optional(string()),
+      image: optional(ImageSchema),
+      overlay: optional(boolean())
+    })
+  ),
+  seo: optional(
+    object({
+      anchor: optional(string()),
+      noindex: optional(boolean())
+    })
+  ),
+  schema: optional(
+    object({
+      enabled: optional(boolean()),
+      type: optional(string())
+    })
+  ),
+  props: object({
+    variant: optional(picklist(['cards', 'list'] as const)),
+    items: array(
+      object({
+        label: string(),
+        value: string(),
+        href: optional(string()),
+        icon: optional(string()),
+        note: optional(string())
+      })
+    )
+  })
+})
+
+// Contact Form Section
+export const SectionContactFormSchema = object({
+  type: literal('contact-form'),
+  id: optional(string()),
+  enabled: optional(boolean()),
+  title: optional(string()),
+  subtitle: optional(string()),
+  eyebrow: optional(string()),
+  description: optional(string()),
+  align: optional(picklist(['left', 'center'] as const)),
+  theme: optional(picklist(['light', 'dark', 'brand'] as const)),
+  container: optional(picklist(['default', 'wide', 'full'] as const)),
+  spacing: optional(picklist(['sm', 'md', 'lg'] as const)),
+  background: optional(
+    object({
+      type: picklist(['none', 'gradient', 'image'] as const),
+      gradient: optional(string()),
+      image: optional(ImageSchema),
+      overlay: optional(boolean())
+    })
+  ),
+  seo: optional(
+    object({
+      anchor: optional(string()),
+      noindex: optional(boolean())
+    })
+  ),
+  schema: optional(
+    object({
+      enabled: optional(boolean()),
+      type: optional(string())
+    })
+  ),
+  props: object({
+    endpoint: optional(string()),
+    method: optional(picklist(['POST'] as const)),
+    fields: array(
+      object({
+        name: string(),
+        label: string(),
+        type: optional(picklist(['text', 'email', 'tel', 'textarea'] as const)),
+        required: optional(boolean()),
+        placeholder: optional(string()),
+        icon: optional(string())
+      })
+    ),
+    consent: optional(
+      object({
+        label: string(),
+        required: optional(boolean())
+      })
+    ),
+    successMessage: optional(string()),
+    errorMessage: optional(string()),
+    spamProtection: optional(
+      object({
+        type: optional(picklist(['honeypot', 'turnstile'] as const))
+      })
+    )
+  })
+})
+
+// Map Section
+export const SectionMapSchema = object({
+  type: literal('map'),
+  id: optional(string()),
+  enabled: optional(boolean()),
+  title: optional(string()),
+  subtitle: optional(string()),
+  eyebrow: optional(string()),
+  description: optional(string()),
+  align: optional(picklist(['left', 'center'] as const)),
+  theme: optional(picklist(['light', 'dark', 'brand'] as const)),
+  container: optional(picklist(['default', 'wide', 'full'] as const)),
+  spacing: optional(picklist(['sm', 'md', 'lg'] as const)),
+  background: optional(
+    object({
+      type: picklist(['none', 'gradient', 'image'] as const),
+      gradient: optional(string()),
+      image: optional(ImageSchema),
+      overlay: optional(boolean())
+    })
+  ),
+  seo: optional(
+    object({
+      anchor: optional(string()),
+      noindex: optional(boolean())
+    })
+  ),
+  schema: optional(
+    object({
+      enabled: optional(boolean()),
+      type: optional(string())
+    })
+  ),
+  props: object({
+    type: picklist(['embed', 'link'] as const),
+    embedUrl: optional(string()),
+    linkUrl: optional(string()),
+    addressText: optional(string()),
+    note: optional(string())
+  })
+})
+
 // Discriminated union schema dla wszystkich sekcji używając variant
 // variant jest lepszy niż union dla discriminated unions z polem 'type'
 export const SectionSchema = variant('type', [
@@ -455,5 +609,8 @@ export const SectionSchema = variant('type', [
   SectionPortfolioSchema,
   SectionFAQSchema,
   SectionCTASchema,
-  SectionPricingSchema
+  SectionPricingSchema,
+  SectionContactDetailsSchema,
+  SectionContactFormSchema,
+  SectionMapSchema
 ])

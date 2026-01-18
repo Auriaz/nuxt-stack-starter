@@ -8,6 +8,9 @@ import type {
   SectionFAQSchema,
   SectionCTASchema,
   SectionPricingSchema,
+  SectionContactDetailsSchema,
+  SectionContactFormSchema,
+  SectionMapSchema,
   SectionBaseSchema
 } from '../schemas/sections'
 
@@ -21,6 +24,9 @@ export type SectionPortfolio = InferOutput<typeof SectionPortfolioSchema>
 export type SectionFAQ = InferOutput<typeof SectionFAQSchema>
 export type SectionCTA = InferOutput<typeof SectionCTASchema>
 export type SectionPricing = InferOutput<typeof SectionPricingSchema>
+export type SectionContactDetails = InferOutput<typeof SectionContactDetailsSchema>
+export type SectionContactForm = InferOutput<typeof SectionContactFormSchema>
+export type SectionMap = InferOutput<typeof SectionMapSchema>
 
 // Discriminated union type
 export type Section
@@ -32,3 +38,6 @@ export type Section
     | SectionFAQ
     | SectionCTA
     | SectionPricing
+    | SectionContactDetails
+    | SectionContactForm
+    | SectionMap
