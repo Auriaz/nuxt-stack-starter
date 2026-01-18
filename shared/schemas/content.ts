@@ -58,6 +58,35 @@ export const HeroSectionSchema = object({
   schema: optional(HeroSchemaSchema)
 })
 
+// PortfolioProjectLinkSchema
+export const PortfolioProjectLinkSchema = object({
+  type: picklist(['live', 'github', 'behance', 'dribbble', 'figma', 'other'] as const),
+  label: string(),
+  url: string(),
+  target: optional(picklist(['_self', '_blank'] as const))
+})
+
+// PortfolioProjectSchema
+export const PortfolioProjectSchema = object({
+  title: string(),
+  slug: optional(string()),
+  description: string(),
+  excerpt: optional(string()),
+  coverImage: ImageSchema,
+  tags: optional(array(string())),
+  technologies: optional(array(string())),
+  year: optional(string()),
+  role: optional(string()),
+  client: optional(string()),
+  featured: optional(boolean()),
+  status: optional(picklist(['draft', 'published', 'archived'] as const)),
+  publishedAt: optional(date()),
+  seo: optional(SEOSchema),
+  gallery: optional(array(ImageSchema)),
+  links: optional(array(PortfolioProjectLinkSchema)),
+  category: optional(string())
+})
+
 // PageSchema
 export const PageSchema = object({
   title: string(),

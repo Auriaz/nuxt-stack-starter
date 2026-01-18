@@ -1,8 +1,12 @@
 import { defineContentConfig, defineCollection } from '@nuxt/content'
-import { BlogPostSchema, PageSchema } from './shared/schemas/content'
+import { BlogPostSchema, PageSchema, PortfolioProjectSchema } from './shared/schemas/content'
 
 export default defineContentConfig({
   collections: {
+    // content: defineCollection({
+    //   type: 'page',
+    //   source: '**/*.md'
+    // }),
     pages: defineCollection({
       type: 'page',
       source: '*.md',
@@ -12,6 +16,11 @@ export default defineContentConfig({
       type: 'page',
       source: 'blog/*.md',
       schema: BlogPostSchema
+    }),
+    portfolio: defineCollection({
+      type: 'page',
+      source: 'portfolio/*.md',
+      schema: PortfolioProjectSchema
     })
   }
 })

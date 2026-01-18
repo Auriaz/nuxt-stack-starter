@@ -1,42 +1,32 @@
 <script setup lang="ts">
+import type { PortfolioCardProps } from '#shared/types/portfolio'
+
 interface Props {
-  title: string
-  description: string
-  image?: string
-  category?: string
-  tags?: string[]
-  link?: string
-  featured?: boolean
+  project: PortfolioCardProps
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  image: undefined,
-  category: undefined,
-  tags: () => [],
-  link: undefined,
-  featured: false
-})
+const props = defineProps<Props>()
 </script>
 
 <template>
   <UCard
     :class="[
       'h-full overflow-hidden transition-transform hover:scale-105',
-      props.featured ? 'lg:col-span-2 lg:row-span-2' : ''
+      props.project.featured ? 'lg:col-span-2 lg:row-span-2' : ''
     ]"
   >
     <template #header>
       <div class="relative aspect-video overflow-hidden bg-muted">
         <NuxtImg
-          v-if="props.image"
-          :src="props.image"
-          :alt="props.title"
+          v-if="props.project.coverImage.src"
+          :src="props.project.coverImage.src"
+          :alt="props.project.coverImage.alt"
           class="w-full h-full object-cover"
           loading="lazy"
         />
         <div
           v-else
-          class="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary-500 to-primary-700"
+          class="w-full h-full flex items-center justify-center bg-linear-to-br from-primary-500 to-primary-700"
         >
           <UIcon
             name="i-lucide-image"
@@ -44,33 +34,53 @@ const props = withDefaults(defineProps<Props>(), {
           />
         </div>
         <div
-          v-if="props.category"
+          v-if="props.project.category"
           class="absolute top-4 left-4"
         >
           <UBadge
             color="primary"
             variant="solid"
           >
-            {{ props.category }}
+            {{ props.project.category }}
+          </UBadge>
+        </div>
+        <div
+          v-if="props.project.featured"
+          class="absolute top-4 right-4"
+        >
+          <UBadge
+            color="primary"
+            variant="solid"
+            size="lg"
+          >
+            Wyróżniony
           </UBadge>
         </div>
       </div>
     </template>
 
     <div>
-      <h3 class="text-xl font-bold mb-2">
-        {{ props.title }}
-      </h3>
+      <div class="flex items-start justify-between gap-2 mb-2">
+        <h3 class="text-xl font-bold">
+          {{ props.project.title }}
+        </h3>
+        <span
+          v-if="props.project.year"
+          class="text-sm text-muted shrink-0"
+        >
+          {{ props.project.year }}
+        </span>
+      </div>
       <p class="text-muted mb-4">
-        {{ props.description }}
+        {{ props.project.excerpt }}
       </p>
 
       <div
-        v-if="props.tags && props.tags.length > 0"
+        v-if="props.project.tags.length > 0"
         class="flex flex-wrap gap-2 mb-4"
       >
         <UBadge
-          v-for="(tag, index) in props.tags"
+          v-for="(tag, index) in props.project.tags"
           :key="index"
           variant="soft"
           color="neutral"
@@ -80,18 +90,28 @@ const props = withDefaults(defineProps<Props>(), {
         </UBadge>
       </div>
 
-      <UButton
-        v-if="props.link"
-        :to="props.link"
-        variant="outline"
-        size="sm"
-      >
-        Zobacz projekt
-        <UIcon
-          name="i-lucide-arrow-right"
-          class="w-4 h-4 ml-1"
+      <div class="flex items-center gap-2">
+        <UButton
+          :to="props.project.to"
+          variant="outline"
+          size="sm"
+        >
+          Zobacz projekt
+          <UIcon
+            name="i-lucide-arrow-right"
+            class="w-4 h-4 ml-1"
+          />
+        </UButton>
+
+        <UButton
+          v-if="props.project.externalLink"
+          :to="props.project.externalLink.url"
+          :target="props.project.externalLink.target || '_blank'"
+          variant="ghost"
+          size="sm"
+          icon="i-lucide-external-link"
         />
-      </UButton>
+      </div>
     </div>
   </UCard>
 </template>

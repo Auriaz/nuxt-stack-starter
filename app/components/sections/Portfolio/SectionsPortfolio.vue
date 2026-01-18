@@ -9,10 +9,20 @@ interface Props {
 
 const props = defineProps<Props>()
 
+// Pobierz projekty z composable
+const { projects } = usePortfolioContent({
+  limit: props.props?.limit,
+  showFeaturedOnly: props.props?.showFeaturedOnly,
+  filterByTags: props.props?.filterByTags,
+  filterByTechnologies: props.props?.filterByTechnologies,
+  filterByYear: props.props?.filterByYear,
+  sortBy: props.props?.sortBy || 'newest'
+})
+
+// Konfiguracja layoutu
 const config = computed(() => ({
   title: props.base.title,
   description: props.base.description,
-  projects: props.props?.projects || [],
   layout: props.props?.layout || 'grid',
   columns: props.props?.columns || 3,
   align: props.base.align || 'center'
@@ -55,60 +65,15 @@ const headerClasses = computed(() => ({
       </p>
     </div>
 
+    <!-- Grid z PortfolioCard -->
     <div
       :class="['grid gap-8', gridClasses]"
     >
-      <UCard
-        v-for="(project, index) in config.projects"
-        :key="index"
-        :to="project.to"
-        variant="outline"
-        :class="[
-          'overflow-hidden transition-transform hover:scale-105',
-          project.featured ? 'lg:col-span-2 lg:row-span-2' : ''
-        ]"
-      >
-        <template
-          v-if="project.image"
-          #header
-        >
-          <div class="relative aspect-video overflow-hidden bg-muted">
-            <NuxtImg
-              :src="project.image.src"
-              :alt="project.image.alt || project.title"
-              class="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
-        </template>
-
-        <div>
-          <h3 class="text-xl font-bold mb-2">
-            {{ project.title }}
-          </h3>
-          <p
-            v-if="project.description"
-            class="text-muted mb-4"
-          >
-            {{ project.description }}
-          </p>
-
-          <div
-            v-if="project.tags && project.tags.length > 0"
-            class="flex flex-wrap gap-2"
-          >
-            <UBadge
-              v-for="(tag, tagIndex) in project.tags"
-              :key="tagIndex"
-              variant="soft"
-              color="neutral"
-              size="sm"
-            >
-              {{ tag }}
-            </UBadge>
-          </div>
-        </div>
-      </UCard>
+      <PortfolioCard
+        v-for="project in projects"
+        :key="project.id"
+        :project="project"
+      />
     </div>
   </div>
 </template>

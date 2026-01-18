@@ -299,17 +299,13 @@ export const SectionPortfolioSchema = object({
     })
   ),
   props: object({
-    projects: array(
-      object({
-        title: string(),
-        description: optional(string()),
-        image: optional(ImageSchema),
-        tags: optional(array(string())),
-        to: optional(string()),
-        featured: optional(boolean())
-      })
-    ),
-    layout: optional(picklist(['grid', 'masonry'] as const)),
+    limit: optional(number()),
+    showFeaturedOnly: optional(boolean()),
+    filterByTags: optional(array(string())),
+    filterByTechnologies: optional(array(string())),
+    filterByYear: optional(string()),
+    sortBy: optional(picklist(['newest', 'oldest', 'featured'] as const)),
+    layout: optional(picklist(['grid', 'masonry', 'carousel'] as const)),
     columns: optional(picklist([2, 3, 4] as const))
   })
 })
