@@ -1,19 +1,22 @@
-import { fileURLToPath } from 'node:url'
 import { defineConfig, devices } from '@playwright/test'
-import type { ConfigOptions } from '@nuxt/test-utils/playwright'
 
-export default defineConfig<ConfigOptions>({
+export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
+  timeout: 60000, // 60s timeout dla testów
   use: {
-    trace: 'on-first-retry',
-    nuxt: {
-      rootDir: fileURLToPath(new URL('.', import.meta.url))
-    }
+    baseURL: 'http://localhost:3001',
+    trace: 'on-first-retry'
+  },
+  webServer: {
+    command: 'npm run dev -- --port 3001',
+    url: 'http://localhost:3001',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000 // 2 min na uruchomienie Nuxt dev server
   },
   projects: [
     {

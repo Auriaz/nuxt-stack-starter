@@ -4,10 +4,6 @@ import { FooterConfigSchema } from './shared/schemas/footer'
 
 export default defineContentConfig({
   collections: {
-    // content: defineCollection({
-    //   type: 'page',
-    //   source: '**/*.md'
-    // }),
     pages: defineCollection({
       type: 'page',
       source: '*.md',
@@ -27,6 +23,10 @@ export default defineContentConfig({
       type: 'data',
       source: 'app/*.md',
       schema: FooterConfigSchema
+    }),
+    content: defineCollection({
+      type: 'page',
+      source: '**/*.md'
     })
   }
 })

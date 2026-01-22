@@ -131,33 +131,24 @@ const gridClasses = computed(() => {
 <template>
   <div class="portfolio-grid">
     <!-- Grid projektów -->
-    <div
+    <UPageGrid
       v-if="filteredProjects.length > 0"
       :class="gridClasses"
+      :columns="3"
     >
       <PortfolioCard
         v-for="project in filteredProjects"
         :key="project.id"
         :project="project"
       />
-    </div>
+    </UPageGrid>
 
     <!-- Brak wyników -->
-    <div
+    <UEmpty
       v-else
-      class="text-center py-12"
-    >
-      <p class="text-muted">
-        Nie znaleziono projektów spełniających kryteria.
-      </p>
-      <UButton
-        variant="outline"
-        class="mt-4"
-        @click="resetFilters"
-      >
-        Resetuj filtry
-      </UButton>
-    </div>
+      title="Nie znaleziono projektów"
+      description="Wygląda na to, że nie ma żadnych projektów. Stwórz jeden, aby rozpocząć."
+    />
 
     <!-- Globalny drawer filtrów (renderowany przez Teleport) -->
     <FiltersDrawer

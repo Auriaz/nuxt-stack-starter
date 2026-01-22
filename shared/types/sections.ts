@@ -1,43 +1,33 @@
 import type { InferOutput } from 'valibot'
 import type {
   SectionHeroSchema,
-  SectionSocialProofSchema,
-  SectionFeaturesSchema,
-  SectionProcessSchema,
-  SectionPortfolioSchema,
-  SectionFAQSchema,
+  SectionBaseSchema,
   SectionCTASchema,
+  SectionFeaturesSchema,
   SectionPricingSchema,
-  SectionContactDetailsSchema,
-  SectionContactFormSchema,
-  SectionMapSchema,
-  SectionBaseSchema
+  SectionFAQSchema,
+  SectionTestimonialsSchema,
+  SectionNewsletterSchema,
+  SectionContactFormSchema
 } from '../schemas/sections'
 
 export type SectionBase = InferOutput<typeof SectionBaseSchema>
-
-export type SectionHero = InferOutput<typeof SectionHeroSchema>
-export type SectionSocialProof = InferOutput<typeof SectionSocialProofSchema>
-export type SectionFeatures = InferOutput<typeof SectionFeaturesSchema>
-export type SectionProcess = InferOutput<typeof SectionProcessSchema>
-export type SectionPortfolio = InferOutput<typeof SectionPortfolioSchema>
-export type SectionFAQ = InferOutput<typeof SectionFAQSchema>
 export type SectionCTA = InferOutput<typeof SectionCTASchema>
+export type SectionHero = InferOutput<typeof SectionHeroSchema>
+export type SectionFeatures = InferOutput<typeof SectionFeaturesSchema>
 export type SectionPricing = InferOutput<typeof SectionPricingSchema>
-export type SectionContactDetails = InferOutput<typeof SectionContactDetailsSchema>
+export type SectionFAQ = InferOutput<typeof SectionFAQSchema>
+export type SectionTestimonials = InferOutput<typeof SectionTestimonialsSchema>
+export type SectionNewsletter = InferOutput<typeof SectionNewsletterSchema>
 export type SectionContactForm = InferOutput<typeof SectionContactFormSchema>
-export type SectionMap = InferOutput<typeof SectionMapSchema>
-
 // Discriminated union type
 export type Section
   = | SectionHero
-    | SectionSocialProof
-    | SectionFeatures
-    | SectionProcess
-    | SectionPortfolio
-    | SectionFAQ
     | SectionCTA
+    | SectionBase
+    | SectionFeatures
     | SectionPricing
-    | SectionContactDetails
+    | SectionFAQ
+    | SectionTestimonials
+    | SectionNewsletter
     | SectionContactForm
-    | SectionMap

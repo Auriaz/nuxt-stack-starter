@@ -3,117 +3,96 @@ title: Oferta
 description: Nasza oferta - wybierz plan dopasowany do Twoich potrzeb
 to: '/oferta'
 sections:
-  - type: 'hero'
-    id: 'hero'
-    title: 'Nasza oferta'
-    description: 'Wybierz plan dopasowany do Twoich potrzeb'
-    align: 'center'
-    spacing: 'lg'
-    props:
-      layout: 'centered'
-      variant: 'primary'
-      actions:
-        - label: 'Skontaktuj się'
-          to: '/kontakt'
+  pricing:
+    pricing:
+    type: 'pricing'
+    id: 'pricing'
+    title: 'Wybierz swój plan'
+    description: 'Elastyczne plany dopasowane do Twoich potrzeb'
+    headline: 'CENNIK'
+    orientation: 'vertical'
+    enabled: true
+    plans:
+      - title: 'Starter'
+        description: 'Dla małych projektów'
+        badge: 'Popularny'
+        price: '$99'
+        billingCycle: '/miesiąc'
+        billingPeriod: 'płatne rocznie'
+        features:
+          - 'Jeden developer'
+          - 'Nielimitowane projekty'
+          - 'Wsparcie email'
+        button:
+          label: 'Wybierz plan'
           color: 'primary'
           variant: 'solid'
           size: 'lg'
+          block: true
+        highlight: true
 
-  - type: 'pricing'
-    id: 'pricing'
-    title: 'Cennik'
-    description: 'Wybierz plan dopasowany do Twoich potrzeb'
-    align: 'center'
-    spacing: 'lg'
-    props:
-      layout: 'grid'
-      plans:
-        - name: 'Podstawowy'
-          price: '999'
-          period: 'PLN'
-          description: 'Idealny dla małych projektów'
-          features:
-            - 'Strona główna + 3 podstrony'
-            - 'Responsywny design'
-            - 'Podstawowe SEO'
-            - 'Formularz kontaktowy'
-            - 'Wsparcie email'
-          action:
-            label: 'Wybierz plan'
-            to: '/kontakt'
-            color: 'neutral'
-            variant: 'outline'
-        - name: 'Standardowy'
-          price: '2499'
-          period: 'PLN'
-          description: 'Najpopularniejszy wybór'
-          popular: true
-          features:
-            - 'Wszystko z planu Podstawowy'
-            - 'Do 10 podstron'
-            - 'Zaawansowane SEO'
-            - 'Blog'
-            - 'Integracje zewnętrzne'
-            - 'Priorytetowe wsparcie'
-          action:
-            label: 'Wybierz plan'
-            to: '/kontakt'
-            color: 'primary'
-            variant: 'solid'
-        - name: 'Premium'
-          price: '4999'
-          period: 'PLN'
-          description: 'Dla wymagających projektów'
-          features:
-            - 'Wszystko z planu Standardowy'
-            - 'Nielimitowane podstrony'
-            - 'E-commerce'
-            - 'Panel administracyjny'
-            - 'Dedykowane wsparcie'
-            - 'Szkolenia'
-          action:
-            label: 'Wybierz plan'
-            to: '/kontakt'
-            color: 'primary'
-            variant: 'solid'
+      - title: 'Pro'
+        description: 'Dla rozwijających się firm'
+        badge:
+          label: 'Najlepszy'
+          color: 'success'
+          variant: 'solid'
+        price: '$299'
+        discount: '$249'
+        billingCycle: '/miesiąc'
+        features:
+          - title: 'Do 5 developerów'
+            icon: 'i-lucide-users'
+          - title: 'Nielimitowane projekty'
+            icon: 'i-lucide-folder'
+          - title: 'Wsparcie priorytetowe'
+            icon: 'i-lucide-headphones'
+        button:
+          label: 'Wybierz plan'
+          color: 'success'
+          size: 'lg'
+          block: true
+        scale: true
 
-  - type: 'faq'
-    id: 'faq'
-    title: 'Często zadawane pytania'
-    description: 'Odpowiedzi na najczęstsze pytania dotyczące oferty'
-    align: 'center'
-    spacing: 'lg'
-    props:
-      variant: 'accordion'
-      items:
-        - question: 'Jak wybrać odpowiedni plan?'
-          answer: 'Wybierz plan w zależności od wielkości projektu i potrzeb. Plan Podstawowy jest idealny dla małych stron, Standardowy dla większości projektów, a Premium dla zaawansowanych rozwiązań.'
-        - question: 'Czy mogę zmienić plan później?'
-          answer: 'Tak, możesz zmienić plan w dowolnym momencie. Różnica w cenie zostanie rozliczona proporcjonalnie.'
-        - question: 'Co zawiera wsparcie?'
-          answer: 'Wsparcie obejmuje pomoc techniczną, aktualizacje i konsultacje. W planie Premium otrzymujesz dedykowane wsparcie z priorytetem.'
-
-  - type: 'cta'
-      id: 'cta'
-      title: 'Gotowy do rozpoczęcia?'
-      description: 'Zacznij swój projekt już dziś z Nuxt Base Starter'
-      align: 'center'
-      spacing: 'none'
-      theme: 'brand'
-      reverse: true
-      container: 'full'
-      props:
-        links:
-          - label: 'Kontakt'
-            to: '/kontakt'
-            color: 'primary'
-            variant: 'solid'
-            size: 'lg'
-          - label: 'Portfolio'
-            to: '/portfolio'
-            variant: 'outline'
-            size: 'lg'
-        variant: 'soft'
-        highlight: 'Bezpłatna konsultacja'
-        note: 'Odpowiemy w ciągu 24 godzin'
+      - title: 'Enterprise'
+        description: 'Dla dużych organizacji'
+        price: 'Kontakt'
+        features:
+          - 'Nielimitowani developerzy'
+          - 'Dedykowany support'
+          - 'SLA 99.9%'
+        button:
+          label: 'Kontakt'
+          variant: 'outline'
+          size: 'lg'
+          block: true
+          to: '/kontakt'
+  cta:
+    type: 'cta'
+    id: 'cta-offer'
+    ref: 'cta-offer'
+    title: 'Gotowy do rozpoczęcia?'
+    description: 'Zacznij swój projekt już dziś z Nuxt Base Starter'
+    reverse: false
+    enabled: true
+    links:
+      - label: 'Kontakt'
+        to: '/kontakt'
+        color: 'primary'
+        variant: 'solid'
+        size: 'lg'
+      - label: 'Portfolio'
+        to: '/portfolio'
+        variant: 'outline'
+        size: 'lg'
+    variant: 'soft'
+    orientation: 'horizontal'
+    ui:
+      root: 'my-12'
+seo:
+  title: 'Oferta'
+  description: 'Nasza oferta - wybierz plan dopasowany do Twoich potrzeb'
 ---
+
+:PagePricing{:section="sections.pricing"}
+:PageCTA{:cta="cta"}

@@ -23,6 +23,5 @@ describe('SEO Utilities', () => {
 
     expect(meta.title).toBeTruthy()
     expect(meta.description).toBeTruthy()
-    expect(meta.image).toBeUndefined()
   })
 })

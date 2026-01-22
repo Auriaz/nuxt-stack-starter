@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
 import type { PageEntry } from '#shared/types/content'
-import { getPageSections } from '#shared/utils/sections'
+// import { getPageSections } from '#shared/utils/sections'
 import appMeta from '~/app.meta'
 
 definePageMeta({
@@ -17,10 +17,10 @@ const { data: page } = await useAsyncData('contact-page', () =>
 )
 
 // Pobierz sekcje z page
-const sections = computed(() => {
-  if (!page.value) return []
-  return getPageSections(page.value)
-})
+// const sections = computed(() => {
+//   if (!page.value) return []
+//   return getPageSections(page.value)
+// })
 
 // Schema.org
 const contactSchema = computed(() => {
@@ -60,7 +60,10 @@ useSeoMeta({
   <NuxtLayout name="default">
     <UPage :ui="{ root: 'container mx-auto px-4 md:px-0' }">
       <UPageBody>
-        <SectionsRenderer :sections="sections" />
+        <ContentRenderer
+          v-if="page"
+          :value="page"
+        />
       </UPageBody>
     </UPage>
   </NuxtLayout>

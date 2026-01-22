@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
 import type { PageEntry } from '#shared/types/content'
-import { getPageSections } from '#shared/utils/sections'
+// import { getPageSections } from '#shared/utils/sections'
 
 definePageMeta({
   layout: 'default'
@@ -14,10 +14,10 @@ const { data: offerPage } = await useAsyncData('offer', () =>
 )
 
 // Pobierz sekcje z page (z fallback do legacy formatu)
-const sections = computed(() => {
-  if (!offerPage.value) return []
-  return getPageSections(offerPage.value)
-})
+// const sections = computed(() => {
+//   if (!offerPage.value) return []
+//   return getPageSections(offerPage.value)
+// })
 
 // SEO Meta
 useSeoMeta({
@@ -31,7 +31,13 @@ useSeoMeta({
   <NuxtLayout name="default">
     <UPage :ui="{ root: 'container mx-auto px-4 md:px-0' }">
       <UPageBody>
+        <!--
         <SectionsRenderer :sections="sections" />
+        -->
+        <ContentRenderer
+          v-if="offerPage"
+          :value="offerPage"
+        />
       </UPageBody>
     </UPage>
   </NuxtLayout>

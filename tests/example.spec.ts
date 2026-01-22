@@ -1,6 +1,6 @@
-import { expect, test } from '@nuxt/test-utils/playwright'
+import { expect, test } from '@playwright/test'
 
-test('example e2e test', async ({ page, goto }) => {
-  await goto('/', { waitUntil: 'hydration' })
+test('example e2e test', async ({ page }) => {
+  await page.goto('/')
   await expect(page).toHaveTitle(/Nuxt/)
 })
