@@ -156,7 +156,7 @@ defineExpose<ModalProps>({
   >
     <div
       v-if="!isMobile && isOpen && layout === 'overlay'"
-      class="fixed left-0 top-16 w-screen z-50 flex items-start justify-center bg-elevated/50 backdrop-blur-md p-2 sm:p-4 md:p-6 rounded-lg gap-2 sm:gap-4 md:gap-6 shadow-lg"
+      class="fixed left-0 top-16 w-screen flex items-start justify-center bg-elevated/50 backdrop-blur-md p-2 sm:p-4 md:p-6 rounded-lg gap-2 sm:gap-4 md:gap-6 border border-primary-500/20"
     >
       <div
         :class="[
