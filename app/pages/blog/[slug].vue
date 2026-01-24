@@ -10,37 +10,69 @@ import dayjs from 'dayjs'
 const { path } = useRoute()
 const { locale } = useI18n()
 
-const { data: post } = await useAsyncData(path, () =>
-  queryCollection<BlogCollectionItem>('blog').path(path).first()
+const { data: post } = await useAsyncData(
+  path,
+  async (_nuxtApp, { signal }) => {
+    if (signal?.aborted) {
+      return null
+    }
+    return await queryCollection<BlogCollectionItem>('blog').path(path).first()
+  },
+  {
+    dedupe: 'cancel'
+  }
 )
 if (!post.value) {
   throw createError({ statusCode: 404, statusMessage: 'Post not found', fatal: true })
 }
 
-const { data: surround } = await useAsyncData(`${path}-surround`, () => {
-  return queryCollectionItemSurroundings('blog', path, {
-    fields: ['description']
-  })
-})
-
-const { data: links } = await useAsyncData(`${path}-links`, async () => {
-  if (!post.value?.tags || !Array.isArray(post.value.tags)) {
-    return []
-  }
-  const results = await queryCollection('blog').where('path', 'NOT LIKE', post.value.path).all()
-  // Sortuj po liczbie wspólnych tagów (najwięcej wspólnych tagów = wyżej)
-  const sorted = results
-    .map((item) => {
-      const commonTags = Array.isArray(item.tags)
-        ? item.tags.filter(tag => post.value.tags.includes(tag))
-        : []
-      return { item, commonTagsCount: commonTags.length }
+const { data: surround } = await useAsyncData(
+  `${path}-surround`,
+  async (_nuxtApp, { signal }) => {
+    if (signal?.aborted) {
+      return []
+    }
+    return await queryCollectionItemSurroundings('blog', path, {
+      fields: ['description']
     })
-    .sort((a, b) => b.commonTagsCount - a.commonTagsCount)
-    .slice(0, 5)
-    .map(({ item }) => item)
-  return sorted
-})
+  },
+  {
+    dedupe: 'cancel'
+  }
+)
+
+const { data: links } = await useAsyncData(
+  `${path}-links`,
+  async (_nuxtApp, { signal }) => {
+    if (signal?.aborted) {
+      return []
+    }
+    if (!post.value?.tags || !Array.isArray(post.value.tags)) {
+      return []
+    }
+    const results = await queryCollection('blog').where('path', 'NOT LIKE', post.value.path).all()
+
+    if (signal?.aborted) {
+      return []
+    }
+
+    // Sortuj po liczbie wspólnych tagów (najwięcej wspólnych tagów = wyżej)
+    const sorted = results
+      .map((item) => {
+        const commonTags = Array.isArray(item.tags)
+          ? item.tags.filter(tag => post.value.tags.includes(tag))
+          : []
+        return { item, commonTagsCount: commonTags.length }
+      })
+      .sort((a, b) => b.commonTagsCount - a.commonTagsCount)
+      .slice(0, 5)
+      .map(({ item }) => item)
+    return sorted
+  },
+  {
+    dedupe: 'cancel'
+  }
+)
 
 useSchemaOrg([
   defineArticle({

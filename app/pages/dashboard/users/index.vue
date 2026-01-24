@@ -16,5 +16,8 @@
 </template>
 
 <script setup>
-const { data: users } = await useFetch('/api/users')
+const { data: users } = await useFetch('/api/users', {
+  // Anuluj poprzednie requesty przy odświeżaniu
+  dedupe: 'cancel'
+})
 </script>

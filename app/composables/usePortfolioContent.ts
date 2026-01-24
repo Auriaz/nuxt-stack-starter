@@ -91,7 +91,12 @@ function sortProjects(
 export function usePortfolioContent(options?: PortfolioContentOptions) {
   const { data, pending, error, refresh } = useAsyncData(
     `portfolio-content-${JSON.stringify(options)}`,
-    async () => {
+    async (_nuxtApp, { signal }) => {
+      // Sprawdź czy request został anulowany przed rozpoczęciem
+      if (signal?.aborted) {
+        return []
+      }
+
       // Pobierz projekty z warstwy danych
       const projects = await getPortfolioProjects({
         status: options?.status || 'published',
@@ -101,14 +106,33 @@ export function usePortfolioContent(options?: PortfolioContentOptions) {
         featured: options?.showFeaturedOnly ? true : undefined
       })
 
+      // Sprawdź ponownie po pobraniu danych
+      if (signal?.aborted) {
+        return []
+      }
+
       // Mapuj do PortfolioCardProps
       const mapped = projects.map(mapProjectToCardProps)
+
+      // Sprawdź ponownie po mapowaniu
+      if (signal?.aborted) {
+        return []
+      }
 
       // Sortowanie
       const sorted = sortProjects(mapped, options?.sortBy || 'newest')
 
+      // Sprawdź ponownie po sortowaniu
+      if (signal?.aborted) {
+        return []
+      }
+
       // Limit
       return options?.limit ? sorted.slice(0, options.limit) : sorted
+    },
+    {
+      // Anuluj poprzednie requesty przy zmianie opcji (np. filtrów)
+      dedupe: 'cancel'
     }
   )
 

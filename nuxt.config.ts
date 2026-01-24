@@ -14,6 +14,7 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxt/test-utils',
     '@nuxtjs/i18n',
+    '@nuxtjs/mcp-toolkit',
     '@nuxtjs/seo',
     '@vueuse/nuxt'
   ],
@@ -56,17 +57,33 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    '/': { prerender: true },
-    '/oferta': { prerender: true },
-    '/portfolio': { prerender: true },
-    '/o-nas': { prerender: true },
-    '/kontakt': { cache: false }, // SSR dla formularza
-    '/blog/**': { prerender: true }
+    // Publiczne strony - prerender + default layout
+    '/': { prerender: true, appLayout: 'default' },
+    '/oferta': { prerender: true, appLayout: 'default' },
+    '/portfolio': { prerender: true, appLayout: 'default' },
+    '/portfolio/**': { prerender: true, appLayout: 'default' },
+    '/o-nas': { prerender: true, appLayout: 'default' },
+    '/kontakt': { cache: false, appLayout: 'default' }, // SSR dla formularza
+    '/blog': { prerender: true, appLayout: 'default' },
+    '/blog/**': { prerender: true, appLayout: 'default' },
+    // Dashboard - może wymagać innego layoutu w przyszłości
+    '/dashboard/**': { appLayout: 'default' }
+  },
+
+  experimental: {
+    asyncContext: true,
+    // Nuxt 4.2: Extract async data handlers for better bundle size (especially for prerendered pages)
+    extractAsyncDataHandlers: true,
+    // Nuxt 4.2: Enhanced TypeScript DX with smart navigation and auto-import support
+    typescriptPlugin: true
   },
 
   compatibilityDate: '2025-01-15',
 
   nitro: {
+    experimental: {
+      wasm: true
+    },
     rollupConfig: {
       external: [/^@prisma\//, /\.wasm$/]
     },
@@ -97,6 +114,10 @@ export default defineNuxtConfig({
       useCookie: true,
       cookieKey: 'i18n_redirected'
     }
+  },
+
+  mcp: {
+    name: 'Fullstack Base Starter'
   },
 
   schemaOrg: {

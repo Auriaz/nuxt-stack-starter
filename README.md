@@ -18,6 +18,7 @@ Solidna "podkładka pod strony internetowe" oparta o Nuxt 4, gotowa do wielokrot
 - 📱 **Responsywny** - Mobile-first design
 - 🌙 **Dark Mode** - Wsparcie dla trybu ciemnego
 - 📧 **Formularze** - Gotowy formularz kontaktowy z walidacją
+- 🤖 **MCP Server** - AI assistant integration (Cursor, Claude Desktop)
 
 ## 📦 Zawartość
 
@@ -49,6 +50,7 @@ Solidna "podkładka pod strony internetowe" oparta o Nuxt 4, gotowa do wielokrot
 - `@nuxt/scripts` - Zarządzanie skryptami
 - `@nuxt/test-utils` - Narzędzia testowe
 - `@nuxtjs/i18n` - Wielojęzyczność
+- `@nuxtjs/mcp-toolkit` - MCP Server dla AI assistantów
 - `@nuxtjs/seo` - SEO
 
 ## 🚀 Quick Start
@@ -554,6 +556,24 @@ Typed Component/API
 ```
 
 Wszystkie typy i utils z `shared/` są automatycznie importowane dzięki konfiguracji w `nuxt.config.ts`.
+
+## 🤖 MCP Server (AI Assistant Integration)
+
+Projekt zawiera skonfigurowany MCP (Model Context Protocol) server, który umożliwia AI asystentom (Cursor, Claude Desktop) dostęp do strukturyzowanych danych projektu.
+
+### Dostępne narzędzia
+
+- **Tools**: Lista endpointów API, schematy Valibot, struktura bazy danych, informacje o komponentach
+- **Resources**: README, przewodnik po architekturze
+- **Prompts**: Pomoc w tworzeniu nowych sekcji i endpointów API
+
+### Szybki start
+
+1. Uruchom serwer: `bun dev`
+2. Skonfiguruj w Cursor: Dodaj MCP server z URL `http://localhost:3000/mcp`
+3. Użyj: Zapytaj AI o strukturę projektu, schematy, endpointy
+
+📖 **Pełna dokumentacja**: Zobacz [MCP_USAGE.md](./MCP_USAGE.md) dla szczegółowych instrukcji.
 
 ## 🗄️ Baza danych (Prisma)
 

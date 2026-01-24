@@ -18,8 +18,8 @@ export default defineEventHandler(async () => {
   const validationResult = safeParse(HealthOutputSchema, output)
   if (!validationResult.success) {
     throw createError({
-      statusCode: 500,
-      message: 'Health check validation failed'
+      status: 500,
+      statusText: 'Health check validation failed'
     })
   }
 
