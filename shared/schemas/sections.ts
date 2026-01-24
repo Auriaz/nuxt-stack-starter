@@ -1,5 +1,6 @@
 import { object, string, optional, boolean, array, picklist, literal, any } from 'valibot'
-import { ImageSchema, ButtonSchema, FeatureItemSchema, PricingPlanSchema, TestimonialItemSchema } from './common'
+import { ImageSchema, ButtonSchema, FeatureItemSchema, PricingPlanSchema, TestimonialItemSchema, FAQItemSchema } from './common'
+import { PortfolioProjectSchema } from './content'
 
 // SectionBaseSchema
 export const SectionBaseSchema = object({
@@ -13,9 +14,14 @@ export const SectionBaseSchema = object({
   title: optional(string()),
   description: optional(string()),
   links: optional(array(ButtonSchema)),
-  orientation: optional(picklist(['horizontal', 'vertical'] as const)),
   features: optional(array(FeatureItemSchema)),
   reverse: optional(boolean()),
+  spacing: optional(picklist(['none', 'xs', 'sm', 'md', 'lg', 'xl', '2xl'] as const)),
+  theme: optional(picklist(['light', 'dark', 'brand', 'neutral'] as const)),
+  background: optional(picklist(['none', 'subtle', 'muted', 'surface', 'gradient', 'image'] as const)),
+  container: optional(picklist(['default', 'narrow', 'wide', 'full'] as const)),
+  align: optional(picklist(['none', 'left', 'center'] as const)),
+  schema: optional(any()),
   ui: optional(object({
     root: optional(string()),
     container: optional(string()),
@@ -23,189 +29,72 @@ export const SectionBaseSchema = object({
     header: optional(string()),
     leading: optional(string()),
     leadingIcon: optional(string()),
-    headline: optional(string()),
-    title: optional(string()),
-    description: optional(string()),
-    body: optional(string()),
-    footer: optional(string()),
-    links: optional(string())
-  }))
-})
-
-// Hero Section - ręcznie łączymy pola z SectionBaseSchema
-export const SectionHeroSchema = object({
-  type: literal('hero'),
-  as: optional(any()),
-  id: optional(string()),
-  ref: optional(string()),
-  enabled: optional(boolean()),
-  headline: optional(string()),
-  title: optional(string()),
-  description: optional(string()),
-  links: optional(array(ButtonSchema)),
-  orientation: optional(picklist(['horizontal', 'vertical'] as const)),
-  image: optional(ImageSchema),
-  reverse: optional(boolean()),
-  ui: optional(object({
-    root: optional(string()),
-    container: optional(string()),
-    wrapper: optional(string()),
-    header: optional(string()),
-    headline: optional(string()),
-    title: optional(string()),
-    description: optional(string()),
-    body: optional(string()),
-    footer: optional(string()),
-    links: optional(string())
-  }))
-})
-
-// Features Section
-export const SectionFeaturesSchema = object({
-  type: literal('features'),
-  as: optional(any()),
-  id: optional(string()),
-  ref: optional(string()),
-  enabled: optional(boolean()),
-  title: optional(string()),
-  description: optional(string()),
-  links: array(ButtonSchema),
-  orientation: optional(picklist(['horizontal', 'vertical'] as const)),
-  reverse: optional(boolean()),
-  headline: optional(string()),
-  icon: optional(string()),
-  features: optional(array(FeatureItemSchema)),
-  ui: optional(object({
-    root: optional(string()),
-    container: optional(string()),
-    wrapper: optional(string()),
-    header: optional(string()),
-    leading: optional(string()),
-    leadingIcon: optional(string()),
-    headline: optional(string()),
-    title: optional(string()),
-    description: optional(string()),
-    body: optional(string()),
-    footer: optional(string()),
-    links: optional(string())
-  }))
-})
-
-// CTA Section
-export const SectionCTASchema = object({
-  type: literal('cta'),
-  as: optional(any()),
-  id: optional(string()),
-  ref: optional(string()),
-  enabled: optional(boolean()),
-  title: optional(string()),
-  description: optional(string()),
-  reverse: optional(boolean()),
-  links: array(ButtonSchema),
-  orientation: optional(picklist(['horizontal', 'vertical'] as const)),
-  variant: optional(picklist(['outline', 'solid', 'soft', 'subtle', 'naked'] as const)),
-  ui: optional(object({
-    root: optional(string()),
-    container: optional(string()),
-    wrapper: optional(string()),
-    header: optional(string()),
-    title: optional(string()),
-    description: optional(string()),
-    body: optional(string()),
-    footer: optional(string()),
-    links: optional(string())
-  }))
-})
-
-// Pricing Section
-export const SectionPricingSchema = object({
-  type: literal('pricing'),
-  as: optional(any()),
-  id: optional(string()),
-  ref: optional(string()),
-  enabled: optional(boolean()),
-  title: optional(string()),
-  description: optional(string()),
-  links: optional(array(ButtonSchema)),
-  plans: array(PricingPlanSchema),
-  orientation: optional(picklist(['horizontal', 'vertical'] as const)),
-  reverse: optional(boolean()),
-  headline: optional(string()),
-  icon: optional(string()),
-  items: optional(array(FeatureItemSchema)),
-  ui: optional(object({
-    root: optional(string()),
-    container: optional(string()),
-    wrapper: optional(string()),
-    header: optional(string()),
-    headline: optional(string()),
-    title: optional(string()),
-    description: optional(string()),
-    body: optional(string()),
-    footer: optional(string()),
-    links: optional(string())
-  }))
-})
-
-// FAQ Item Schema
-export const FAQItemSchema = object({
-  question: string(),
-  answer: string(),
-  icon: optional(string())
-})
-
-// FAQ Section
-export const SectionFAQSchema = object({
-  type: literal('faq'),
-  as: optional(any()),
-  id: optional(string()),
-  ref: optional(string()),
-  enabled: optional(boolean()),
-  headline: optional(string()),
-  title: optional(string()),
-  description: optional(string()),
-  items: array(FAQItemSchema),
-  orientation: optional(picklist(['horizontal', 'vertical'] as const)),
-  reverse: optional(boolean()),
-  multiple: optional(boolean()),
-
-  ui: optional(object({
-    root: optional(string()),
-    container: optional(string()),
-    wrapper: optional(string()),
-    header: optional(string()),
-    headline: optional(string()),
-    title: optional(string()),
-    description: optional(string()),
-    body: optional(string()),
-    items: optional(string())
-  }))
-})
-
-// Testimonials Section
-export const SectionTestimonialsSchema = object({
-  type: literal('testimonials'),
-  as: optional(any()),
-  id: optional(string()),
-  ref: optional(string()),
-  enabled: optional(boolean()),
-  headline: optional(string()),
-  title: optional(string()),
-  description: optional(string()),
-  orientation: optional(picklist(['horizontal', 'vertical'] as const)),
-  reverse: optional(boolean()),
-  items: array(TestimonialItemSchema),
-  layout: optional(picklist(['grid', 'carousel'] as const)),
-  ui: optional(object({
-    root: optional(string()),
-    container: optional(string()),
-    wrapper: optional(string()),
-    header: optional(string()),
     headline: optional(string()),
     title: optional(string()),
     description: optional(string()),
     body: optional(string()),
     items: optional(string()),
-    item: optional(string())
+    item: optional(string()),
+    footer: optional(string()),
+    links: optional(string())
   }))
+})
+
+// Hero Section – dziedziczy z SectionBaseSchema
+export const SectionHeroSchema = object({
+  ...SectionBaseSchema.entries,
+  type: literal('hero'),
+  image: optional(ImageSchema),
+  orientation: optional(picklist(['horizontal', 'vertical'] as const))
+})
+
+// Features Section – dziedziczy z SectionBaseSchema
+export const SectionFeaturesSchema = object({
+  ...SectionBaseSchema.entries,
+  type: literal('features'),
+  // W tej sekcji linki są wymagane
+  links: array(ButtonSchema)
+})
+
+// CTA Section – dziedziczy z SectionBaseSchema
+export const SectionCTASchema = object({
+  ...SectionBaseSchema.entries,
+  type: literal('cta'),
+  // CTA wymaga linków
+  links: array(ButtonSchema),
+  variant: optional(picklist(['outline', 'solid', 'soft', 'subtle', 'naked'] as const))
+})
+
+// Pricing Section – dziedziczy z SectionBaseSchema
+export const SectionPricingSchema = object({
+  ...SectionBaseSchema.entries,
+  type: literal('pricing'),
+  plans: array(PricingPlanSchema),
+  items: optional(array(FeatureItemSchema))
+})
+
+// FAQ Section – dziedziczy z SectionBaseSchema
+export const SectionFAQSchema = object({
+  ...SectionBaseSchema.entries,
+  type: literal('faq'),
+  items: array(FAQItemSchema),
+  multiple: optional(boolean())
+})
+
+// Testimonials Section – dziedziczy z SectionBaseSchema
+export const SectionTestimonialsSchema = object({
+  ...SectionBaseSchema.entries,
+  type: literal('testimonials'),
+  items: array(TestimonialItemSchema),
+  layout: optional(picklist(['grid', 'carousel'] as const))
+})
+
+// Portfolio Section – dziedziczy z SectionBaseSchema
+export const SectionPortfolioSchema = object({
+  ...SectionBaseSchema.entries,
+  type: literal('portfolio'),
+  options: object({
+    projects: array(PortfolioProjectSchema),
+    layout: optional(picklist(['grid', 'carousel'] as const))
+  })
 })

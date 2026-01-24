@@ -138,7 +138,7 @@ async function share() {
     <UPageHeader
       :title="post?.title"
       :description="post?.description"
-      class="container mx-auto py-4 md:py-8"
+      class="container mx-auto py-4 md:pt-14 md:pb-8"
     >
       <template #headline>
         <div class="flex flex-col gap-3 md:gap-2 w-full mb-5">

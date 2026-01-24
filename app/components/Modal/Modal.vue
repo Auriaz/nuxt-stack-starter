@@ -147,16 +147,16 @@ defineExpose<ModalProps>({
   </UModal>
 
   <Transition
-    enter-active-class="transition-all duration-300 ease-out"
-    enter-from-class="opacity-0 -translate-y-4 scale-95"
-    enter-to-class="opacity-100 translate-y-0 scale-100"
-    leave-active-class="transition-all duration-200 ease-in"
-    leave-from-class="opacity-100 translate-y-0 scale-100"
-    leave-to-class="opacity-0 -translate-y-2 scale-95"
+    enter-active-class="transition-all duration-300 delay-100 ease-out"
+    enter-from-class="-translate-y-16"
+    enter-to-class="-translate-y-0"
+    leave-active-class="transition-all duration-200 delay-100 ease-in"
+    leave-from-class="translate-y-0"
+    leave-to-class="-translate-y-16"
   >
     <div
       v-if="!isMobile && isOpen && layout === 'overlay'"
-      class="absolute left-0 top-0 w-full z-50 flex items-start justify-center bg-elevated/50 backdrop-blur-md p-2 sm:p-4 md:p-6 rounded-lg gap-2 sm:gap-4 md:gap-6 shadow-lg"
+      class="fixed left-0 top-16 w-screen z-50 flex items-start justify-center bg-elevated/50 backdrop-blur-md p-2 sm:p-4 md:p-6 rounded-lg gap-2 sm:gap-4 md:gap-6 shadow-lg"
     >
       <div
         :class="[

@@ -31,12 +31,16 @@ useSeoMeta({
     <UPage :ui="{ root: 'relative container mx-auto px-2 md:px-0' }">
       <UPageBody>
         <PageSection
-          :section="{
-            id: 'portfolio-section',
-            ref: 'portfolio-section',
-            title: projects?.title || 'Nasze Portfolio',
-            description: projects?.description,
-            orientation: 'vertical'
+          id="portfolio-section"
+          ref="portfolio-section"
+          type="portfolio"
+          :title="projects?.title || 'Nasze Portfolio'"
+          :description="projects?.description || 'Zobacz nasze realizacje i projekty'"
+          :reverse="false"
+          :ui="{
+            root: 'relative container mx-auto px-2 md:px-0',
+            container: 'max-w-7xl mx-auto',
+            content: ''
           }"
         >
           <PortfolioGrid :projects="projects || []" />

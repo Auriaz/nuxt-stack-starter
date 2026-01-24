@@ -1,28 +1,31 @@
-import { object, string, pipe, minLength, email, optional, boolean } from 'valibot'
+import { object, string, optional, boolean } from 'valibot'
 
-export const ContactFormSchema = object({
-  name: pipe(string(), minLength(2, 'Imię i nazwisko musi mieć co najmniej 2 znaki')),
-  email: pipe(string(), email('Nieprawidłowy adres email')),
-  phone: optional(string()),
-  subject: pipe(string(), minLength(3, 'Temat musi mieć co najmniej 3 znaki')),
-  message: pipe(string(), minLength(10, 'Wiadomość musi mieć co najmniej 10 znaków'))
+/**
+ * Schemat walidacji inputu dla formularza kontaktowego
+ */
+export const ContactFormInputSchema = object({
+  name: string(),
+  email: string(),
+  message: string(),
+  honeypot: optional(string()) // Pole honeypot dla ochrony przed spamem
 })
 
-export const NewsletterSubscribeSchema = object({
-  email: pipe(string(), email('Nieprawidłowy adres email')),
-  consent: optional(boolean())
-})
-
-export const CreatePostRequestSchema = object({
-  title: string(),
-  content: string(),
-  authorId: string()
-})
-
-export const PostResponseSchema = object({
+/**
+ * Schemat outputu dla formularza kontaktowego (DTO)
+ */
+export const ContactFormOutputSchema = object({
   id: string(),
-  title: string(),
-  content: string(),
-  authorId: string(),
-  createdAt: string()
+  name: string(),
+  email: string(),
+  message: string(),
+  createdAt: string() // ISO date string
+})
+
+/**
+ * Schemat outputu dla health check endpoint
+ */
+export const HealthOutputSchema = object({
+  ok: boolean(),
+  version: string(),
+  timestamp: string() // ISO date string
 })

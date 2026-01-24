@@ -59,10 +59,10 @@ useSeoMeta({
 <template>
   <NuxtLayout name="default">
     <UPage :ui="{ root: 'container mx-auto px-4 md:px-0' }">
-      <UPageBody>
-        <ContentRenderer
-          v-if="page"
-          :value="page"
+      <UPageBody class="p-0">
+        <SectionsRenderer
+          v-if="page?.sections"
+          :sections="page.sections"
         />
       </UPageBody>
     </UPage>

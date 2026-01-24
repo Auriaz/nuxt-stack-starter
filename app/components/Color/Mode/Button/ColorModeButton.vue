@@ -50,6 +50,15 @@ const startViewTransition = (event: MouseEvent) => {
     )
   })
 }
+
+defineShortcuts({
+  ctrl_l: () => {
+    startViewTransition(new MouseEvent('click', {
+      clientX: window.innerWidth / 2,
+      clientY: window.innerHeight / 2
+    }))
+  }
+})
 </script>
 
 <template>

@@ -19,7 +19,17 @@ export default defineNuxtConfig({
   ],
 
   imports: {
-    dirs: ['shared/types', 'shared/utils']
+    dirs: [
+      // Scan top-level composables
+      '~/composables',
+      // ... or scan composables nested one level deep with a specific name and file extension
+      '~/composables/*/index.{ts,js,mjs,mts}',
+      // ... or scan all composables within given directory
+      '~/composables/**',
+      '~/shared/schemas/**',
+      '~/shared/types/**',
+      '~/shared/utils/**'
+    ]
   },
 
   devtools: {
@@ -29,7 +39,7 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   site: {
-    url: appMeta.url || 'https://example.com',
+    // url: appMeta.url || 'https://example.com',
     name: appMeta.name,
     description: appMeta.description,
     defaultLocale: 'pl'
@@ -39,6 +49,10 @@ export default defineNuxtConfig({
     public: {
       plausibleDomain: process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN || ''
     }
+  },
+
+  alias: {
+    '~domain': './domain'
   },
 
   routeRules: {
@@ -53,6 +67,9 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-15',
 
   nitro: {
+    alias: {
+      '~domain': './domain'
+    },
     prerender: {
       routes: ['/sitemap.xml', '/robots.txt'],
       ignore: ['/__nuxt_content/content/query']
@@ -81,6 +98,7 @@ export default defineNuxtConfig({
       cookieKey: 'i18n_redirected'
     }
   },
+
   schemaOrg: {
     identity: definePerson(appMeta.author),
     publisher: definePerson(appMeta.author),

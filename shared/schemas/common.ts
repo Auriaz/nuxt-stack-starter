@@ -203,3 +203,10 @@ export const TestimonialItemSchema = object({
     }))
   }))
 })
+
+// FAQ Item Schema
+export const FAQItemSchema = object({
+  question: string(),
+  answer: string(),
+  icon: optional(string())
+})

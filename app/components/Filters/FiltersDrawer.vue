@@ -41,10 +41,10 @@ const handleReset = () => {
   emit('reset')
 }
 
-const handleApply = () => {
-  emit('apply')
-  filters.close()
-}
+// const handleApply = () => {
+//   emit('apply')
+//   filters.close()
+// }
 </script>
 
 <template>
@@ -78,16 +78,6 @@ const handleApply = () => {
         >
           <span class="hidden sm:inline truncate">Resetuj</span>
           <span class="sm:hidden truncate">Reset</span>
-        </UButton>
-
-        <UButton
-          color="primary"
-          icon="i-lucide-check"
-          size="sm"
-          class="flex-1 sm:flex-none hidden lg:flex items-center justify-center min-w-0 sm:min-w-[120px] md:min-w-[140px] max-w-full"
-          @click="handleApply"
-        >
-          <span class="truncate">Zastosuj</span>
         </UButton>
       </div>
     </template>

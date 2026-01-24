@@ -1,4 +1,4 @@
-import { object, string, date, array, optional, picklist, boolean } from 'valibot'
+import { object, string, date, array, optional, picklist, boolean, union } from 'valibot'
 import { ImageSchema, SEOSchema } from './common'
 import { AuthorSchema } from './user'
 import { SectionHeroSchema, SectionCTASchema, SectionBaseSchema, SectionFeaturesSchema, SectionPricingSchema, SectionFAQSchema, SectionTestimonialsSchema } from './sections'
@@ -52,14 +52,18 @@ export const PageSchema = object({
   title: string(),
   description: optional(string()),
   to: optional(string()),
-  sections: optional(object({
-    hero: optional(SectionHeroSchema),
-    section: optional(SectionBaseSchema),
-    features: optional(SectionFeaturesSchema),
-    pricing: optional(SectionPricingSchema),
-    cta: optional(SectionCTASchema),
-    faq: optional(SectionFAQSchema),
-    testimonials: optional(SectionTestimonialsSchema)
-  })),
+  sections: optional(
+    array(
+      union([
+        SectionHeroSchema,
+        SectionFeaturesSchema,
+        SectionPricingSchema,
+        SectionCTASchema,
+        SectionFAQSchema,
+        SectionTestimonialsSchema,
+        SectionBaseSchema
+      ])
+    )
+  ),
   seo: optional(SEOSchema)
 })

@@ -27,7 +27,7 @@ const spacingClasses = computed(() => {
 const themeClasses = computed(() => {
   const theme = config.value.theme || 'light'
   const classes: Record<string, string> = {
-    light: 'bg-background text-foreground border-t border-border',
+    light: 'bg-background text-foreground border-t-1 border-gray-600 dark:border-gray-800',
     dark: 'bg-neutral-900 text-white border-t border-neutral-800',
     brand: 'bg-primary text-primary-foreground border-t border-primary/20'
   }

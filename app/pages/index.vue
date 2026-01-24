@@ -23,9 +23,9 @@ useSeoMeta({
   <NuxtLayout name="default">
     <UPage :ui="{ root: 'w-full min-h-screen' }">
       <UPageBody class="p-0">
-        <ContentRenderer
-          v-if="page"
-          :value="page"
+        <SectionsRenderer
+          v-if="page?.sections"
+          :sections="page.sections"
         />
       </UPageBody>
     </UPage>

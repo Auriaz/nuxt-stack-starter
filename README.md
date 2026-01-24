@@ -60,12 +60,21 @@ Solidna "podkładka pod strony internetowe" oparta o Nuxt 4, gotowa do wielokrot
 git clone https://github.com/Auriaz/nuxt-base-starter.git
 cd nuxt-base-starter
 
-# Zainstaluj zależności
-npm install
-# lub
-pnpm install
-# lub
+# Zainstaluj zależności (Bun jest primary runtime)
 bun install
+```
+
+### Konfiguracja bazy danych
+
+```bash
+# Wygeneruj Prisma Client
+bun db:generate
+
+# Utwórz migrację
+bun db:migrate
+
+# Otwórz Prisma Studio (opcjonalnie)
+bun db:studio
 ```
 
 ### Konfiguracja
@@ -91,46 +100,46 @@ site: {
 
 ```bash
 # Uruchom serwer deweloperski
-npm run dev
+bun dev
 
 # Linting
-npm run lint
-npm run lint:fix
+bun lint
+bun lint:fix
 
 # Formatowanie
-npm run format
+bun format
 
 # Type checking
-npm run typecheck
+bun typecheck
 ```
 
 ### Production
 
 ```bash
 # Build
-npm run build
+bun build
 
 # Preview
-npm run preview
+bun preview
 ```
 
 ## 🧪 Testy
 
 ```bash
 # Wszystkie testy
-npm run test
+bun test
 
 # Unit tests
-npm run test:unit
+bun test:unit
 
 # Component tests
-npm run test:nuxt
+bun test:nuxt
 
 # E2E tests
-npm run test:e2e
+bun test:e2e
 
 # E2E tests z UI
-npm run test:e2e:ui
+bun test:e2e:ui
 ```
 
 ## 📁 Struktura projektu
@@ -138,51 +147,316 @@ npm run test:e2e:ui
 ```
 nuxt-base-starter/
 ├── app/
-│   ├── components/      # Komponenty Vue
-│   │   ├── sections/    # Sekcje strony
-│   │   ├── ui/          # Komponenty UI
-│   │   ├── layout/      # Komponenty layoutu
-│   │   └── portfolio/   # Komponenty portfolio
-│   ├── composables/     # Composables Vue
-│   ├── layouts/         # Layouty
-│   ├── pages/           # Strony (file-based routing)
-│   ├── server/          # Server API routes
-│   ├── assets/          # Zasoby przetwarzane przez Vite
-│   │   ├── css/         # Style CSS (main.css)
-│   │   └── images/       # Obrazy do importu w komponentach (logo.svg, icons/, illustrations/)
-│   └── utils/           # Utility functions
-├── content/             # Nuxt Content files
-│   └── blog/            # Wpisy bloga
-├── public/              # Pliki statyczne (serwowane bezpośrednio)
-│   ├── favicon.ico      # Favicon
-│   ├── icons/           # Ikony PWA (icon-192x192.png, icon-512x512.png, apple-touch-icon.png)
-│   ├── images/          # Obrazy ogólne (og-image.png, logo.png, placeholders/)
-│   ├── blog/            # Obrazy bloga (opcjonalnie)
-│   ├── portfolio/       # Obrazy portfolio (opcjonalnie)
-│   └── documents/       # Dokumenty do pobrania (opcjonalnie)
-├── shared/              # Współdzielone typy, schematy i utils
-│   ├── types/           # TypeScript types (auto-importowane)
-│   │   ├── content.ts   # Typy dla Nuxt Content
-│   │   ├── user.ts      # Typy użytkownika/autora
-│   │   ├── common.ts    # Wspólne typy (Image, SEO)
-│   │   ├── auth.ts      # Typy autoryzacji (przyszłość)
-│   │   └── api.ts       # Typy API/DTO (przyszłość)
-│   ├── schemas/         # Valibot schemas (walidacja)
-│   │   ├── content.ts   # Schematy dla Nuxt Content
-│   │   ├── user.ts      # Schematy użytkownika/autora
-│   │   ├── common.ts    # Wspólne schematy
-│   │   ├── auth.ts      # Schematy autoryzacji
-│   │   └── api.ts       # Schematy API
-│   └── utils/           # Pure utility functions (auto-importowane)
-│       ├── content.ts   # Helpery dla content
-│       └── types.ts     # Type guards
-├── test/                # Vitest tests
-│   ├── unit/            # Unit tests
-│   └── nuxt/            # Component tests
-├── tests/               # Playwright E2E tests
-└── i18n/                # Pliki tłumaczeń
-    └── locales/
+│   ├── components/      # Komponenty Vue (prezentacyjne)
+│   │   ├── sections/   # Sekcje strony (SectionsHero, SectionsFeatures, etc.)
+│   │   ├── ui/         # Wrappery UI (Section, SectionHeader, AppCard)
+│   │   ├── layout/     # Komponenty layoutu (Header, Footer)
+│   │   └── portfolio/  # Komponenty portfolio
+│   ├── composables/
+│   │   ├── resources/  # Jedyny fetch w UI (useApiClient, useContactResource, etc.)
+│   │   └── ui/         # Composables UI (useMotionPresets, useFilters)
+│   ├── layouts/        # Layouty
+│   ├── pages/          # Strony (file-based routing)
+│   ├── assets/         # Zasoby przetwarzane przez Vite
+│   └── utils/          # Utility functions
+├── domain/             # Logika biznesowa (use-cases, types, errors)
+│   ├── contact/        # Use-case: sendContactMessage
+│   ├── portfolio/      # Use-case: listPortfolio (opcjonalnie)
+│   └── shared/         # Result pattern, błędy domenowe
+├── server/
+│   ├── api/            # Endpointy API (parse → validate → use-case → DTO)
+│   ├── repositories/   # Prisma queries (abstrakcja bazy danych)
+│   └── services/       # Serwisy (prisma.ts - singleton)
+├── shared/             # Współdzielone typy, schematy i utils
+│   ├── types/          # TypeScript types (auto-importowane)
+│   ├── schemas/        # Valibot schemas (walidacja)
+│   └── utils/          # Pure utility functions
+├── content/            # Nuxt Content files
+│   ├── pages/          # Strony contentowe
+│   ├── blog/           # Wpisy bloga
+│   └── portfolio/      # Projekty portfolio
+├── prisma/             # Prisma schema i migracje
+│   └── schema.prisma   # Model bazy danych
+├── public/             # Pliki statyczne
+├── test/               # Vitest tests
+├── tests/              # Playwright E2E tests
+└── i18n/               # Pliki tłumaczeń
 ```
+
+## 🏗️ Architektura
+
+Projekt używa warstwowej architektury z jasnymi granicami odpowiedzialności:
+
+### Warstwy
+
+1. **UI Layer** (`app/`)
+   - Komponenty Vue - czysto prezentacyjne (props + UI + motion)
+   - Composables resources - jedyny fetch w UI
+   - Pages - używają SectionsRenderer
+
+2. **API Layer** (`server/api/`)
+   - Parse input → Validate (Valibot) → Call use-case → Return DTO
+   - Brak logiki biznesowej
+
+3. **Domain Layer** (`domain/`)
+   - Use-cases - logika biznesowa
+   - Types - kontrakty domenowe
+   - Errors - błędy domenowe
+   - Result pattern - bezpieczne obsługiwanie błędów
+
+4. **Repository Layer** (`server/repositories/`)
+   - Prisma queries
+   - Abstrakcja bazy danych
+
+5. **Data Layer** (Prisma)
+   - Model bazy danych
+   - Migracje
+
+### Flow danych
+
+```
+UI Component
+    ↓ (używa)
+Resource Composable (useApiClient)
+    ↓ (fetch)
+API Endpoint
+    ↓ (walidacja Valibot)
+Use-case (domain/)
+    ↓ (używa)
+Repository
+    ↓ (Prisma)
+Database
+```
+
+## ⚠️ Zasady systemowe
+
+**KRYTYCZNE - bez wyjątków:**
+
+1. **Komponenty Vue** (`app/components`, `app/pages`):
+   - ❌ NIE wykonują fetch
+   - ❌ NIE znają API
+   - ✅ Są czysto prezentacyjne (props + UI + motion)
+
+2. **Jedyny fetch w UI** odbywa się przez warstwę `resources`:
+   - `app/composables/resources/*`
+   - np. `useContactResource()`, `usePortfolioResource()`
+
+3. **server/api/\***:
+   - ❌ NIE zawiera logiki biznesowej
+   - ✅ Robi tylko: parse input → validate → call use-case → return DTO
+
+4. **Logika biznesowa** ma jedno miejsce:
+   - `/domain/*`
+   - Use-case'y, reguły, kontrakty, mapowania
+
+5. **Content** (Nuxt Content):
+   - ✅ Tylko marketing, blog, portfolio, statyczne strony
+   - ❌ Żadnych bytów aplikacyjnych / DB
+
+6. **Jeden model stron**:
+   - PageSchema (seo + sections[])
+   - UI budowane wyłącznie przez SectionsRenderer
+   - ❌ Brak "magicznych" pól UI w root
+
+## 📖 Jak dodać...
+
+### Nową sekcję (opartą o PageSection)
+
+1. Dodaj schemat w `shared/schemas/sections.ts` jako rozszerzenie `SectionBaseSchema`:
+
+```typescript
+export const SectionMyNewSectionSchema = object({
+  ...SectionBaseSchema.entries,
+  type: literal('my-new-section'),
+  // ... pola specyficzne dla sekcji
+})
+```
+
+2. Dodaj typ w `shared/types/sections.ts`:
+
+```typescript
+export type SectionMyNewSection = InferOutput<typeof SectionMyNewSectionSchema>
+```
+
+3. Utwórz komponent w `app/components/sections/SectionsMyNewSection.vue`,
+   który renderuje **tylko treść** sekcji (bez własnego wrappera layoutu),
+   a za layout odpowiada `PageSection`:
+
+```vue
+<script setup lang="ts">
+  import type { SectionMyNewSection } from '#shared/types/sections'
+
+  const props = defineProps<{
+    section: SectionMyNewSection
+  }>()
+</script>
+
+<template>
+  <!-- Tutaj tylko treść sekcji, np. karty / grid / CTA -->
+  <div class="grid gap-6">
+    <!-- ... -->
+  </div>
+</template>
+```
+
+4. Zarejestruj w `app/components/sections/SectionsRenderer.vue`,
+   aby `SectionsRenderer` mógł rozwiązać komponent treści:
+
+```typescript
+const sectionComponents = {
+  // ...
+  'my-new-section': SectionsMyNewSection,
+}
+```
+
+5. Dodaj do union w `shared/schemas/content.ts`:
+
+```typescript
+sections: optional(
+  array(
+    union([
+      // ...
+      SectionMyNewSectionSchema,
+    ])
+  )
+)
+```
+
+### Nowy endpoint API
+
+1. Utwórz `server/api/my-endpoint.post.ts`:
+
+```typescript
+import { safeParse } from 'valibot'
+import { MyInputSchema } from '~/shared/schemas/api'
+import { myUseCase } from '~/domain/my-domain/my.usecase'
+import { myRepository } from '~/server/repositories/my.repo'
+
+export default defineEventHandler(async (event) => {
+  const body = await readBody(event)
+
+  const result = safeParse(MyInputSchema, body)
+  if (!result.success) {
+    throw createError({ statusCode: 400, message: 'Invalid input' })
+  }
+
+  const useCaseResult = await myUseCase(result.output, myRepository)
+
+  if (isErr(useCaseResult)) {
+    throw createError({
+      statusCode: useCaseResult.error.statusCode,
+      message: useCaseResult.error.message,
+    })
+  }
+
+  return { data: useCaseResult.value }
+})
+```
+
+2. Dodaj schematy w `shared/schemas/api.ts`:
+
+```typescript
+export const MyInputSchema = object({
+  /* ... */
+})
+export const MyOutputSchema = object({
+  /* ... */
+})
+```
+
+### Nowy use-case w domain
+
+1. Utwórz `domain/my-domain/my.types.ts`:
+
+```typescript
+export interface MyInput {
+  // ...
+}
+
+export interface MyOutput {
+  // ...
+}
+```
+
+2. Utwórz `domain/my-domain/my.usecase.ts`:
+
+```typescript
+import type { MyInput, MyOutput } from './my.types'
+import type { MyRepository } from '~/server/repositories/my.repo'
+import { ok, err, type Result } from '../shared/result'
+import { ValidationError } from '../shared/errors'
+
+export async function myUseCase(
+  input: MyInput,
+  repository: MyRepository
+): Promise<Result<MyOutput, ValidationError>> {
+  // Logika biznesowa
+  try {
+    const result = await repository.create(input)
+    return ok(result)
+  } catch (error) {
+    return err(new ValidationError('Failed'))
+  }
+}
+```
+
+3. Utwórz repository w `server/repositories/my.repo.ts`:
+
+```typescript
+import { prisma } from '../services/prisma'
+
+export interface MyRepository {
+  create(input: MyInput): Promise<MyOutput>
+}
+
+export const myRepository: MyRepository = {
+  async create(input) {
+    // Prisma query
+  },
+}
+```
+
+### Nowy resource
+
+1. Utwórz `app/composables/resources/useMyResource.ts`:
+
+```typescript
+import { useApiClient } from './useApiClient'
+
+export function useMyResource() {
+  const apiClient = useApiClient()
+
+  async function submitMyForm(payload: MyInput) {
+    return await apiClient.request<MyOutput>('/api/my-endpoint', {
+      method: 'POST',
+      body: payload,
+    })
+  }
+
+  return {
+    submitMyForm,
+  }
+}
+```
+
+### Nową stronę contentową
+
+1. Utwórz `content/my-page.md`:
+
+```markdown
+---
+title: 'Moja strona'
+description: 'Opis strony'
+sections:
+  - type: 'hero'
+    title: 'Tytuł'
+    # ...
+  - type: 'features'
+    # ...
+---
+```
+
+2. Strona jest automatycznie dostępna pod `/my-page` dzięki file-based routing
 
 ## 🔧 Konfiguracja
 
@@ -280,6 +554,35 @@ Typed Component/API
 ```
 
 Wszystkie typy i utils z `shared/` są automatycznie importowane dzięki konfiguracji w `nuxt.config.ts`.
+
+## 🗄️ Baza danych (Prisma)
+
+Projekt używa Prisma jako ORM. Minimalny model zawiera:
+
+- `ContactMessage` - wiadomości z formularza kontaktowego
+
+### Komendy Prisma
+
+```bash
+# Wygeneruj Prisma Client
+bun db:generate
+
+# Utwórz migrację
+bun db:migrate
+
+# Otwórz Prisma Studio (GUI do bazy danych)
+bun db:studio
+```
+
+### Konfiguracja
+
+Ustaw `DATABASE_URL` w `.env`:
+
+```bash
+DATABASE_URL="file:./dev.db"  # SQLite (MVP)
+# lub
+DATABASE_URL="postgresql://user:password@localhost:5432/mydb"  # PostgreSQL
+```
 
 ## 📚 Rozszerzanie startera
 

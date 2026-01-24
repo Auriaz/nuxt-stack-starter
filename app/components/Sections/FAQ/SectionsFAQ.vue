@@ -1,29 +1,23 @@
 <script setup lang="ts">
 import type { SectionFAQ } from '#shared/types/sections'
+import PageSection from '~/components/Page/Section/PageSection.vue'
 
-const props = defineProps({
-  section: {
-    type: Object as PropType<SectionFAQ>,
-    required: true
-  }
-})
+const props = defineProps<{
+  section: SectionFAQ
+}>()
 
 const config = computed(() => ({
-  type: props.section.type || 'faq',
-  id: props.section.id || undefined,
-  ref: props.section.ref || undefined,
-  enabled: props.section.enabled !== false,
-  headline: props.section.headline || undefined,
-  title: props.section.title || undefined,
-  description: props.section.description || undefined,
-  items: props.section.items || undefined,
+  id: props.section.id,
+  ref: props.section.ref,
+  headline: props.section.headline,
+  title: props.section.title,
+  description: props.section.description,
+  items: props.section.items || [],
   multiple: props.section.multiple || false,
-  orientation: props.section.orientation || 'horizontal',
   reverse: props.section.reverse || false,
   ui: props.section.ui || {}
 }))
 
-// Transform items for UAccordion
 const accordionItems = computed(() =>
   config.value.items.map((item, index) => ({
     label: item.question,
@@ -33,9 +27,8 @@ const accordionItems = computed(() =>
   }))
 )
 
-// Schema.org FAQPage markup for SEO
 const faqSchema = computed(() => {
-  if (!config.value.enabled || config.value.items.length === 0) return null
+  if (config.value.items.length === 0) return null
 
   return {
     '@context': 'https://schema.org',
@@ -58,21 +51,15 @@ if (faqSchema.value) {
 
 <template>
   <PageSection
-    v-if="config.enabled"
-    :section="{
-      type: config.type,
-      id: config.id,
-      ref: config.ref,
-      enabled: config.enabled,
-      headline: config.headline,
-      title: config.title,
-      description: config.description,
-      orientation: config.orientation,
-      reverse: config.reverse,
-      ui: config.ui
-    }"
+    :headline="section.headline"
+    :title="section.title"
+    :description="section.description"
+    :items="section.items"
+    :multiple="section.multiple"
+    :reverse="section.reverse"
+    :ui="section.ui"
+    :type="section.type"
   >
-    <!-- FAQ Accordion -->
     <UAccordion
       :items="accordionItems"
       :multiple="config.multiple"

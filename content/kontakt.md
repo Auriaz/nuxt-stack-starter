@@ -10,14 +10,13 @@ seo:
 
 # Hero - Główny header
 sections:
-  hero:
-    type: 'hero'
-    id: 'hero'
+  - type: 'hero'
+    id: 'contact-hero'
+    ref: 'contact-hero'
     enabled: true
     headline: 'KONTAKT'
     title: 'Porozmawiajmy o Twoim projekcie'
     description: 'Jesteśmy tutaj, aby odpowiedzieć na Twoje pytania i pomóc w realizacji projektu. Oferujemy bezpłatną konsultację, podczas której omówimy Twoje potrzeby i zaproponujemy najlepsze rozwiązanie.'
-    orientation: 'vertical'
     links:
       - label: 'kontakt@nuxt-starter.pl'
         to: 'mailto:kontakt@nuxt-starter.pl'
@@ -32,13 +31,12 @@ sections:
         icon: 'i-lucide-phone'
 
   # CTA - Wezwanie do działania
-  cta:
-    type: 'cta'
-    id: 'cta'
+  - type: 'cta'
+    id: 'contact-cta'
+    ref: 'contact-cta'
     enabled: true
     title: 'Gotowy na rozmowę?'
     description: 'Skontaktuj się z nami już dziś. Pierwsza konsultacja jest bezpłatna - opowiemy Ci, jak możemy pomóc w realizacji Twojego projektu.'
-    orientation: 'vertical'
     variant: 'soft'
     links:
       - label: 'Wyślij email'
@@ -55,6 +53,3 @@ sections:
     ui:
       root: ''
 ---
-
-:PageHero{:hero="sections.hero"}
-:PageCTA{:cta="sections.cta"}

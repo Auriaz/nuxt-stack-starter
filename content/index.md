@@ -3,13 +3,13 @@ title: 'Home'
 description: 'Home page'
 to: '/'
 sections:
-  hero:
-    type: 'hero'
+  - type: 'hero'
     id: 'homepage-hero'
     ref: 'homepage-hero'
     title: 'Witamy w Nuxt Base Starter'
     description: 'Solidna podkładka pod strony internetowe oparta o Nuxt 4, gotowa do wielokrotnego użycia i łatwa do aktualizowania.'
     headline: 'HERO PAGE'
+    orientation: 'horizontal'
     image:
       src: '/images/hero/home_1.png'
       alt: 'Nuxt Base Starter'
@@ -25,13 +25,15 @@ sections:
         size: 'lg'
     reverse: false
     orientation: 'horizontal'
-  features:
-    type: 'features'
+
+  - type: 'features'
     id: 'homepage-features'
     ref: 'homepage-features'
+    headline: 'NASZE FUNKCJE'
     title: 'Nasze funkcje'
     description: 'Wszystko czego potrzebujesz do rozpoczęcia projektu'
     orientation: 'vertical'
+    links: []
     features:
       - title: 'Nuxt 4'
         description: 'Najnowsza wersja Nuxt z pełnym wsparciem dla TypeScript i Vue 3.'
@@ -55,8 +57,7 @@ sections:
         description: 'Konfiguracja testów: Vitest (unit/component) i Playwright (E2E).'
         icon: 'i-lucide-check-circle'
 
-  testimonials:
-    type: 'testimonials'
+  - type: 'testimonials'
     id: 'homepage-testimonials'
     ref: 'homepage-testimonials'
     headline: 'OPINIE KLIENTÓW'
@@ -92,8 +93,8 @@ sections:
           role: 'IT Director'
           company: 'MediaCorp'
         rating: 5
-  cta:
-    type: 'cta'
+
+  - type: 'cta'
     id: 'homepage-cta'
     ref: 'homepage-cta'
     title: 'Gotowy do rozpoczęcia?'
@@ -114,12 +115,7 @@ sections:
     orientation: 'vertical'
     ui:
       root: 'my-12'
-  seo:
-    title: 'Home'
-    description: 'Home page'
+seo:
+  title: 'Home'
+  description: 'Home page'
 ---
-
-:PageHero{:hero="sections.hero"}
-:PageSection{:section="sections.features"}
-:PageTestimonials{:section="sections.testimonials"}
-:PageCTA{:cta="sections.cta"}

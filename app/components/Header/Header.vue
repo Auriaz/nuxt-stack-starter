@@ -6,7 +6,6 @@ const isScrolled = ref(false)
 // const { clear: clearUserSession, loggedIn, user } = useUserSession()
 
 // Globalny system filtrów
-const filters = useFilters()
 
 onMounted(() => {
   const handleScroll = () => {
@@ -52,15 +51,7 @@ const searchTerm = ref('')
     <template #right>
       <div class="hidden md:flex items-center gap-2 mr-5">
         <!-- Przycisk filtrów (widoczny tylko gdy strona ma filtry) -->
-        <UButton
-          v-if="filters.hasFilters.value"
-          icon="i-lucide-filter"
-          variant="ghost"
-          color="primary"
-          size="sm"
-          :label="filters.isOpen.value ? 'Zamknij filtry' : 'Filtry'"
-          @click="filters.toggle"
-        />
+        <FiltersButton />
 
         <ColorModeButton />
 
@@ -74,7 +65,9 @@ const searchTerm = ref('')
             variant="subtle"
             color="primary"
             size="sm"
+            :tooltip="{ text: 'Szukaj', kbds: ['Ctrl + K'] }"
           />
+
           <ClientOnly>
             <LazyUContentSearch
               v-model:search-term="searchTerm"
@@ -192,15 +185,7 @@ const searchTerm = ref('')
       </div>
 
       <!-- Przycisk filtrów (mobile) -->
-      <UButton
-        v-if="filters.hasFilters.value"
-        icon="i-lucide-filter"
-        variant="ghost"
-        color="primary"
-        size="sm"
-        class="md:hidden"
-        @click="filters.toggle"
-      />
+      <FiltersButton class="md:hidden" />
     </template>
 
     <template #body>

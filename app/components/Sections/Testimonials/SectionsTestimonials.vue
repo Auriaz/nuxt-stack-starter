@@ -1,32 +1,26 @@
 <script setup lang="ts">
 import type { SectionTestimonials } from '#shared/types/sections'
 import type { TestimonialItem } from '#shared/types/common'
+import PageSection from '~/components/Page/Section/PageSection.vue'
 
-const props = defineProps({
-  section: {
-    type: Object as PropType<SectionTestimonials>,
-    required: true
-  }
-})
+const props = defineProps<{
+  section: SectionTestimonials
+}>()
 
 const config = computed(() => ({
-  type: props.section.type || 'testimonials',
-  id: props.section.id || undefined,
-  ref: props.section.ref || undefined,
-  enabled: props.section.enabled || true,
-  headline: props.section.headline || undefined,
-  title: props.section.title || undefined,
-  description: props.section.description || undefined,
+  id: props.section.id,
+  ref: props.section.ref,
+  headline: props.section.headline,
+  title: props.section.title,
+  description: props.section.description,
   items: (props.section.items || []) as TestimonialItem[],
   layout: props.section.layout || 'grid',
-  orientation: props.section.orientation || 'horizontal',
   reverse: props.section.reverse || false,
   ui: props.section.ui || {}
 }))
 
-// Schema.org Review markup for SEO
 const reviewSchema = computed(() => {
-  if (!config.value.enabled || config.value.items.length === 0) return null
+  if (config.value.items.length === 0) return null
 
   return {
     '@context': 'https://schema.org',
@@ -63,38 +57,34 @@ if (reviewSchema.value) {
 
 <template>
   <PageSection
-    v-if="config.enabled"
-    :section="{
-      type: config.type,
-      id: config.id,
-      ref: config.ref,
-      enabled: config.enabled,
-      headline: config.headline,
-      title: config.title,
-      description: config.description,
-      orientation: config.orientation,
-      reverse: config.reverse,
-      ui: config.ui
-    }"
+    :id="section.id"
+    :type="section.type"
+    :section-ref="section.ref"
+    :headline="section.headline"
+    :title="section.title"
+    :description="section.description"
+    :items="section.items"
+    :reverse="section.reverse"
+    :ui="section.ui"
   >
-    <!-- Grid Layout -->
-    <div
-      v-if="config.layout === 'grid'"
-      class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-      :class="config.ui.items"
-    >
-      <CardTestimonial
-        v-for="(testimonial, index) in config.items"
-        :key="index"
-        :testimonial="testimonial"
-        :item-class="config.ui.item"
-      />
-    </div>
+    <!-- Grid Layout
+        <Motion
+          v-if="config.layout === 'grid'"
+          :variants="staggerList"
+          :initial="false"
+          class="w-full grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          :class="config.ui.items"
+        >
+          <CardTestimonial
+            v-for="(testimonial, index) in config.items"
+            :key="index"
+            :testimonial="testimonial"
+            :item-class="config.ui.item"
+          />
+        </Motion>
+      -->
 
     <!-- Carousel Layout -->
-    <!-- Note: UCarousel expects CarouselItem[] but we pass TestimonialItem[] -->
-    <!-- Type assertion (as any) is used to bypass the type mismatch -->
-    <!-- Items are properly typed as TestimonialItem in the v-slot -->
     <UCarousel
       v-if="config.layout === 'carousel'"
       v-slot="{ item }"
@@ -102,6 +92,7 @@ if (reviewSchema.value) {
       :loop="true"
       :autoplay="{ delay: 2000 }"
       :ui="{
+        root: 'w-full',
         item: 'basis-full md:basis-1/2 lg:basis-1/3'
       }"
       arrows

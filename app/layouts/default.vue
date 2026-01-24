@@ -6,7 +6,7 @@
       <Navbar />
     </Header>
 
-    <UMain class="md:pt-20">
+    <UMain class="md:pt-8">
       <slot />
     </UMain>
 

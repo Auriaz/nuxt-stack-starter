@@ -3,15 +3,13 @@ title: Oferta
 description: Nasza oferta - wybierz plan dopasowany do Twoich potrzeb
 to: '/oferta'
 sections:
-  pricing:
-    pricing:
-    type: 'pricing'
+  - type: 'pricing'
     id: 'pricing'
     title: 'Wybierz swój plan'
     description: 'Elastyczne plany dopasowane do Twoich potrzeb'
     headline: 'CENNIK'
-    orientation: 'vertical'
     enabled: true
+    links: []
     plans:
       - title: 'Starter'
         description: 'Dla małych projektów'
@@ -30,7 +28,6 @@ sections:
           size: 'lg'
           block: true
         highlight: true
-
       - title: 'Pro'
         description: 'Dla rozwijających się firm'
         badge:
@@ -53,7 +50,6 @@ sections:
           size: 'lg'
           block: true
         scale: true
-
       - title: 'Enterprise'
         description: 'Dla dużych organizacji'
         price: 'Kontakt'
@@ -67,8 +63,7 @@ sections:
           size: 'lg'
           block: true
           to: '/kontakt'
-  cta:
-    type: 'cta'
+  - type: 'cta'
     id: 'cta-offer'
     ref: 'cta-offer'
     title: 'Gotowy do rozpoczęcia?'
@@ -86,13 +81,9 @@ sections:
         variant: 'outline'
         size: 'lg'
     variant: 'soft'
-    orientation: 'horizontal'
     ui:
       root: 'my-12'
 seo:
   title: 'Oferta'
   description: 'Nasza oferta - wybierz plan dopasowany do Twoich potrzeb'
 ---
-
-:PagePricing{:section="sections.pricing"}
-:PageCTA{:cta="cta"}
