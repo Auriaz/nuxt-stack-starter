@@ -67,8 +67,8 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-15',
 
   nitro: {
-    alias: {
-      '~domain': './domain'
+    rollupConfig: {
+      external: [/^@prisma\//, /\.wasm$/]
     },
     prerender: {
       routes: ['/sitemap.xml', '/robots.txt'],
