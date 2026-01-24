@@ -90,17 +90,36 @@ const shareText = computed(() => `${post.value.title} - ${post.value.description
 
 const shareToTwitter = () => {
   const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText.value)}&url=${encodeURIComponent(currentUrl)}`
-  window.open(url, '_blank', 'width=550,height=420')
+  navigateTo(url, { external: true, open: {
+    target: '_blank',
+    windowFeatures: {
+      width: 500,
+      height: 500
+    }
+  } })
 }
 
 const shareToFacebook = () => {
   const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`
-  window.open(url, '_blank', 'width=550,height=420')
+  navigateTo(url, { external: true, open: {
+    target: '_blank',
+    windowFeatures: {
+      width: 500,
+      height: 500
+    }
+  } })
 }
 
 const shareToLinkedIn = () => {
   const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`
-  window.open(url, '_blank', 'width=550,height=420')
+  // window.open(url, '_blank', 'width=550,height=420')
+  navigateTo(url, { external: true, open: {
+    target: '_blank',
+    windowFeatures: {
+      width: 500,
+      height: 500
+    }
+  } })
 }
 
 const toast = useToast()
