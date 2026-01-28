@@ -26,7 +26,9 @@ export default defineEventHandler(async (event) => {
     '/api/auth/register',
     '/api/auth/forgot-password',
     '/api/auth/reset-password',
-    '/api/health'
+    '/api/health',
+    // Publiczny endpoint formularza kontaktowego
+    '/api/contact'
   ]
   if (publicPaths.includes(event.path)) {
     return

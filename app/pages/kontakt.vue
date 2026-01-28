@@ -64,6 +64,9 @@ useSeoMeta({
           v-if="page?.sections"
           :sections="page.sections"
         />
+
+        <!-- Formularz kontaktowy (niezależny od content layer) -->
+        <ContactForm />
       </UPageBody>
     </UPage>
   </NuxtLayout>
