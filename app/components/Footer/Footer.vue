@@ -46,7 +46,7 @@ const themeClasses = computed(() => {
   const classes: Record<string, string> = {
     light: 'bg-background text-foreground border-t border-gray-200 dark:border-gray-800',
     dark: 'bg-neutral-900 text-white border-t border-neutral-800',
-    brand: 'bg-gradient-to-b from-elevated-950/80 via-slate-950 to-slate-950 text-white border-t border-primary/30'
+    brand: 'bg-elevated dark:bg-gradient-to-b dark:from-elevated-950/80 dark:via-slate-950 dark:to-slate-950 text-white border-t border-primary/30'
   }
   return classes[theme] || classes.light
 })
@@ -174,7 +174,7 @@ if (footerSchema.value) {
             <Logo />
             <h3
               v-if="config.brand.name"
-              class="text-lg font-bold"
+              class="text-lg font-bold dark:text-white text-black"
             >
               {{ config.brand.name }}
             </h3>
@@ -183,7 +183,7 @@ if (footerSchema.value) {
             v-if="config.brand.description"
             :class="[
               'text-sm leading-relaxed',
-              isBrandTheme ? 'text-white/70' : 'text-muted-foreground/80'
+              isBrandTheme ? 'dark:text-white/70 text-black/70' : 'text-muted-foreground/80'
             ]"
           >
             {{ config.brand.description }}
@@ -199,6 +199,7 @@ if (footerSchema.value) {
           <h4 class="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
             {{ column.title }}
           </h4>
+
           <ul class="space-y-2">
             <li
               v-for="(link, linkIndex) in column.links"
@@ -209,9 +210,11 @@ if (footerSchema.value) {
                 :href="link.href"
                 :target="getLinkAttributes(link).target"
                 :rel="getLinkAttributes(link).rel"
+                :active-class="isBrandTheme ? 'text-primary-600 dark:text-primary-400' : 'text-primary'"
+                inactive-class="dark:text-white text-black/80"
                 :class="[
                   'text-sm transition-colors flex items-center gap-2',
-                  isBrandTheme ? 'text-white/70 hover:text-white' : 'text-muted-foreground/80 hover:text-primary'
+                  isBrandTheme ? ' dark:hover:text-white hover:text-primary-600' : 'hover:text-primary'
                 ]"
               >
                 <UIcon
@@ -244,7 +247,7 @@ if (footerSchema.value) {
               />
               <a
                 :href="`mailto:${config.contact.email}`"
-                class="hover:text-foreground transition-colors"
+                class="hover:text-foreground transition-colors dark:text-white text-black"
               >
                 {{ config.contact.email }}
               </a>
@@ -259,7 +262,7 @@ if (footerSchema.value) {
               />
               <a
                 :href="`tel:${config.contact.phone}`"
-                class="hover:text-foreground transition-colors"
+                class="hover:text-foreground transition-colors dark:text-white text-black"
               >
                 {{ config.contact.phone }}
               </a>
@@ -272,7 +275,7 @@ if (footerSchema.value) {
                 name="i-lucide-map-pin"
                 class="w-4 h-4 shrink-0 mt-0.5"
               />
-              <span>{{ config.contact.address }}</span>
+              <span class="dark:text-white text-black">{{ config.contact.address }}</span>
             </div>
             <div
               v-if="config.contact.hours"
@@ -282,7 +285,7 @@ if (footerSchema.value) {
                 name="i-lucide-clock"
                 class="w-4 h-4 shrink-0"
               />
-              <span>{{ config.contact.hours }}</span>
+              <span class="dark:text-white text-black">{{ config.contact.hours }}</span>
             </div>
           </div>
         </address>
@@ -326,7 +329,7 @@ if (footerSchema.value) {
 
           <p
             v-if="config.newsletter.description"
-            class="col-span-2 text-sm text-muted-foreground"
+            class="col-span-2 text-sm dark:text-white text-black text-muted-foreground"
           >
             {{ config.newsletter.description }}
           </p>
@@ -358,7 +361,7 @@ if (footerSchema.value) {
       <div
         :class="[
           'relative z-10 flex flex-col gap-4 text-sm sm:flex-row sm:items-center sm:justify-between',
-          isBrandTheme ? 'text-white/60' : 'text-muted-foreground'
+          isBrandTheme ? 'dark:text-white/60 text-black/60' : 'text-muted-foreground'
         ]"
       >
         <div class="flex flex-wrap items-center gap-4">
