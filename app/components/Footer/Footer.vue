@@ -5,6 +5,23 @@ import { defineOrganization, defineWebSite } from 'nuxt-schema-org/schema'
 import appMeta from '~/app.meta'
 
 const { config } = useFooterConfig()
+const { locale, locales } = useI18n()
+const switchLocalePath = useSwitchLocalePath()
+const isBrandTheme = computed(() => config.value.theme === 'brand')
+
+type LocaleOption = { code: string, name?: string }
+
+const localeOptions = computed(() =>
+  (locales.value as Array<string | LocaleOption>).map((item) => {
+    if (typeof item === 'string') {
+      return { code: item, name: item.toUpperCase() }
+    }
+    return {
+      code: item.code,
+      name: item.name || item.code.toUpperCase()
+    }
+  })
+)
 
 // Computed dla klas kontenera
 const containerClasses = computed(() => {
@@ -27,9 +44,9 @@ const spacingClasses = computed(() => {
 const themeClasses = computed(() => {
   const theme = config.value.theme || 'light'
   const classes: Record<string, string> = {
-    light: 'bg-background text-foreground border-t-1 border-gray-600 dark:border-gray-800',
+    light: 'bg-background text-foreground border-t border-gray-200 dark:border-gray-800',
     dark: 'bg-neutral-900 text-white border-t border-neutral-800',
-    brand: 'bg-primary text-primary-foreground border-t border-primary/20'
+    brand: 'bg-gradient-to-b from-elevated-950/80 via-slate-950 to-slate-950 text-white border-t border-primary/30'
   }
   return classes[theme] || classes.light
 })
@@ -71,11 +88,6 @@ const getLinkAttributes = (link: { to?: string, href?: string, external?: boolea
     target: external ? '_blank' : undefined,
     rel: external ? 'noopener noreferrer' : undefined
   }
-}
-
-// Scroll to top
-const scrollToTop = () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 // Copyright year
@@ -144,9 +156,15 @@ if (footerSchema.value) {
 </script>
 
 <template>
-  <footer :class="['w-full', themeClasses, spacingClasses]">
+  <footer :class="['relative isolate overflow-hidden w-full', themeClasses, spacingClasses]">
+    <div class="pointer-events-none absolute inset-0">
+      <div class="absolute -top-40 right-0 h-72 w-72 rounded-full bg-elevated/20 blur-[140px]" />
+      <div class="absolute left-10 top-16 h-64 w-64 rounded-full bg-sky-500/20 blur-[130px]" />
+      <div class="absolute bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-violet-500/20 blur-[160px]" />
+    </div>
+
     <UContainer :class="containerClasses">
-      <div :class="['grid gap-8 sm:gap-10 md:gap-12', gridClasses]">
+      <div :class="['relative w-full z-10 grid gap-8 sm:gap-10 md:gap-12', gridClasses]">
         <!-- Brand Section -->
         <div
           v-if="config.brand"
@@ -163,7 +181,10 @@ if (footerSchema.value) {
           </div>
           <p
             v-if="config.brand.description"
-            class="text-sm text-muted-foreground leading-relaxed"
+            :class="[
+              'text-sm leading-relaxed',
+              isBrandTheme ? 'text-white/70' : 'text-muted-foreground/80'
+            ]"
           >
             {{ config.brand.description }}
           </p>
@@ -175,7 +196,7 @@ if (footerSchema.value) {
           :key="index"
           class="space-y-3"
         >
-          <h4 class="text-sm font-semibold uppercase tracking-wider">
+          <h4 class="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
             {{ column.title }}
           </h4>
           <ul class="space-y-2">
@@ -188,7 +209,10 @@ if (footerSchema.value) {
                 :href="link.href"
                 :target="getLinkAttributes(link).target"
                 :rel="getLinkAttributes(link).rel"
-                class="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-2"
+                :class="[
+                  'text-sm transition-colors flex items-center gap-2',
+                  isBrandTheme ? 'text-white/70 hover:text-white' : 'text-muted-foreground/80 hover:text-primary'
+                ]"
               >
                 <UIcon
                   v-if="link.icon"
@@ -204,12 +228,12 @@ if (footerSchema.value) {
         <!-- Contact Section -->
         <address
           v-if="config.contact"
-          class="not-italic space-y-3"
+          class="not-italic col-span-2 gap-4 w-full"
         >
-          <h4 class="text-sm font-semibold uppercase tracking-wider">
+          <h4 class="col-span-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
             Kontakt
           </h4>
-          <div class="space-y-2 text-sm text-muted-foreground">
+          <div class="col-span-2 space-y-2 text-sm text-muted-foreground">
             <div
               v-if="config.contact.email"
               class="flex items-center gap-2"
@@ -266,11 +290,12 @@ if (footerSchema.value) {
         <!-- Social Media Section -->
         <div
           v-if="config.social && config.social.length > 0"
-          class="space-y-3"
+          class="col-span-1 gap-3"
         >
-          <h4 class="text-sm font-semibold uppercase tracking-wider">
+          <h4 class="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">
             Social Media
           </h4>
+
           <div class="flex flex-wrap gap-3">
             <UButton
               v-for="(social, index) in config.social"
@@ -290,28 +315,30 @@ if (footerSchema.value) {
         <!-- Newsletter Section -->
         <div
           v-if="config.newsletter?.enabled"
-          class="space-y-3"
+          class="col-span-2 gap-4 w-full"
         >
           <h4
             v-if="config.newsletter.title"
-            class="text-sm font-semibold uppercase tracking-wider"
+            class="col-span-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary/80"
           >
             {{ config.newsletter.title }}
           </h4>
+
           <p
             v-if="config.newsletter.description"
-            class="text-sm text-muted-foreground"
+            class="col-span-2 text-sm text-muted-foreground"
           >
             {{ config.newsletter.description }}
           </p>
+
           <form
-            class="flex flex-col sm:flex-row gap-2"
+            class="col-span-2 flex flex-col gap-2 sm:flex-row"
             @submit.prevent="() => {}"
           >
             <UInput
               type="email"
               :placeholder="config.newsletter.placeholder || 'Twój email'"
-              class="flex-1"
+              class="flex-1 bg-white/10 border-white/10 text-white placeholder:text-white/60 w-full"
             />
             <UButton
               type="submit"
@@ -325,10 +352,15 @@ if (footerSchema.value) {
       </div>
 
       <!-- Divider -->
-      <USeparator class="my-8" />
+      <USeparator class="my-8 opacity-40" />
 
       <!-- Legal Section -->
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+      <div
+        :class="[
+          'relative z-10 flex flex-col gap-4 text-sm sm:flex-row sm:items-center sm:justify-between',
+          isBrandTheme ? 'text-white/60' : 'text-muted-foreground'
+        ]"
+      >
         <div class="flex flex-wrap items-center gap-4">
           <span>
             © {{ copyrightYear }} {{ config.legal?.companyName || appMeta.name }}. Wszelkie prawa zastrzeżone.
@@ -352,27 +384,29 @@ if (footerSchema.value) {
           <ULink
             v-if="config.legal?.cookiesUrl"
             :to="config.legal.cookiesUrl"
-            class="hover:text-foreground transition-colors"
+            class="hover:text-primary transition-colors"
           >
             Polityka cookies
           </ULink>
         </nav>
-      </div>
-
-      <!-- Back to Top Button -->
-      <div
-        v-if="config.backToTop"
-        class="mt-8 flex justify-center"
-      >
-        <UButton
-          variant="ghost"
-          size="sm"
-          icon="i-lucide-arrow-up"
-          aria-label="Przewiń do góry"
-          @click="scrollToTop"
-        >
-          Do góry
-        </UButton>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs uppercase tracking-[0.2em] text-primary/70">
+            Język
+          </span>
+          <UButton
+            v-for="option in localeOptions"
+            :key="option.code"
+            :to="switchLocalePath(option.code)"
+            variant="ghost"
+            size="xs"
+            :class="[
+              'rounded-full px-3',
+              option.code === locale ? 'bg-primary/15 text-primary' : 'text-muted-foreground/80 hover:text-primary'
+            ]"
+          >
+            {{ option.name }}
+          </UButton>
+        </div>
       </div>
     </UContainer>
   </footer>

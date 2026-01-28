@@ -30,6 +30,9 @@ export default defineEventHandler(async (event) => {
     // Publiczny endpoint formularza kontaktowego
     '/api/contact'
   ]
+  if (event.path.startsWith('/api/_nuxt_icon')) {
+    return
+  }
   if (publicPaths.includes(event.path)) {
     return
   }

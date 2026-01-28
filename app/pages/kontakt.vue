@@ -58,16 +58,15 @@ useSeoMeta({
 
 <template>
   <NuxtLayout name="default">
-    <UPage :ui="{ root: 'container mx-auto px-4 md:px-0' }">
-      <UPageBody class="p-0">
-        <SectionsRenderer
-          v-if="page?.sections"
-          :sections="page.sections"
-        />
-
-        <!-- Formularz kontaktowy (niezależny od content layer) -->
-        <ContactForm />
-      </UPageBody>
-    </UPage>
+    <div class="relative isolate overflow-hidden">
+      <UPage :ui="{ root: 'relative z-10 py-12 md:py-16' }">
+        <UPageBody class="p-0">
+          <SectionsRenderer
+            v-if="page?.sections"
+            :sections="page.sections"
+          />
+        </UPageBody>
+      </UPage>
+    </div>
   </NuxtLayout>
 </template>

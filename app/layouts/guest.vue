@@ -21,7 +21,7 @@
       </template>
     </UHeader>
 
-    <UMain class="min-h-screen flex items-center justify-center">
+    <UMain class="min-h-screen flex ">
       <slot />
     </UMain>
   </div>

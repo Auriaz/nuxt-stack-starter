@@ -7,7 +7,8 @@ import type {
   SectionPricingSchema,
   SectionFAQSchema,
   SectionTestimonialsSchema,
-  SectionPortfolioSchema
+  SectionPortfolioSchema,
+  SectionContactSchema
 } from '../schemas/sections'
 
 export type SectionBase = InferOutput<typeof SectionBaseSchema>
@@ -18,6 +19,7 @@ export type SectionPricing = InferOutput<typeof SectionPricingSchema>
 export type SectionFAQ = InferOutput<typeof SectionFAQSchema>
 export type SectionTestimonials = InferOutput<typeof SectionTestimonialsSchema>
 export type SectionPortfolio = InferOutput<typeof SectionPortfolioSchema>
+export type SectionContact = InferOutput<typeof SectionContactSchema>
 // Discriminated union type
 export type Section
   = | SectionHero
@@ -28,3 +30,4 @@ export type Section
     | SectionFAQ
     | SectionTestimonials
     | SectionPortfolio
+    | SectionContact

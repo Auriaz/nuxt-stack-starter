@@ -1,7 +1,9 @@
 <script lang="ts" setup>
-import type { ComputedRef } from 'vue'
-import { computed } from 'vue'
+import type { ComputedRef, DefineComponent } from 'vue'
+import { computed, useSlots } from 'vue'
+import { LazyMotion, domAnimation, motion } from 'motion-v'
 import type { SectionBase } from '#shared/types/sections'
+import { getMotionPreset, motionPresets } from '~/utils/motion'
 
 const props = defineProps({
   type: {
@@ -30,7 +32,7 @@ const props = defineProps({
   },
   align: {
     type: String as PropType<SectionBase['align']>,
-    default: 'left'
+    default: 'center'
   },
   ui: {
     type: Object as PropType<SectionBase['ui']>,
@@ -79,6 +81,15 @@ const props = defineProps({
 })
 
 const enabled = computed(() => props.enabled !== false)
+const LazyMotionWrapper = LazyMotion as unknown as DefineComponent<Record<string, unknown>>
+const MotionSection = motion.div as unknown as DefineComponent<Record<string, unknown>>
+const prefersReducedMotion = usePreferredReducedMotion()
+const reduceMotion = computed(() => prefersReducedMotion.value === 'reduce')
+const sectionMotion = computed(() => getMotionPreset(motionPresets.sectionEnter, reduceMotion.value))
+const slots = useSlots()
+const featuresProp = computed(() => (slots.features ? undefined : props.features))
+const hasBodySlot = computed(() => Boolean(slots.body))
+const hasFeaturesSlot = computed(() => Boolean(slots.features))
 
 const spacingClasses: Record<NonNullable<SectionBase['spacing']>, string> = {
   'none': '',
@@ -107,7 +118,7 @@ const backgroundClasses: Record<NonNullable<SectionBase['background']>, string> 
 }
 
 const containerClasses: Record<NonNullable<SectionBase['container']>, string> = {
-  default: '',
+  default: 'container max-w-6xl mx-auto px-4 md:px-6',
   narrow: 'container max-w-3xl mx-auto px-4 md:px-6',
   wide: 'container max-w-7xl mx-auto px-4 md:px-6',
   full: 'w-full px-4 md:px-6'
@@ -145,11 +156,19 @@ const sectionAlignClass: ComputedRef<string> = computed(() => {
 })
 
 const ui = computed(() => {
-  const baseRoot = [sectionSpacingClass.value, sectionThemeClass.value, sectionBackgroundClass.value]
+  const baseRoot = [
+    sectionSpacingClass.value,
+    sectionThemeClass.value,
+    sectionBackgroundClass.value,
+    'min-h-0 h-auto'
+  ]
     .filter(Boolean)
     .join(' ')
 
-  const baseContainer = sectionContainerClass.value
+  const baseContainer = [
+    sectionContainerClass.value,
+    'min-h-0 !py-8 sm:!py-12 lg:!py-16'
+  ].filter(Boolean).join(' ')
   const baseHeader = sectionAlignClass.value
 
   return {
@@ -159,9 +178,18 @@ const ui = computed(() => {
     header: [baseHeader, props.ui?.header].filter(Boolean).join(' '),
     leading: props.ui?.leading,
     leadingIcon: props.ui?.leadingIcon,
-    headline: ['text-center text-primary-600 dark:text-primary-500', props.ui?.headline].filter(Boolean).join(' '),
-    title: props.ui?.title,
-    description: props.ui?.description,
+    headline: [
+      'text-xs md:text-sm uppercase tracking-[0.25em] text-primary',
+      props.ui?.headline
+    ].filter(Boolean).join(' '),
+    title: [
+      'text-2xl md:text-3xl font-semibold tracking-tight',
+      props.ui?.title
+    ].filter(Boolean).join(' '),
+    description: [
+      'text-sm md:text-base text-gray-500 dark:text-gray-400',
+      props.ui?.description
+    ].filter(Boolean).join(' '),
     body: props.ui?.body,
     items: props.ui?.items,
     item: props.ui?.item,
@@ -172,91 +200,128 @@ const ui = computed(() => {
 </script>
 
 <template>
-  <UPageSection
-    v-if="enabled"
-    :id="id"
-    :ref="sectionRef"
-    :as="as"
-    :headline="headline"
-    :icon="icon"
-    :title="title"
-    :description="description"
-    :links="links"
-    :features="features"
-    :reverse="reverse ?? false"
-    :ui="ui"
-  >
-    <template #top>
-      <slot name="top" />
-    </template>
+  <LazyMotionWrapper :features="domAnimation">
+    <MotionSection
+      v-if="enabled"
+      :initial="sectionMotion.initial"
+      :while-in-view="sectionMotion.animate"
+      :viewport="{ once: true, amount: 0.25 }"
+    >
+      <UPageSection
+        :id="id"
+        :ref="sectionRef"
+        :as="as"
+        :headline="headline"
+        :icon="icon"
+        :title="title"
+        :description="description"
+        :links="links"
+        :features="featuresProp"
+        :reverse="reverse ?? false"
+        :ui="ui"
+      >
+        <template
+          v-if="slots.top"
+          #top
+        >
+          <slot name="top" />
+        </template>
 
-    <template #header="slotProps">
-      <slot
-        name="header"
-        v-bind="slotProps"
-      />
-    </template>
+        <template
+          v-if="slots.header"
+          #header="slotProps"
+        >
+          <slot
+            name="header"
+            v-bind="slotProps"
+          />
+        </template>
 
-    <template #leading="slotProps">
-      <slot
-        name="leading"
-        v-bind="slotProps"
-      />
-    </template>
+        <template
+          v-if="slots.leading"
+          #leading="slotProps"
+        >
+          <slot
+            name="leading"
+            v-bind="slotProps"
+          />
+        </template>
 
-    <template #headline="slotProps">
-      <slot
-        name="headline"
-        v-bind="slotProps"
-      />
-    </template>
+        <template
+          v-if="slots.headline"
+          #headline="slotProps"
+        >
+          <slot
+            name="headline"
+            v-bind="slotProps"
+          />
+        </template>
 
-    <template #title="slotProps">
-      <slot
-        name="title"
-        v-bind="slotProps"
-      />
-    </template>
+        <template
+          v-if="slots.title"
+          #title="slotProps"
+        >
+          <slot
+            name="title"
+            v-bind="slotProps"
+          />
+        </template>
 
-    <template #description="slotProps">
-      <slot
-        name="description"
-        v-bind="slotProps"
-      />
-    </template>
+        <template
+          v-if="slots.description"
+          #description="slotProps"
+        >
+          <slot
+            name="description"
+            v-bind="slotProps"
+          />
+        </template>
 
-    <template #body="slotProps">
-      <slot
-        name="body"
-        v-bind="slotProps"
-      />
-    </template>
+        <template
+          v-if="hasBodySlot || hasFeaturesSlot"
+          #body="slotProps"
+        >
+          <slot
+            v-if="slots.body"
+            name="body"
+            v-bind="slotProps"
+          />
+          <slot
+            v-if="slots.features"
+            name="features"
+            v-bind="slotProps"
+          />
+        </template>
 
-    <template #features="slotProps">
-      <slot
-        name="features"
-        v-bind="slotProps"
-      />
-    </template>
+        <template
+          v-if="slots.footer"
+          #footer="slotProps"
+        >
+          <slot
+            name="footer"
+            v-bind="slotProps"
+          />
+        </template>
 
-    <template #footer="slotProps">
-      <slot
-        name="footer"
-        v-bind="slotProps"
-      />
-    </template>
+        <template
+          v-if="slots.links"
+          #links="slotProps"
+        >
+          <slot
+            name="links"
+            v-bind="slotProps"
+          />
+        </template>
 
-    <template #links="slotProps">
-      <slot
-        name="links"
-        v-bind="slotProps"
-      />
-    </template>
+        <slot />
 
-    <slot />
-
-    <template #bottom>
-      <slot name="bottom" />
-    </template>
-  </UPageSection>
+        <template
+          v-if="slots.bottom"
+          #bottom
+        >
+          <slot name="bottom" />
+        </template>
+      </UPageSection>
+    </MotionSection>
+  </LazyMotionWrapper>
 </template>

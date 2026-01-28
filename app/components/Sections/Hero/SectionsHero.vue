@@ -27,7 +27,9 @@ const image = computed(() => ({
   <PageSection
     :type="section.type"
     :ui="{
-      wrapper: 'hidden'
+      wrapper: 'hidden',
+      header: 'max-w-3xl',
+      title: 'text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight'
     }"
   >
     <UPageHero
@@ -43,7 +45,7 @@ const image = computed(() => ({
         v-if="image.src"
         :src="image.src"
         :alt="image.alt"
-        class="rounded-lg w-full h-auto shadow-2xl ring ring-default"
+        class="rounded-2xl w-full h-auto shadow-xl ring-1 ring-black/5 dark:ring-white/10"
       />
     </UPageHero>
   </PageSection>

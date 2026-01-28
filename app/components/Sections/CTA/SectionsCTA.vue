@@ -24,18 +24,26 @@ const config = computed(() => ({
     :type="section.type"
     :section-ref="section.ref"
     :ui="{
-      wrapper: 'hidden'
+      wrapper: 'hidden',
+      header: 'max-w-2xl'
     }"
   >
-    <UPageCTA
-      :title="config.title"
-      :description="config.description"
-      :links="config.links"
-      :variant="config.variant"
-      :reverse="config.reverse"
-      :ui="config.ui"
+    <UCard
+      class=" bg-white/80 shadow-sm backdrop-blur-sm dark:bg-gray-900/60"
+      :ui="{
+        body: 'p-6 md:p-7'
+      }"
     >
-      <slot />
-    </UPageCTA>
+      <UPageCTA
+        :title="config.title"
+        :description="config.description"
+        :links="config.links"
+        :variant="config.variant"
+        :reverse="config.reverse"
+        :ui="config.ui"
+      >
+        <slot />
+      </UPageCTA>
+    </UCard>
   </PageSection>
 </template>

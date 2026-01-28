@@ -1,10 +1,5 @@
 import type { InferOutput } from 'valibot'
-import type {
-  BlogPostSchema,
-  PageSchema,
-  PortfolioProjectSchema,
-  PortfolioProjectLinkSchema
-} from '../schemas/content'
+import type { BlogPostSchema, PageSchema, PortfolioProjectSchema, PortfolioProjectLinkSchema, LegalPageSchema } from '../schemas/content'
 import type { Section } from './sections'
 
 export type BlogPost = InferOutput<typeof BlogPostSchema>
@@ -33,6 +28,12 @@ export type PageEntry = Page & {
 
 // Typ dla wyników queryCollection('portfolio')
 export type PortfolioProjectEntry = PortfolioProject & {
+  _path: string
+  _id: string
+  _type: string
+}
+
+export type LegalPage = InferOutput<typeof LegalPageSchema> & {
   _path: string
   _id: string
   _type: string

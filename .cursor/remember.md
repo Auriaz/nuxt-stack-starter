@@ -66,6 +66,56 @@ Ma zapobiegać chaosowi i przypadkowemu łamaniu konwencji.
 - Integracja z Nuxt UI `UForm` / `UAuthForm`
 - Dokumentacja: `content/docs/useForm.md`
 
+## 4A) UI System (ContactForm-style)
+
+### Layout & spacing
+
+- Sekcja (standard): `py-12 md:py-16` + `space-y-12 md:space-y-16`
+- Grid contentowy (desktop): `grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]`
+- Mobile: stack (brak osobnych klas, domyślny flow)
+- Rytm pionowy: preferuj `space-y-*` zamiast ręcznych `mt-*`
+
+### Typografia (role tekstu)
+
+- Section label: `text-xs md:text-sm uppercase tracking-[0.25em] text-primary`
+- H1 marketing: `text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight`
+- H2 sekcji: `text-2xl md:text-3xl font-semibold tracking-tight`
+- H3 w kartach: `text-lg font-semibold`
+- Body: `text-sm md:text-base text-gray-500 dark:text-gray-400`
+- Meta: `text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400`
+- Gradient (akcent): `bg-linear-to-r from-primary to-sky-500 bg-clip-text text-transparent`
+
+### UCard (kanoniczny wygląd)
+
+- `class`: `border border-gray-200/70 bg-white/80 shadow-sm backdrop-blur-sm dark:bg-gray-900/60 dark:border-gray-800`
+- `ui.body`: `p-6 md:p-7 space-y-5`
+
+### Formularze
+
+- Wrapper pola: `space-y-1`
+- Label: `block text-sm font-medium`
+- Inputy: `UInput` / `UTextarea` bez custom CSS
+- Akcje: `UButton` `primary`, `size="lg"`, `block`, `:loading`
+- Feedback: `UAlert` `variant="soft"` (success/error)
+
+### Kolor i kontrast
+
+- Akcent tylko w nagłówkach/ikonach, nie jako tło sekcji
+- Brak ciężkich efektów (glow/parallax/over‑blur)
+- Kontrast zgodny z WCAG (tekst neutralny: `text-gray-500 dark:text-gray-400`)
+
+### Motion (motion-v)
+
+- Tylko `opacity` + `translateY`
+- Timing: `duration 0.25–0.4s`, `easeOut`
+- Respektuj `prefers-reduced-motion`
+- Presety:
+  - sectionEnter: opacity 0→1, y 12→0
+  - cardEnter: opacity 0→1, y 8→0
+  - listStagger: delay 60–80ms
+  - alertAppear: opacity 0→1, y 6→0
+  - buttonHover: scale 1.01 / y -1 (opcjonalnie)
+
 ## 5) Sekcje stron (Page Builder)
 
 - Strony content-driven: `PageSchema` zawiera `sections[]`

@@ -1,10 +1,10 @@
 import { object, string, optional, boolean, array, picklist, literal, any } from 'valibot'
-import { ImageSchema, ButtonSchema, FeatureItemSchema, PricingPlanSchema, TestimonialItemSchema, FAQItemSchema } from './common'
+import { ImageSchema, ButtonSchema, FeatureItemSchema, PricingPlanSchema, TestimonialItemSchema, FAQItemSchema, LinkSchema } from './common'
 import { PortfolioProjectSchema } from './content'
 
 // SectionBaseSchema
 export const SectionBaseSchema = object({
-  type: picklist(['section', 'hero', 'features', 'cta', 'pricing', 'faq', 'testimonials', 'social-proof', 'process', 'portfolio'] as const),
+  type: picklist(['section', 'hero', 'features', 'cta', 'pricing', 'faq', 'testimonials', 'social-proof', 'process', 'portfolio', 'contact'] as const),
   as: optional(any()),
   icon: optional(string()),
   id: optional(string()),
@@ -97,4 +97,26 @@ export const SectionPortfolioSchema = object({
     projects: array(PortfolioProjectSchema),
     layout: optional(picklist(['grid', 'carousel'] as const))
   })
+})
+
+// Contact Section – dziedziczy z SectionBaseSchema
+export const SectionContactSchema = object({
+  ...SectionBaseSchema.entries,
+  type: literal('contact'),
+  cards: optional(array(FeatureItemSchema)),
+  address: optional(object({
+    label: optional(string()),
+    line1: string(),
+    line2: optional(string()),
+    city: string(),
+    postalCode: optional(string()),
+    country: optional(string()),
+    note: optional(string())
+  })),
+  map: optional(object({
+    embedUrl: string(),
+    linkUrl: optional(string()),
+    label: optional(string())
+  })),
+  socials: optional(array(LinkSchema))
 })

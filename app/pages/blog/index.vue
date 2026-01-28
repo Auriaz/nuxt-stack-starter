@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
 import type { BlogPostEntry } from '#shared/types/content'
+import PageSection from '~/components/Page/Section/PageSection.vue'
 
 const { data: posts } = await useAsyncData('blog-posts', () =>
   queryCollection<BlogPostEntry>('blog').all()
@@ -17,15 +18,15 @@ useSeoMeta({
 
 <template>
   <NuxtLayout name="default">
-    <UPage :ui="{ root: 'container mx-auto px-4 py-10 md:px-0' }">
-      <UPageHeader
-        title="Blog"
-        description="Tutaj znajdziesz wszystkie posty z naszego bloga"
-      />
-
-      <UPageBody>
-        <BlogPostsGrid :posts="posts || []" />
-      </UPageBody>
-    </UPage>
+    <PageSection
+      id="blog-section"
+      ref="blog-section"
+      title="Blog"
+      description="Tutaj znajdziesz wszystkie posty z naszego bloga"
+      type="section"
+      :ui="{ root: 'container mx-auto px-4 py-0 md:px-0', content: 'space-y-8' }"
+    >
+      <BlogPostsGrid :posts="posts || []" />
+    </PageSection>
   </NuxtLayout>
 </template>

@@ -4,6 +4,16 @@ brand:
   description: 'Profesjonalny starter dla nowoczesnych aplikacji'
   logo: '/favicon.ico'
 columns:
+  - title: 'Nawigacja'
+    links:
+      - label: 'Strona główna'
+        to: '/'
+      - label: 'Oferta'
+        to: '/oferta'
+      - label: 'Portfolio'
+        to: '/portfolio'
+      - label: 'Kontakt'
+        to: '/kontakt'
   - title: 'Oferta'
     links:
       - label: 'Portfolio'
@@ -39,13 +49,13 @@ legal:
   termsUrl: '/regulamin'
   cookiesUrl: '/polityka-cookies'
 newsletter:
-  enabled: false
+  enabled: true
   title: 'Newsletter'
   description: 'Zapisz się do newslettera'
   placeholder: 'Twój email'
   buttonLabel: 'Zapisz się'
 backToTop: true
-theme: 'light'
+theme: 'brand'
 container: 'default'
 spacing: 'md'
 schema:

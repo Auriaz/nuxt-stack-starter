@@ -1,4 +1,4 @@
-import { object, string, date, array, optional, picklist, boolean, union } from 'valibot'
+import { object, string, date, array, optional, picklist, boolean, union, literal } from 'valibot'
 import { ImageSchema, SEOSchema } from './common'
 import { AuthorSchema } from './user'
 import { SectionHeroSchema, SectionCTASchema, SectionBaseSchema, SectionFeaturesSchema, SectionPricingSchema, SectionFAQSchema, SectionTestimonialsSchema } from './sections'
@@ -65,5 +65,18 @@ export const PageSchema = object({
       ])
     )
   ),
+  seo: optional(SEOSchema)
+})
+
+// LegalPageSchema - dla stron prawnych (polityka prywatności, regulamin, cookies)
+export const LegalPageSchema = object({
+  title: string(),
+  description: string(),
+  path: string(),
+  slug: string(),
+  type: literal('legal'),
+  legalKind: picklist(['privacy', 'terms', 'cookies'] as const),
+  updatedAt: optional(string()),
+  locale: optional(picklist(['pl', 'en'] as const)),
   seo: optional(SEOSchema)
 })

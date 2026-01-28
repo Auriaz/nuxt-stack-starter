@@ -8,6 +8,7 @@ import SectionsPricing from '~/components/Sections/Pricing/SectionsPricing.vue'
 import SectionsCTA from '~/components/Sections/CTA/SectionsCTA.vue'
 import SectionsFAQ from '~/components/Sections/FAQ/SectionsFAQ.vue'
 import SectionsTestimonials from '~/components/Sections/Testimonials/SectionsTestimonials.vue'
+import SectionsContact from '~/components/Sections/Contact/SectionsContact.vue'
 
 interface Props {
   sections?: Section[]
@@ -28,7 +29,8 @@ const sectionComponents: Record<string, Component> = {
   pricing: SectionsPricing,
   cta: SectionsCTA,
   faq: SectionsFAQ,
-  testimonials: SectionsTestimonials
+  testimonials: SectionsTestimonials,
+  contact: SectionsContact
 }
 </script>
 

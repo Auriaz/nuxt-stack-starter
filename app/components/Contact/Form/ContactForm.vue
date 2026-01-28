@@ -15,6 +15,30 @@ const form = ref<ContactFormInput>({
 const pending = ref(false)
 const success = ref(false)
 const errorMessage = ref<string | null>(null)
+const contactCards = [
+  {
+    title: 'Email',
+    description: 'kontakt@example.com',
+    icon: 'i-lucide-mail',
+    to: 'mailto:kontakt@example.com'
+  },
+  {
+    title: 'Telefon',
+    description: '+48 600 000 000',
+    icon: 'i-lucide-phone',
+    to: 'tel:+48600000000'
+  },
+  {
+    title: 'Godziny',
+    description: 'Pn–Pt 9:00–17:00',
+    icon: 'i-lucide-clock'
+  },
+  {
+    title: 'Lokalizacja',
+    description: 'Polska / CET',
+    icon: 'i-lucide-map-pin'
+  }
+]
 
 async function onSubmit() {
   if (pending.value) return
@@ -62,50 +86,53 @@ async function onSubmit() {
       </p>
 
       <div class="grid gap-4 sm:grid-cols-2">
-        <div class="flex items-start gap-3">
-          <UIcon
-            name="i-lucide-mail"
-            class="mt-0.5 h-5 w-5 text-primary"
-          />
-          <div>
-            <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-              E-mail
-            </p>
-            <p class="text-sm font-medium">
-              kontakt@example.com
-            </p>
+        <component
+          :is="card.to ? 'NuxtLink' : 'div'"
+          v-for="(card, index) in contactCards"
+          :key="`${card.title}-${index}`"
+          :to="card.to || undefined"
+          class="group relative overflow-hidden rounded-2xl border border-gray-200/70 bg-white/80 p-5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900/60"
+        >
+          <div class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div class="absolute -top-16 right-0 h-32 w-32 rounded-full bg-primary/20 blur-3xl" />
+            <div class="absolute bottom-0 left-0 h-20 w-20 rounded-full bg-primary/10 blur-2xl" />
           </div>
-        </div>
 
-        <div class="flex items-start gap-3">
-          <UIcon
-            name="i-lucide-phone"
-            class="mt-0.5 h-5 w-5 text-primary"
-          />
-          <div>
-            <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-              Telefon
-            </p>
-            <p class="text-sm font-medium">
-              +48 600 000 000
-            </p>
-          </div>
-        </div>
+          <div class="relative z-10 flex items-start gap-4">
+            <div
+              class="flex h-11 w-11 items-center justify-center rounded-2xl border shadow-sm transition-colors duration-300"
+              :class="[
+                index % 6 === 0 && 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300',
+                index % 6 === 1 && 'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-500/30 dark:bg-sky-500/10 dark:text-sky-300',
+                index % 6 === 2 && 'border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-500/30 dark:bg-violet-500/10 dark:text-violet-300',
+                index % 6 === 3 && 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300',
+                index % 6 === 4 && 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300',
+                index % 6 === 5 && 'border-teal-200 bg-teal-50 text-teal-700 dark:border-teal-500/30 dark:bg-teal-500/10 dark:text-teal-300'
+              ]"
+            >
+              <UIcon
+                v-if="card.icon"
+                :name="card.icon"
+                class="h-5 w-5"
+              />
+              <span
+                v-else
+                class="text-xs font-semibold"
+              >
+                {{ index + 1 }}
+              </span>
+            </div>
 
-        <div class="flex items-start gap-3 sm:col-span-2">
-          <UIcon
-            name="i-lucide-map-pin"
-            class="mt-0.5 h-5 w-5 text-primary"
-          />
-          <div>
-            <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-              Lokalizacja
-            </p>
-            <p class="text-sm font-medium">
-              Zdalnie / Polska, strefa czasowa CET
-            </p>
+            <div class="space-y-2">
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+                {{ card.title }}
+              </p>
+              <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                {{ card.description }}
+              </p>
+            </div>
           </div>
-        </div>
+        </component>
       </div>
     </div>
 

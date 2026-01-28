@@ -1,5 +1,5 @@
 import { defineContentConfig, defineCollection } from '@nuxt/content'
-import { BlogPostSchema, PageSchema, PortfolioProjectSchema } from './shared/schemas/content'
+import { BlogPostSchema, PageSchema, PortfolioProjectSchema, LegalPageSchema } from './shared/schemas/content'
 import { FooterConfigSchema } from './shared/schemas/footer'
 
 export default defineContentConfig({
@@ -23,6 +23,11 @@ export default defineContentConfig({
       type: 'data',
       source: 'app/*.md',
       schema: FooterConfigSchema
+    }),
+    legal: defineCollection({
+      type: 'page',
+      source: 'legal/*.md',
+      schema: LegalPageSchema
     }),
     content: defineCollection({
       type: 'page',

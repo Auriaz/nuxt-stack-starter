@@ -21,7 +21,10 @@ export function useFooterConfig() {
     try {
       // Dla kolekcji typu 'data' pobieramy wszystkie i filtrujemy po _path
       const results = await queryCollection<FooterConfigEntry>('app').all()
-      footerData = results.find(item => item._path === '/app/footer') || null
+      footerData = results.find(item => item._path === '/app/footer')
+        || results.find(item => item._path?.endsWith('/footer'))
+        || results[0]
+        || null
     } catch {
       // Jeśli plik nie istnieje, footerData pozostanie null
       // eslint-disable-next-line no-console
