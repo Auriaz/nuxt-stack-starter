@@ -26,7 +26,7 @@ export default defineContentConfig({
     }),
     legal: defineCollection({
       type: 'page',
-      source: 'legal/*.md',
+      source: 'legal/**/*.md',
       schema: LegalPageSchema
     }),
     content: defineCollection({

@@ -15,10 +15,15 @@
  * ```
  */
 export default defineEventHandler(async (event) => {
+  const rawPath = event.path || ''
+
   // Middleware działa tylko dla endpointów API (nie dla stron publicznych)
-  if (!event.path.startsWith('/api/')) {
+  if (!rawPath.startsWith('/api/')) {
     return
   }
+
+  // Znormalizowana ścieżka bez query string (np. ?token=...)
+  const normalizedPath = rawPath.split('?')[0]
 
   // Pomiń middleware dla publicznych endpointów auth
   const publicPaths = [
@@ -26,14 +31,20 @@ export default defineEventHandler(async (event) => {
     '/api/auth/register',
     '/api/auth/forgot-password',
     '/api/auth/reset-password',
+    '/api/auth/verify-email',
+    '/api/auth/resend-verification',
     '/api/health',
     // Publiczny endpoint formularza kontaktowego
     '/api/contact'
   ]
-  if (event.path.startsWith('/api/_nuxt_icon')) {
+  // @ts-expect-error normalizedPath jest zawsze zdefiniowane po ustawieniu rawPath
+  if (normalizedPath.startsWith('/api/_nuxt_icon')) {
     return
   }
-  if (publicPaths.includes(event.path)) {
+
+  // Obsłuż zarówno dokładne ścieżki, jak i warianty z ukośnikiem na końcu
+  // @ts-expect-error normalizedPath jest zawsze zdefiniowane po ustawieniu rawPath
+  if (publicPaths.some(path => normalizedPath === path || normalizedPath.startsWith(`${path}/`))) {
     return
   }
 
@@ -46,7 +57,7 @@ export default defineEventHandler(async (event) => {
       data: {
         error: {
           code: 'UNAUTHORIZED',
-          message: 'Authentication required'
+          message: 'Authentication required. Please login to continue.'
         }
       }
     })

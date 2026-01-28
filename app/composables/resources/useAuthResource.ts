@@ -1,4 +1,12 @@
-import type { AuthOutput, LoginInput, RegisterInput, ForgotPasswordInput, ResetPasswordInput } from '#shared/types/auth'
+import type {
+  AuthOutput,
+  LoginInput,
+  RegisterInput,
+  ForgotPasswordInput,
+  ResetPasswordInput,
+  VerifyEmailInput,
+  ResendVerificationInput
+} from '#shared/types/auth'
 import { useApiClient } from './useApiClient'
 
 /**
@@ -28,16 +36,16 @@ export function useAuthResource() {
     return response as AuthOutput
   }
 
-  async function register(input: RegisterInput): Promise<AuthOutput> {
-    const response = await apiClient.request<{ data: AuthOutput } | AuthOutput>('/api/auth/register', {
+  async function register(input: RegisterInput): Promise<{ ok: true }> {
+    const response = await apiClient.request<{ data: { ok: true } } | { ok: true }>('/api/auth/register', {
       method: 'POST',
       body: input
     })
     // Obsługa formatu { data: ... } lub bezpośredniego obiektu
     if (response && typeof response === 'object' && 'data' in response) {
-      return (response as { data: AuthOutput }).data
+      return (response as { data: { ok: true } }).data
     }
-    return response as AuthOutput
+    return response as { ok: true }
   }
 
   async function getMe(): Promise<AuthOutput['user']> {
@@ -73,11 +81,41 @@ export function useAuthResource() {
     return response as AuthOutput
   }
 
+  async function verifyEmail(input: VerifyEmailInput): Promise<{ verified: boolean }> {
+    const response = await apiClient.request<{ data: { verified: boolean } } | { verified: boolean }>(
+      `/api/auth/verify-email?token=${encodeURIComponent(input.token)}`,
+      {
+        method: 'GET'
+      }
+    )
+
+    if (response && typeof response === 'object' && 'data' in response) {
+      return (response as { data: { verified: boolean } }).data
+    }
+
+    return response as { verified: boolean }
+  }
+
+  async function resendVerification(input: ResendVerificationInput): Promise<{ ok: true }> {
+    const response = await apiClient.request<{ data: { ok: true } } | { ok: true }>('/api/auth/resend-verification', {
+      method: 'POST',
+      body: input
+    })
+
+    if (response && typeof response === 'object' && 'data' in response) {
+      return (response as { data: { ok: true } }).data
+    }
+
+    return response as { ok: true }
+  }
+
   return {
     login,
     register,
     getMe,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    verifyEmail,
+    resendVerification
   }
 }

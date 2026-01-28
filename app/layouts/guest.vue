@@ -17,7 +17,7 @@
       </template>
 
       <template #right>
-        <UColorModeSelect />
+        <ColorModeButton />
       </template>
     </UHeader>
 

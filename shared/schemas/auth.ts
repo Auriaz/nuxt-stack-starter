@@ -5,7 +5,8 @@ import {
   number,
   optional,
   email,
-  pipe
+  pipe,
+  boolean
 } from 'valibot'
 
 /**
@@ -34,7 +35,8 @@ export const RegisterFormSchema = object({
   username: pipe(string(), minLength(3, 'Nazwa użytkownika musi mieć co najmniej 3 znaki')),
   email: pipe(string(), email('Nieprawidłowy adres email')),
   password: pipe(string(), minLength(8, 'Hasło musi mieć co najmniej 8 znaków')),
-  passwordConfirm: pipe(string(), minLength(1, 'Potwierdzenie hasła jest wymagane'))
+  passwordConfirm: pipe(string(), minLength(1, 'Potwierdzenie hasła jest wymagane')),
+  isAgreedToTerms: boolean()
 })
 
 /**
@@ -62,4 +64,18 @@ export const AuthOutputSchema = object({
     username: string(),
     email: string()
   })
+})
+
+/**
+ * Schemat inputu dla weryfikacji adresu e-mail
+ */
+export const VerifyEmailInputSchema = object({
+  token: pipe(string(), minLength(1, 'Token is required'))
+})
+
+/**
+ * Schemat inputu dla ponownej wysyłki maila weryfikacyjnego
+ */
+export const ResendVerificationInputSchema = object({
+  email: pipe(string(), email('Invalid email format'))
 })

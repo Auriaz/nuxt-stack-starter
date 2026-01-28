@@ -99,3 +99,55 @@ export async function sendContactEmail(
   const emailProvider = getProvider()
   return await emailProvider.send(payload)
 }
+
+function buildVerificationEmailTemplate(to: string, verificationLink: string): EmailPayload {
+  const runtimeConfig = useRuntimeConfig()
+  const publicConfig = runtimeConfig.public as { siteUrl?: string }
+
+  const baseUrl = publicConfig.siteUrl || 'http://localhost:3000'
+  const finalLink = verificationLink.startsWith('http') ? verificationLink : `${baseUrl}${verificationLink}`
+
+  const subject = 'Potwierdź swój adres e-mail'
+
+  const textLines: string[] = [
+    'Dziękujemy za rejestrację.',
+    '',
+    'Aby dokończyć zakładanie konta, potwierdź swój adres e-mail, klikając w poniższy link:',
+    finalLink,
+    '',
+    'Jeśli nie zakładałeś konta, zignoruj tę wiadomość.'
+  ]
+
+  const text = textLines.join('\n')
+
+  const htmlLines: string[] = [
+    '<p>Dziękujemy za rejestrację.</p>',
+    '<p>Aby dokończyć zakładanie konta, potwierdź swój adres e-mail, klikając w przycisk poniżej:</p>',
+    `<p><a href="${finalLink}" style="display:inline-block;padding:10px 16px;background:#0f766e;color:#ffffff;text-decoration:none;border-radius:4px;">Potwierdź adres e-mail</a></p>`,
+    `<p>Jeśli przycisk nie działa, skopiuj i wklej poniższy link do przeglądarki:</p>`,
+    `<p><a href="${finalLink}">${finalLink}</a></p>`,
+    '<p>Jeśli nie zakładałeś konta, zignoruj tę wiadomość.</p>'
+  ]
+
+  const html = htmlLines.join('\n')
+
+  const config = getEmailConfig()
+
+  return {
+    to,
+    subject,
+    text,
+    html,
+    from: config.from,
+    replyTo: config.replyToDefault
+  }
+}
+
+export async function sendVerificationEmail(
+  to: string,
+  verificationPath: string
+): Promise<EmailSendResult> {
+  const payload = buildVerificationEmailTemplate(to, verificationPath)
+  const emailProvider = getProvider()
+  return await emailProvider.send(payload)
+}

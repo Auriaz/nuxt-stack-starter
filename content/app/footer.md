@@ -45,9 +45,9 @@ social:
 legal:
   companyName: 'Nuxt Base Starter'
   yearStart: '2024'
-  privacyUrl: '/polityka-prywatnosci'
-  termsUrl: '/regulamin'
-  cookiesUrl: '/polityka-cookies'
+  privacyUrl: '/legal/privacy'
+  termsUrl: '/legal/terms'
+  cookiesUrl: '/legal/cookies'
 newsletter:
   enabled: true
   title: 'Newsletter'

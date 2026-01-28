@@ -60,3 +60,39 @@ export class ForbiddenError extends DomainError {
     super('FORBIDDEN', message, 403)
   }
 }
+
+/**
+ * Błąd gdy token weryfikacyjny jest nieprawidłowy
+ */
+export class TokenInvalidError extends DomainError {
+  constructor(message: string = 'Verification token is invalid') {
+    super('TOKEN_INVALID', message, 400)
+  }
+}
+
+/**
+ * Błąd gdy token weryfikacyjny wygasł
+ */
+export class TokenExpiredError extends DomainError {
+  constructor(message: string = 'Verification token has expired') {
+    super('TOKEN_EXPIRED', message, 410)
+  }
+}
+
+/**
+ * Błąd gdy token weryfikacyjny został już użyty
+ */
+export class TokenAlreadyUsedError extends DomainError {
+  constructor(message: string = 'Verification token has already been used') {
+    super('TOKEN_ALREADY_USED', message, 409)
+  }
+}
+
+/**
+ * Błąd limitu częstotliwości (rate limiting)
+ */
+export class RateLimitError extends DomainError {
+  constructor(message: string = 'Too many requests') {
+    super('RATE_LIMITED', message, 429)
+  }
+}

@@ -31,3 +31,20 @@ export interface AuthOutput {
     email: string
   }
 }
+
+export interface VerifyEmailInput {
+  token: string
+}
+
+export interface ResendVerificationInput {
+  email: string
+}
+
+export interface VerifyEmailOutput {
+  verified: boolean
+  user: {
+    id: number
+    username: string
+    email: string
+  }
+}
