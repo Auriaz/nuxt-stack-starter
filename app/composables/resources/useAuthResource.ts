@@ -86,6 +86,16 @@ export function useAuthResource() {
     return response as ResetPasswordOutput
   }
 
+  async function logout(): Promise<{ ok: true }> {
+    const response = await apiClient.request<{ data: { ok: true } } | { ok: true }>('/api/auth/logout', {
+      method: 'POST'
+    })
+    if (response && typeof response === 'object' && 'data' in response) {
+      return (response as { data: { ok: true } }).data
+    }
+    return response as { ok: true }
+  }
+
   async function verifyEmail(input: VerifyEmailInput): Promise<{ verified: boolean }> {
     const response = await apiClient.request<{ data: { verified: boolean } } | { verified: boolean }>(
       `/api/auth/verify-email?token=${encodeURIComponent(input.token)}`,
@@ -118,6 +128,7 @@ export function useAuthResource() {
     login,
     register,
     getMe,
+    logout,
     forgotPassword,
     resetPassword,
     verifyEmail,

@@ -19,11 +19,17 @@ model User {
   username String @unique
   password String // Hash hasła (bcrypt przez nuxt-auth-utils)
 
+  // Profil użytkownika (do OAuth i dashboardu)
+  name      String?
+  avatarUrl String?
+  role      String  @default("user")
+
   emailVerifiedAt   DateTime?
   passwordChangedAt DateTime?
 
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens     PasswordResetToken[]
+  oauthAccounts           OAuthAccount[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -68,4 +74,20 @@ model PasswordResetToken {
   @@index([userId])
   @@index([tokenHash])
   @@index([expiresAt])
+}
+
+model OAuthAccount {
+  id                Int       @id @default(autoincrement())
+  userId            Int
+  provider          String
+  providerAccountId String
+  accessToken       String?
+  refreshToken      String?
+  expiresAt         DateTime?
+  createdAt         DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
 }

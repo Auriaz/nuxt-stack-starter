@@ -12,10 +12,16 @@ declare module '#auth-utils' {
   interface User {
     /** ID użytkownika z bazy danych */
     id: number
-    /** Nazwa użytkownika (unikalna) */
-    username: string
-    /** Email użytkownika (unikalny) */
-    email: string
+    /** Nazwa wyświetlana użytkownika (np. z OAuth lub profilu) */
+    name?: string
+    /** Nazwa użytkownika (unikalna, lokalne konto) */
+    username?: string
+    /** Email użytkownika (unikalny, jeśli dostępny) */
+    email?: string
+    /** URL do avatara (np. z GitHub/Google) */
+    avatarUrl?: string
+    /** Rola użytkownika (np. user, admin) */
+    role: string
   }
 
   /**

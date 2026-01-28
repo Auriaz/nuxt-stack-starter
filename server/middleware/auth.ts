@@ -22,6 +22,12 @@ export default defineEventHandler(async (event) => {
     return
   }
 
+  // Bardzo ważne: nie blokuj internal route używanego przez nuxt-auth-utils
+  // do zarządzania sesją (`/api/_auth/session` itp.)
+  if (rawPath.startsWith('/api/_auth/')) {
+    return
+  }
+
   // Znormalizowana ścieżka bez query string (np. ?token=...)
   const normalizedPath = rawPath.split('?')[0]
 

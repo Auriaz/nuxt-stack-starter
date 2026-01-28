@@ -53,7 +53,8 @@ export const ModelName = {
   User: 'User',
   ContactMessage: 'ContactMessage',
   EmailVerificationToken: 'EmailVerificationToken',
-  PasswordResetToken: 'PasswordResetToken'
+  PasswordResetToken: 'PasswordResetToken',
+  OAuthAccount: 'OAuthAccount'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -77,6 +78,9 @@ export const UserScalarFieldEnum = {
   email: 'email',
   username: 'username',
   password: 'password',
+  name: 'name',
+  avatarUrl: 'avatarUrl',
+  role: 'role',
   emailVerifiedAt: 'emailVerifiedAt',
   passwordChangedAt: 'passwordChangedAt',
   createdAt: 'createdAt',
@@ -123,6 +127,20 @@ export const PasswordResetTokenScalarFieldEnum = {
 } as const
 
 export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
+
+
+export const OAuthAccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  providerAccountId: 'providerAccountId',
+  accessToken: 'accessToken',
+  refreshToken: 'refreshToken',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+} as const
+
+export type OAuthAccountScalarFieldEnum = (typeof OAuthAccountScalarFieldEnum)[keyof typeof OAuthAccountScalarFieldEnum]
 
 
 export const SortOrder = {

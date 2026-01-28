@@ -86,8 +86,14 @@ export function useAuth() {
   }
 
   async function logout(): Promise<void> {
-    // session.clear() czyści sesję lokalnie i usuwa cookie z sesją
-    // Nie ma potrzeby wywoływania endpointu API, ponieważ sesja jest przechowywana w cookie
+    // Najpierw wyczyść sesję po stronie serwera (cookie) przez API
+    try {
+      await authResource.logout()
+    } catch {
+      // Ignorujemy błąd API, ponieważ i tak wyczyścimy stan lokalny
+    }
+
+    // Następnie wyczyść lokalny stan sesji (nuxt-auth-utils)
     await session.clear()
 
     toast.add({
@@ -148,6 +154,28 @@ export function useAuth() {
     }
   }
 
+  async function loginWithProvider(provider: 'github' | 'google' | string, options?: { returnTo?: string }): Promise<void> {
+    const basePath = `/auth/${provider}`
+    const returnTo = options?.returnTo ?? (router.currentRoute.value.query.redirect as string | undefined) ?? '/dashboard'
+    const url = `${basePath}?returnTo=${encodeURIComponent(returnTo)}`
+
+    try {
+      // Otwórz OAuth w popupie – moduł sam zamknie okno po sukcesie
+      session.openInPopup(url)
+      // Po powrocie odśwież sesję
+      await session.fetch()
+
+      await router.push(returnTo)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Nie udało się zalogować przez dostawcę OAuth'
+      toast.add({
+        title: 'Błąd logowania OAuth',
+        description: message,
+        color: 'error'
+      })
+    }
+  }
+
   return {
     user: readonly(user),
     isLoggedIn,
@@ -156,6 +184,7 @@ export function useAuth() {
     register,
     logout,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    loginWithProvider
   }
 }

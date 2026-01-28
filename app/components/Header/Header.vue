@@ -122,7 +122,7 @@ const handleLogout = async () => {
               :items="[
                 [
                   {
-                    label: user?.username || 'Użytkownik',
+                    label: user?.name || user?.username || user?.email || 'Użytkownik',
                     slot: 'account',
                     disabled: true
                   }
@@ -162,12 +162,19 @@ const handleLogout = async () => {
                 class="text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary"
               >
                 <template #leading>
+                  <UAvatar
+                    v-if="user?.avatarUrl"
+                    :src="user.avatarUrl"
+                    :alt="user?.name || user?.username || user?.email || 'Użytkownik'"
+                    size="xs"
+                  />
                   <UIcon
+                    v-else
                     name="i-lucide-user"
                     class="w-4 h-4"
                   />
                 </template>
-                {{ user?.username || 'Użytkownik' }}
+                {{ user?.name || user?.username || user?.email || 'Użytkownik' }}
                 <UIcon
                   name="i-lucide-chevron-down"
                   class="w-4 h-4 ml-1"
@@ -175,13 +182,21 @@ const handleLogout = async () => {
               </UButton>
 
               <template #account>
-                <div class="text-left">
-                  <p class="font-medium text-gray-900 dark:text-white">
-                    {{ user?.username }}
-                  </p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    {{ user?.email }}
-                  </p>
+                <div class="flex items-center gap-3 text-left">
+                  <UAvatar
+                    v-if="user?.avatarUrl"
+                    :src="user.avatarUrl"
+                    :alt="user?.name || user?.username || user?.email || 'Użytkownik'"
+                    size="sm"
+                  />
+                  <div>
+                    <p class="font-medium text-gray-900 dark:text-white">
+                      {{ user?.name || user?.username || user?.email || 'Użytkownik' }}
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ user?.email }}
+                    </p>
+                  </div>
                 </div>
               </template>
             </UDropdownMenu>
@@ -249,7 +264,7 @@ const handleLogout = async () => {
             <div class="flex flex-col gap-3">
               <div class="px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
                 <p class="font-medium text-sm text-gray-900 dark:text-white">
-                  {{ user?.username }}
+                  {{ user?.name || user?.username || user?.email || 'Użytkownik' }}
                 </p>
                 <p class="text-xs text-gray-500 dark:text-gray-400">
                   {{ user?.email }}

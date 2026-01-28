@@ -9,6 +9,7 @@ const emit = defineEmits<{
 }>()
 
 const auth = useAuth()
+const router = useRouter()
 
 // Użyj schematu z shared/schemas/auth.ts
 const form = useForm(LoginInputSchema)
@@ -43,8 +44,8 @@ const providers: ButtonProps[] = [
     variant: 'subtle',
     block: true,
     onClick: () => {
-      const toast = useToast()
-      toast.add({ title: 'Google', description: 'Logowanie przez Google' })
+      const returnTo = (router.currentRoute.value.query.redirect as string | undefined) ?? '/dashboard'
+      void auth.loginWithProvider('google', { returnTo })
     }
   },
   {
@@ -54,8 +55,8 @@ const providers: ButtonProps[] = [
     variant: 'subtle',
     block: true,
     onClick: () => {
-      const toast = useToast()
-      toast.add({ title: 'GitHub', description: 'Logowanie przez GitHub' })
+      const returnTo = (router.currentRoute.value.query.redirect as string | undefined) ?? '/dashboard'
+      void auth.loginWithProvider('github', { returnTo })
     }
   }
 ]

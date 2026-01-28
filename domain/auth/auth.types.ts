@@ -57,3 +57,25 @@ export interface VerifyEmailOutput {
     email: string
   }
 }
+
+/**
+ * Profil zwrócony przez providera OAuth w ustandaryzowanej formie
+ */
+export interface OAuthProfile {
+  provider: 'github' | 'google' | string
+  providerAccountId: string
+  email?: string
+  emailVerified?: boolean
+  name?: string
+  avatarUrl?: string
+}
+
+/**
+ * Minimalny użytkownik przechowywany w sesji
+ */
+export interface SessionUser {
+  id: number
+  role: string
+  name?: string
+  avatarUrl?: string
+}

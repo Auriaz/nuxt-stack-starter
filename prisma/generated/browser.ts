@@ -36,3 +36,8 @@ export type EmailVerificationToken = Prisma.EmailVerificationTokenModel
  * 
  */
 export type PasswordResetToken = Prisma.PasswordResetTokenModel
+/**
+ * Model OAuthAccount
+ * 
+ */
+export type OAuthAccount = Prisma.OAuthAccountModel
