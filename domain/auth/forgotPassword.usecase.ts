@@ -1,33 +1,52 @@
 import type { ForgotPasswordInput } from './auth.types'
 import type { UserRepository } from '~~/server/repositories/user.repo'
+import type { PasswordResetTokenRepository } from '~~/server/repositories/passwordResetToken.repo'
 import { ok, type Result } from '../shared/result'
-// TODO: Import email service gdy będzie dodany
+import { generateSecureToken, hashToken } from '~~/server/services/security/token.service'
+import { sendPasswordResetEmail } from '~~/server/services/email/email.service'
 
 /**
- * Use-case dla resetu hasła (forgot password)
+ * Use-case dla żądania resetu hasła (forgot password)
  *
- * Generuje token resetu i wysyła email (gdy email service będzie dodany).
+ * Generuje token resetu i wysyła email.
  * Dla bezpieczeństwa zawsze zwraca success, nawet jeśli email nie istnieje.
  */
-export async function forgotPasswordUseCase(
+export async function requestPasswordResetUseCase(
   input: ForgotPasswordInput,
-  repository: UserRepository
-): Promise<Result<{ success: boolean }, never>> {
+  userRepository: UserRepository,
+  tokenRepository: PasswordResetTokenRepository,
+  requestIp?: string,
+  userAgent?: string
+): Promise<Result<{ ok: true }, never>> {
   // 1. Znajdź użytkownika
-  const user = await repository.findByEmail(input.email)
+  const user = await userRepository.findByEmail(input.email)
+
+  // 2. Zawsze zwróć success (security: nie ujawniaj czy email istnieje)
   if (!user) {
-    // Dla bezpieczeństwa nie ujawniamy czy email istnieje
-    return ok({ success: true })
+    return ok({ ok: true })
   }
 
-  // 2. (Do przyszłej implementacji) Wygeneruj token resetu i zapisz w DB
-  // const resetToken = crypto.randomBytes(32).toString('hex')
-  // const resetTokenExpiry = new Date(Date.now() + 3600000) // 1 godzina
-  // await repository.updateResetToken(user.id, resetToken, resetTokenExpiry)
+  // 3. Unieważnij wszystkie istniejące tokeny dla użytkownika
+  await tokenRepository.invalidateForUser(user.id)
 
-  // 4. Wyślij email z linkiem resetu
-  // TODO: Implementacja email service
-  // await emailService.sendResetPasswordEmail(user.email, resetToken)
+  // 4. Wygeneruj nowy token
+  const plainToken = generateSecureToken()
+  const tokenHash = hashToken(plainToken)
 
-  return ok({ success: true })
+  const expiresAt = new Date()
+  expiresAt.setMinutes(expiresAt.getMinutes() + 60) // 60 minut TTL
+
+  await tokenRepository.create({
+    userId: user.id,
+    tokenHash,
+    expiresAt,
+    requestIp,
+    userAgent
+  })
+
+  // 5. Wyślij email z linkiem resetu
+  const resetPath = `/auth/reset-password?token=${plainToken}`
+  await sendPasswordResetEmail(user.email, resetPath)
+
+  return ok({ ok: true })
 }

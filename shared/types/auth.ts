@@ -17,3 +17,12 @@ export type AuthOutput = InferOutput<typeof AuthOutputSchema>
 
 export type VerifyEmailInput = InferOutput<typeof VerifyEmailInputSchema>
 export type ResendVerificationInput = InferOutput<typeof ResendVerificationInputSchema>
+
+export interface ResetPasswordOutput {
+  ok: true
+  user: {
+    id: number
+    username: string
+    email: string
+  }
+}

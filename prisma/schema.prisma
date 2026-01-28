@@ -19,9 +19,11 @@ model User {
   username String @unique
   password String // Hash hasła (bcrypt przez nuxt-auth-utils)
 
-  emailVerifiedAt DateTime?
+  emailVerifiedAt   DateTime?
+  passwordChangedAt DateTime?
 
   emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens     PasswordResetToken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -49,4 +51,21 @@ model EmailVerificationToken {
 
   @@index([userId])
   @@index([tokenHash])
+}
+
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  tokenHash String
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  usedAt    DateTime?
+  requestIp String?
+  userAgent String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([expiresAt])
 }

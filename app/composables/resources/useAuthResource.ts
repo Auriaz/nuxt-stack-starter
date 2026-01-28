@@ -4,6 +4,7 @@ import type {
   RegisterInput,
   ForgotPasswordInput,
   ResetPasswordInput,
+  ResetPasswordOutput,
   VerifyEmailInput,
   ResendVerificationInput
 } from '#shared/types/auth'
@@ -57,28 +58,32 @@ export function useAuthResource() {
     return (response as { user: AuthOutput['user'] }).user
   }
 
-  async function forgotPassword(input: ForgotPasswordInput): Promise<{ success: boolean }> {
-    const response = await apiClient.request<{ data: { success: boolean } } | { success: boolean }>('/api/auth/forgot-password', {
+  async function forgotPassword(input: ForgotPasswordInput): Promise<{ ok: true }> {
+    const response = await apiClient.request<{ data: { ok: true } } | { ok: true }>('/api/auth/forgot-password', {
       method: 'POST',
       body: input
     })
     // Obsługa formatu { data: ... } lub bezpośredniego obiektu
     if (response && typeof response === 'object' && 'data' in response) {
-      return (response as { data: { success: boolean } }).data
+      return (response as { data: { ok: true } }).data
     }
-    return response as { success: boolean }
+    return response as { ok: true }
   }
 
-  async function resetPassword(input: ResetPasswordInput): Promise<AuthOutput> {
-    const response = await apiClient.request<{ data: AuthOutput } | AuthOutput>('/api/auth/reset-password', {
+  async function resetPassword(input: ResetPasswordInput): Promise<ResetPasswordOutput> {
+    const response = await apiClient.request<{ data: ResetPasswordOutput } | ResetPasswordOutput>('/api/auth/reset-password', {
       method: 'POST',
-      body: input
+      body: {
+        token: input.token,
+        password: input.password,
+        passwordConfirm: input.passwordConfirm
+      }
     })
     // Obsługa formatu { data: ... } lub bezpośredniego obiektu
     if (response && typeof response === 'object' && 'data' in response) {
-      return (response as { data: AuthOutput }).data
+      return (response as { data: ResetPasswordOutput }).data
     }
-    return response as AuthOutput
+    return response as ResetPasswordOutput
   }
 
   async function verifyEmail(input: VerifyEmailInput): Promise<{ verified: boolean }> {

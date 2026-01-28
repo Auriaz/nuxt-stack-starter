@@ -52,9 +52,9 @@ export const ForgotPasswordInputSchema = object({
  * Schemat inputu dla resetu hasła
  */
 export const ResetPasswordInputSchema = object({
-  email: pipe(string(), email('Invalid email format')),
+  token: pipe(string(), minLength(1, 'Token is required')),
   password: pipe(string(), minLength(8, 'Password must be at least 8 characters')),
-  token: pipe(string(), minLength(1, 'Token is required'))
+  passwordConfirm: pipe(string(), minLength(1, 'Password confirmation is required'))
 })
 
 /**

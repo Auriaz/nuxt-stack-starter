@@ -1,7 +1,14 @@
-import type { ResetPasswordInput, AuthOutput } from './auth.types'
+import type { ResetPasswordInput, ResetPasswordOutput } from './auth.types'
 import type { UserRepository } from '~~/server/repositories/user.repo'
+import type { PasswordResetTokenRepository } from '~~/server/repositories/passwordResetToken.repo'
 import { ok, err, type Result } from '../shared/result'
-import { UnauthorizedError } from '../shared/errors'
+import {
+  TokenInvalidError,
+  TokenExpiredError,
+  TokenAlreadyUsedError,
+  ValidationError
+} from '../shared/errors'
+import { hashToken } from '~~/server/services/security/token.service'
 // hashPassword jest auto-importowane przez nuxt-auth-utils
 
 /**
@@ -12,34 +19,51 @@ import { UnauthorizedError } from '../shared/errors'
  */
 export async function resetPasswordUseCase(
   input: ResetPasswordInput,
-  repository: UserRepository
-): Promise<Result<AuthOutput, UnauthorizedError>> {
-  // 1. Znajdź użytkownika
-  const user = await repository.findByEmail(input.email)
-  if (!user) {
-    return err(new UnauthorizedError('Invalid reset token'))
+  tokenRepository: PasswordResetTokenRepository,
+  userRepository: UserRepository
+): Promise<Result<ResetPasswordOutput, TokenInvalidError | TokenExpiredError | TokenAlreadyUsedError | ValidationError>> {
+  // 1. Walidacja password === passwordConfirm
+  if (input.password !== input.passwordConfirm) {
+    return err(new ValidationError('Passwords do not match'))
   }
 
-  // 2. Zweryfikuj token (wymaga pól resetToken, resetTokenExpiry w User)
-  // TODO: Gdy pola będą dodane do Prisma schema
-  // if (user.resetToken !== input.token || user.resetTokenExpiry < new Date()) {
-  //   return err(new UnauthorizedError('Invalid or expired reset token'))
-  // }
+  // 2. Hash tokena i znajdź rekord
+  const tokenHash = hashToken(input.token)
+  const record = await tokenRepository.findByTokenHash(tokenHash)
 
-  // 3. Hash nowego hasła
+  if (!record) {
+    return err(new TokenInvalidError())
+  }
+
+  const now = new Date()
+
+  // 3. Sprawdź czy token został użyty
+  if (record.usedAt) {
+    return err(new TokenAlreadyUsedError())
+  }
+
+  // 4. Sprawdź czy token wygasł
+  if (record.expiresAt <= now) {
+    return err(new TokenExpiredError())
+  }
+
+  // 5. Hash nowego hasła
   const hashedPassword = await hashPassword(input.password)
 
-  // 4. Zaktualizuj hasło i wyczyść token
-  const updatedUser = await repository.updatePassword(user.id, hashedPassword)
-  // TODO: Gdy pola będą dodane
-  // await repository.clearResetToken(user.id)
+  // 6. Zaktualizuj hasło i passwordChangedAt
+  await userRepository.updatePassword(record.userId, hashedPassword)
+  await userRepository.updatePasswordChangedAt(record.userId, now)
 
-  // 5. Zwróć dane użytkownika
+  // 7. Oznacz token jako użyty
+  await tokenRepository.markUsed(record.id, now)
+
+  // 8. Zwróć dane użytkownika
   return ok({
+    ok: true,
     user: {
-      id: updatedUser.id,
-      username: updatedUser.username,
-      email: updatedUser.email
+      id: record.user.id,
+      username: record.user.username,
+      email: record.user.email
     }
   })
 }

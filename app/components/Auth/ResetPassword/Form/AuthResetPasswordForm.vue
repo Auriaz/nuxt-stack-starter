@@ -1,47 +1,53 @@
 <script lang="ts" setup>
-import { ResetPasswordInputSchema } from '#shared/schemas/auth'
-import type { InferOutput } from 'valibot'
-import type { AuthFormField } from '@nuxt/ui'
+import { object, string, minLength, pipe, forward, partialCheck, type InferOutput } from 'valibot'
+import type { AuthFormField, FormSubmitEvent } from '@nuxt/ui'
 
 const route = useRoute()
 const auth = useAuth()
+const router = useRouter()
 
-// Użyj schematu z shared/schemas/auth.ts
-// Uwaga: ResetPasswordInputSchema wymaga token z query string
-const form = useForm(ResetPasswordInputSchema)
+// Schemat formularza (tylko pola wpisywane przez użytkownika)
+// Token pochodzi z query param i NIE jest częścią schematu formularza.
+const ResetPasswordFormSchema = pipe(
+  object({
+    password: pipe(string(), minLength(8, 'Hasło musi mieć co najmniej 8 znaków')),
+    passwordConfirm: pipe(string(), minLength(1, 'Potwierdzenie hasła jest wymagane'))
+  }),
+  // Walidacja zgodności haseł na poziomie schematu (Valibot + Nuxt UI)
+  forward(
+    partialCheck(
+      [['password'], ['passwordConfirm']],
+      input => input.password === input.passwordConfirm,
+      'Hasła nie są identyczne'
+    ),
+    ['passwordConfirm']
+  )
+)
+
+// Użyj lokalnego schematu formularza dla UAuthForm + useForm
+const form = useForm(ResetPasswordFormSchema)
 
 // Pobierz token z query string
 const token = computed(() => (route.query.token as string) || '')
-const email = computed(() => (route.query.email as string) || '')
-
-// Ustaw domyślne wartości jeśli są w query (w onMounted)
-onMounted(() => {
-  if (email.value || token.value) {
-    form.setValues({
-      email: email.value || undefined,
-      token: token.value || undefined
-    } as Partial<InferOutput<typeof ResetPasswordInputSchema>>)
-  }
-})
 
 const fields: AuthFormField[] = [
-  {
-    name: 'email',
-    type: 'email',
-    label: 'Email',
-    placeholder: 'twoj@email.pl',
-    required: true
-  },
   {
     name: 'password',
     label: 'Nowe hasło',
     type: 'password',
     placeholder: '••••••••',
     required: true
+  },
+  {
+    name: 'passwordConfirm',
+    label: 'Potwierdź hasło',
+    type: 'password',
+    placeholder: '••••••••',
+    required: true
   }
 ]
 
-async function onSubmit(values: InferOutput<typeof ResetPasswordInputSchema>) {
+async function onSubmit(values: InferOutput<typeof ResetPasswordFormSchema>) {
   if (!token.value) {
     const toast = useToast()
     toast.add({
@@ -54,15 +60,38 @@ async function onSubmit(values: InferOutput<typeof ResetPasswordInputSchema>) {
 
   try {
     // useAuth.resetPassword() obsługuje toast i redirect
-    // Token jest w query, więc przekazujemy go osobno
     await auth.resetPassword({
-      ...values,
-      token: token.value
+      token: token.value,
+      password: values.password,
+      passwordConfirm: values.passwordConfirm
     })
-  } catch (error) {
-    form.setErrorsFromApi(error)
+    // Po sukcesie redirect do dashboard (sesja jest już ustawiona przez endpoint)
+    await router.push('/dashboard')
+  } catch (error: unknown) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const err = error as any
+    const code = err.data?.error?.code ?? err.data?.data?.error?.code ?? err.error?.code
+
+    // Obsługa błędów tokenu z odpowiednimi komunikatami UX
+    if (code === 'TOKEN_EXPIRED') {
+      form.formError.value = 'Link resetu hasła wygasł. Poproś o nowy link.'
+    } else if (code === 'TOKEN_ALREADY_USED') {
+      form.formError.value = 'Link resetu hasła został już użyty. Poproś o nowy link.'
+    } else if (code === 'TOKEN_INVALID') {
+      form.formError.value = 'Link resetu hasła jest nieprawidłowy. Sprawdź link w emailu.'
+    } else {
+      form.setErrorsFromApi(error)
+    }
     throw error // Re-throw dla useAuth (obsługuje toast)
   }
+}
+
+// Wrapper dla @submit event z UAuthForm
+// UAuthForm sam wykonuje walidację wg lokalnego schematu formularza.
+function handleSubmitEvent(
+  event: FormSubmitEvent<InferOutput<typeof ResetPasswordFormSchema>>
+): void {
+  void onSubmit(event.data)
 }
 </script>
 
@@ -74,7 +103,7 @@ async function onSubmit(values: InferOutput<typeof ResetPasswordInputSchema>) {
     <!-- HUD Corner Indicators -->
     <div class="cockpit-hud-corners" />
     <UAuthForm
-      :schema="ResetPasswordInputSchema"
+      :schema="ResetPasswordFormSchema"
       :fields="fields"
       title="Resetuj hasło"
       description="Wprowadź nowe hasło dla swojego konta"
@@ -85,29 +114,22 @@ async function onSubmit(values: InferOutput<typeof ResetPasswordInputSchema>) {
         class: 'glass-button-primary',
         loading: form.pending.value || auth.isLoading.value
       }"
-      @submit="form.handleSubmit(onSubmit)"
-    >
-      <template
-        v-if="!token"
-        #error
-      >
-        <UAlert
-          color="error"
-          variant="soft"
-          title="Brak tokenu"
-          description="Link resetu hasła jest nieprawidłowy lub wygasł. Poproś o nowy link."
-        />
-      </template>
-      <template
-        v-else-if="form.formError.value"
-        #error
-      >
-        <UAlert
-          color="error"
-          variant="soft"
-          :title="form.formError.value"
-        />
-      </template>
-    </UAuthForm>
+      @submit="handleSubmitEvent"
+    />
+
+    <UAlert
+      v-if="!token"
+      color="error"
+      variant="soft"
+      title="Brak tokenu"
+      description="Link resetu hasła jest nieprawidłowy lub wygasł. Poproś o nowy link."
+    />
+
+    <UAlert
+      v-else-if="form.formError.value"
+      color="error"
+      variant="soft"
+      :title="form.formError.value"
+    />
   </UPageCard>
 </template>

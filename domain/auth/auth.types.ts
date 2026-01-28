@@ -19,9 +19,18 @@ export interface ForgotPasswordInput {
 }
 
 export interface ResetPasswordInput {
-  email: string
-  password: string
   token: string
+  password: string
+  passwordConfirm: string
+}
+
+export interface ResetPasswordOutput {
+  ok: true
+  user: {
+    id: number
+    username: string
+    email: string
+  }
 }
 
 export interface AuthOutput {

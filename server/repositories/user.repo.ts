@@ -13,6 +13,7 @@ export interface UserRepository {
   create(data: { email: string, username: string, password: string }): Promise<User>
   updatePassword(id: number, password: string): Promise<User>
   updateEmailVerifiedAt(id: number, emailVerifiedAt: Date): Promise<User>
+  updatePasswordChangedAt(id: number, passwordChangedAt: Date): Promise<User>
 }
 
 export const userRepository: UserRepository = {
@@ -45,6 +46,13 @@ export const userRepository: UserRepository = {
     return await prisma.user.update({
       where: { id },
       data: { emailVerifiedAt }
+    })
+  },
+
+  async updatePasswordChangedAt(id, passwordChangedAt) {
+    return await prisma.user.update({
+      where: { id },
+      data: { passwordChangedAt }
     })
   }
 }

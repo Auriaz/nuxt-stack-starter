@@ -151,3 +151,57 @@ export async function sendVerificationEmail(
   const emailProvider = getProvider()
   return await emailProvider.send(payload)
 }
+
+function buildPasswordResetEmailTemplate(to: string, resetLink: string): EmailPayload {
+  const runtimeConfig = useRuntimeConfig()
+  const publicConfig = runtimeConfig.public as { siteUrl?: string }
+  const baseUrl = publicConfig.siteUrl || 'http://localhost:3000'
+  const finalLink = resetLink.startsWith('http') ? resetLink : `${baseUrl}${resetLink}`
+
+  const subject = 'Reset hasła'
+
+  const textLines: string[] = [
+    'Otrzymaliśmy żądanie resetu hasła dla Twojego konta.',
+    '',
+    'Aby zresetować hasło, kliknij w poniższy link:',
+    finalLink,
+    '',
+    'Link jest ważny przez 60 minut.',
+    '',
+    'Jeśli nie żądałeś resetu hasła, zignoruj tę wiadomość.'
+  ]
+
+  const text = textLines.join('\n')
+
+  const htmlLines: string[] = [
+    '<p>Otrzymaliśmy żądanie resetu hasła dla Twojego konta.</p>',
+    '<p>Aby zresetować hasło, kliknij w przycisk poniżej:</p>',
+    `<p><a href="${finalLink}" style="display:inline-block;padding:10px 16px;background:#0f766e;color:#ffffff;text-decoration:none;border-radius:4px;">Zresetuj hasło</a></p>`,
+    `<p>Jeśli przycisk nie działa, skopiuj i wklej poniższy link do przeglądarki:</p>`,
+    `<p><a href="${finalLink}">${finalLink}</a></p>`,
+    '<p><strong>Link jest ważny przez 60 minut.</strong></p>',
+    '<p>Jeśli nie żądałeś resetu hasła, zignoruj tę wiadomość.</p>'
+  ]
+
+  const html = htmlLines.join('\n')
+
+  const config = getEmailConfig()
+
+  return {
+    to,
+    subject,
+    text,
+    html,
+    from: config.from,
+    replyTo: config.replyToDefault
+  }
+}
+
+export async function sendPasswordResetEmail(
+  to: string,
+  resetPath: string
+): Promise<EmailSendResult> {
+  const payload = buildPasswordResetEmailTemplate(to, resetPath)
+  const emailProvider = getProvider()
+  return await emailProvider.send(payload)
+}
