@@ -6,7 +6,8 @@ import {
   optional,
   email,
   pipe,
-  boolean
+  boolean,
+  union
 } from 'valibot'
 
 /**
@@ -15,7 +16,8 @@ import {
 export const LoginInputSchema = object({
   email: pipe(string(), email('Invalid email format')),
   password: pipe(string(), minLength(1, 'Password is required')),
-  remember: optional(string())
+  // Checkbox może zwrócić 'on' (string) lub boolean z innych źródeł – akceptujemy oba
+  remember: optional(union([string(), boolean()]))
 })
 
 /**

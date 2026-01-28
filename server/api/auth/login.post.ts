@@ -3,6 +3,7 @@ import { LoginInputSchema } from '#shared/schemas/auth'
 import { loginUseCase } from '~~/domain/auth/login.usecase'
 import { userRepository } from '~~/server/repositories/user.repo'
 import { isErr } from '~~/domain/shared/result'
+import { useRuntimeConfig } from '#imports'
 // setUserSession jest auto-importowane przez nuxt-auth-utils
 
 /**
@@ -30,8 +31,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const { remember, ...loginInput } = inputResult.output
+  const shouldRemember = !!remember
+
   // Złożona logika → use-case
-  const useCaseResult = await loginUseCase(inputResult.output, userRepository)
+  const useCaseResult = await loginUseCase(loginInput, userRepository)
 
   // Obsługa błędów z Result pattern
   if (isErr(useCaseResult)) {
@@ -47,10 +51,19 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Ustaw sesję użytkownika (nuxt-auth-utils)
-  await setUserSession(event, {
-    user: useCaseResult.value.user
-  })
+  // Konfiguracja sesji z obsługą „Zapamiętaj mnie”
+  const runtimeConfig = useRuntimeConfig()
+  const rememberMeDays = runtimeConfig.auth?.rememberMeDays ?? 30
+  const maxAge = shouldRemember ? rememberMeDays * 24 * 60 * 60 : undefined
+
+  // Ustaw sesję użytkownika (nuxt-auth-utils) z ewentualnym maxAge
+  await setUserSession(
+    event,
+    {
+      user: useCaseResult.value.user
+    },
+    maxAge ? { maxAge } : undefined
+  )
 
   return { data: useCaseResult.value }
 })

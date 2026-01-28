@@ -37,7 +37,7 @@ async function onSubmit(values: InferOutput<typeof ForgotPasswordInputSchema>) {
 <template>
   <UPageCard
     variant="ghost"
-    class="w-full glass-panel cockpit-panel relative overflow-hidden"
+    class="w-full glass-panel cockpit-panel relative overflow-hidden border border-slate-200/80 dark:border-slate-700/80 rounded-lg shadow-xl shadow-black"
   >
     <!-- HUD Corner Indicators -->
     <div class="cockpit-hud-corners" />

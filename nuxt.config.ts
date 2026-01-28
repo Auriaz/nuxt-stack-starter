@@ -53,6 +53,10 @@ export default defineNuxtConfig({
       replyToDefault: process.env.MAIL_REPLY_TO_DEFAULT,
       toContact: process.env.MAIL_TO_CONTACT
     },
+    auth: {
+      // Ilość dni ważności sesji przy opcji „Zapamiętaj mnie”
+      rememberMeDays: process.env.AUTH_REMEMBER_ME_DAYS ? Number(process.env.AUTH_REMEMBER_ME_DAYS) : 30
+    },
     public: {
       plausibleDomain: process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN || '',
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'

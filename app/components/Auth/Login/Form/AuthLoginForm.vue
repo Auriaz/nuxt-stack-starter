@@ -61,9 +61,13 @@ const providers: ButtonProps[] = [
 ]
 
 async function onSubmit(values: InferOutput<typeof LoginInputSchema>) {
-  // auth.login() rzuca błąd, który jest obsługiwany w handleSubmit przez setErrorsFromApi
-  // Toast jest wyświetlany w useAuth.login()
-  await auth.login(values)
+  // Zamień checkbox „remember” na boolean i przekaż do useAuth.login
+  const { remember, ...rest } = values
+
+  await auth.login({
+    ...rest,
+    remember: !!remember
+  })
 }
 
 // Wrapper dla @submit event
