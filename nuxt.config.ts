@@ -4,6 +4,7 @@ import { definePerson, defineImage } from 'nuxt-schema-org/schema'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - auto-importowane przez Nuxt
 export default defineNuxtConfig({
+
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
@@ -16,31 +17,26 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@nuxtjs/mcp-toolkit',
     '@nuxtjs/seo',
-    '@vueuse/nuxt'
+    '@vueuse/nuxt',
+    'nuxt-auth-utils'
   ],
-
-  imports: {
-    dirs: [
-      // Scan top-level composables
-      '~/composables',
-      // ... or scan composables nested one level deep with a specific name and file extension
-      '~/composables/*/index.{ts,js,mjs,mts}',
-      // ... or scan all composables within given directory
-      '~/composables/**',
-      '~/shared/schemas/**',
-      '~/shared/types/**',
-      '~/shared/utils/**'
-    ]
-  },
 
   devtools: {
     enabled: true
   },
 
+  app: {
+    head: {
+      link: [
+        { rel: 'icon', href: '/favicon.ico' }
+      ]
+    }
+  },
+
   css: ['~/assets/css/main.css'],
 
   site: {
-    // url: appMeta.url || 'https://example.com',
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
     name: appMeta.name,
     description: appMeta.description,
     defaultLocale: 'pl'
@@ -48,26 +44,13 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      plausibleDomain: process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN || ''
+      plausibleDomain: process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN || '',
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'
     }
   },
 
   alias: {
     '~domain': './domain'
-  },
-
-  routeRules: {
-    // Publiczne strony - prerender + default layout
-    '/': { prerender: true, appLayout: 'default' },
-    '/oferta': { prerender: true, appLayout: 'default' },
-    '/portfolio': { prerender: true, appLayout: 'default' },
-    '/portfolio/**': { prerender: true, appLayout: 'default' },
-    '/o-nas': { prerender: true, appLayout: 'default' },
-    '/kontakt': { cache: false, appLayout: 'default' }, // SSR dla formularza
-    '/blog': { prerender: true, appLayout: 'default' },
-    '/blog/**': { prerender: true, appLayout: 'default' },
-    // Dashboard - może wymagać innego layoutu w przyszłości
-    '/dashboard/**': { appLayout: 'default' }
   },
 
   experimental: {
@@ -86,6 +69,13 @@ export default defineNuxtConfig({
     },
     rollupConfig: {
       external: [/^@prisma\//, /\.wasm$/]
+    },
+    // Workaround dla błędu "File URL path must be absolute" na Windows przy prerenderze:
+    // wymuszamy cache w pamięci zamiast domyślnego drivera plikowego.
+    storage: {
+      cache: {
+        driver: 'memory'
+      }
     },
     prerender: {
       routes: ['/sitemap.xml', '/robots.txt'],
@@ -114,10 +104,6 @@ export default defineNuxtConfig({
       useCookie: true,
       cookieKey: 'i18n_redirected'
     }
-  },
-
-  mcp: {
-    name: 'Fullstack Base Starter'
   },
 
   schemaOrg: {

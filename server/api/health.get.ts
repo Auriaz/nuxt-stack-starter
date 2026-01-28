@@ -19,9 +19,16 @@ export default defineEventHandler(async () => {
   if (!validationResult.success) {
     throw createError({
       status: 500,
-      statusText: 'Health check validation failed'
+      statusText: 'Health check validation failed',
+      data: {
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'Output validation failed',
+          issues: validationResult.issues
+        }
+      }
     })
   }
 
-  return validationResult.output
+  return { data: validationResult.output }
 })

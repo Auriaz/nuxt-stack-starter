@@ -17,6 +17,7 @@ model User {
   id       Int    @id @default(autoincrement())
   email    String @unique
   username String @unique
+  password String // Hash hasła (bcrypt przez nuxt-auth-utils)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

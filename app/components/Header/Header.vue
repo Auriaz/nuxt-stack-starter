@@ -3,7 +3,9 @@
 // @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
 // const { locale } = useI18n()
 const isScrolled = ref(false)
-// const { clear: clearUserSession, loggedIn, user } = useUserSession()
+
+// Auth state
+const { user, isLoggedIn, logout } = useAuth()
 
 // Globalny system filtrów
 
@@ -21,9 +23,10 @@ onMounted(() => {
 const { data: navigation } = await useAsyncData('navigation', () => queryCollectionNavigation('content'))
 const { data: files } = await useAsyncData('search', () => queryCollectionSearchSections('content'), { server: false })
 const searchTerm = ref('')
-// const handleLogout = async () => {
-//   await clearUserSession()
-// }
+
+const handleLogout = async () => {
+  await logout()
+}
 </script>
 
 <template>
@@ -81,8 +84,9 @@ const searchTerm = ref('')
         </div>
         <!-- Auth Buttons / User Menu - Desktop -->
         <div class="hidden md:flex items-center gap-2">
-          <!-- Guest: Login/Register Buttons
-            <template v-if="!auth.isAuthenticated.value">
+          <AuthState>
+            <!-- Guest: Login/Register Buttons -->
+            <template v-if="!isLoggedIn">
               <UButton
                 to="/auth/login"
                 variant="ghost"
@@ -111,15 +115,14 @@ const searchTerm = ref('')
                 Rejestracja
               </UButton>
             </template>
-          -->
 
-          <!-- Authenticated: User Dropdown Menu
+            <!-- Authenticated: User Dropdown Menu -->
             <UDropdownMenu
-              v-if="loggedIn"
+              v-if="isLoggedIn"
               :items="[
                 [
                   {
-                    label: user?.name || 'Użytkownik',
+                    label: user?.username || 'Użytkownik',
                     slot: 'account',
                     disabled: true
                   }
@@ -145,7 +148,9 @@ const searchTerm = ref('')
                   {
                     label: 'Wyloguj się',
                     icon: 'i-lucide-log-out',
-                    click: handleLogout
+                    color: 'error',
+                    variant: 'outline',
+                    onClick: () => handleLogout()
                   }
                 ]
               ]"
@@ -162,7 +167,7 @@ const searchTerm = ref('')
                     class="w-4 h-4"
                   />
                 </template>
-                {{ user?.name || 'Użytkownik' }}
+                {{ user?.username || 'Użytkownik' }}
                 <UIcon
                   name="i-lucide-chevron-down"
                   class="w-4 h-4 ml-1"
@@ -172,7 +177,7 @@ const searchTerm = ref('')
               <template #account>
                 <div class="text-left">
                   <p class="font-medium text-gray-900 dark:text-white">
-                    {{ user?.name }}
+                    {{ user?.username }}
                   </p>
                   <p class="text-sm text-gray-500 dark:text-gray-400">
                     {{ user?.email }}
@@ -180,7 +185,7 @@ const searchTerm = ref('')
                 </div>
               </template>
             </UDropdownMenu>
-          -->
+          </AuthState>
         </div>
       </div>
 
@@ -204,104 +209,95 @@ const searchTerm = ref('')
         <div
           class="flex flex-col gap-4 pt-4 border-t border-slate-200/80 dark:border-slate-700/80 shrink-0"
         >
-          <!-- Auth Buttons / User Menu - Mobile
+          <!-- Auth Buttons / User Menu - Mobile -->
+          <template v-if="!isLoggedIn">
+            <div class="flex flex-col gap-3">
+              <UButton
+                to="/auth/login"
+                variant="outline"
+                size="md"
+                block
+                class="w-full justify-center"
+              >
+                <template #leading>
+                  <UIcon
+                    name="i-lucide-log-in"
+                    class="w-4 h-4"
+                  />
+                </template>
+                Zaloguj się
+              </UButton>
+              <UButton
+                to="/auth/register"
+                size="md"
+                block
+                class="w-full justify-center glass-button-primary"
+              >
+                <template #leading>
+                  <UIcon
+                    name="i-lucide-user-plus"
+                    class="w-4 h-4"
+                  />
+                </template>
+                Utwórz konto
+              </UButton>
+            </div>
+          </template>
 
-            <template v-if="!loggedIn">
-              <div class="flex flex-col gap-3">
-                <UButton
-                  to="/auth/login"
-                  variant="outline"
-                  size="md"
-                  block
-                  class="w-full justify-center"
-                >
-                  <template #leading>
-                    <UIcon
-                      name="i-lucide-log-in"
-                      class="w-4 h-4"
-                    />
-                  </template>
-                  Zaloguj się
-                </UButton>
-                <UButton
-                  to="/auth/register"
-                  size="md"
-                  block
-                  class="w-full justify-center glass-button-primary"
-                >
-                  <template #leading>
-                    <UIcon
-                      name="i-lucide-user-plus"
-                      class="w-4 h-4"
-                    />
-                  </template>
-                  Utwórz konto
-                </UButton>
+          <!-- Authenticated: User Info and Actions - Mobile -->
+          <template v-else>
+            <div class="flex flex-col gap-3">
+              <div class="px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                <p class="font-medium text-sm text-gray-900 dark:text-white">
+                  {{ user?.username }}
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  {{ user?.email }}
+                </p>
               </div>
-            </template>
-          -->
+              <UButton
+                to="/dashboard"
+                variant="outline"
+                size="md"
+                block
+                class="w-full justify-center"
+              >
+                <template #leading>
+                  <UIcon
+                    name="i-lucide-layout-dashboard"
+                    class="w-4 h-4"
+                  />
+                </template>
+                Dashboard
+              </UButton>
+              <UButton
+                to="/dashboard/settings/profile"
+                variant="ghost"
+                size="md"
+                block
+                class="w-full justify-center"
+              >
+                <template #leading>
+                  <UIcon
+                    name="i-lucide-user"
+                    class="w-4 h-4"
+                  />
+                </template>
+                Profil
+              </UButton>
 
-          <!-- Authenticated: User Info and Actions - Mobile
-
-            <template v-else>
-              <div class="flex flex-col gap-3">
-                <div class="px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                  <p class="font-medium text-sm text-gray-900 dark:text-white">
-                    {{ user?.name }}
-                  </p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    {{ user?.email }}
-                  </p>
-                </div>
-                <UButton
-                  to="/dashboard"
-                  variant="outline"
-                  size="md"
-                  block
-                  class="w-full justify-center"
-                >
-                  <template #leading>
-                    <UIcon
-                      name="i-lucide-layout-dashboard"
-                      class="w-4 h-4"
-                    />
-                  </template>
-                  Dashboard
-                </UButton>
-                <UButton
-                  to="/dashboard/settings/profile"
-                  variant="ghost"
-                  size="md"
-                  block
-                  class="w-full justify-center"
-                >
-                  <template #leading>
-                    <UIcon
-                      name="i-lucide-user"
-                      class="w-4 h-4"
-                    />
-                  </template>
-                  Profil
-                </UButton>
-
-                <UButton
-                  variant="outline"
-                  size="md"
-                  block
-                  class="w-full justify-center text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
-                  @click="handleLogout"
-                >
-                  <template #leading>
-                    <UIcon
-                      name="i-lucide-log-out"
-                      class="w-4 h-4"
-                    />
-                  </template>
-                  Wyloguj się
-                </UButton>
-              </div>
-            </template>
-          -->
+              <UButton
+                variant="outline"
+                size="md"
+                block
+                color="error"
+                class="w-full justify-center"
+                @click="() => handleLogout()"
+              >
+                Wyloguj się
+              </UButton>
+            </div>
+          </template>
 
           <!-- Color Mode Selector -->
           <div class="flex items-center justify-between">

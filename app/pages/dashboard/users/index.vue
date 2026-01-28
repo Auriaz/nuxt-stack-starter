@@ -15,9 +15,13 @@
   </div>
 </template>
 
-<script setup>
-const { data: users } = await useFetch('/api/users', {
-  // Anuluj poprzednie requesty przy odświeżaniu
-  dedupe: 'cancel'
+<script setup lang="ts">
+import { useUsersResource } from '~/composables/resources/useUsersResource'
+
+const { getUsers } = useUsersResource()
+
+// Użycie resource composable zamiast bezpośredniego useFetch
+const { data: users } = await useAsyncData('users', async () => {
+  return await getUsers()
 })
 </script>

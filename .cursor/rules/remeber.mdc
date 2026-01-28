@@ -1,0 +1,171 @@
+---
+alwaysApply: true
+---
+
+Always follow .cursor/remember.md
+
+---
+
+## 📌 Cursor Project Rules — nuxt-base-starter
+
+### 1️⃣ Zasady ogólne projektu
+
+* Projekt jest **Nuxt full-stack** (jeden framework, jeden język).
+* Priorytet: **systemowy porządek + minimalizm**, nie „framework w frameworku”.
+* Decyzje architektoniczne są ważniejsze niż skróty implementacyjne.
+* Jeśli coś jest niejasne → **sprawdź `.cursor/remember.md`**.
+
+---
+
+### 2️⃣ Warstwy i odpowiedzialności (MUST FOLLOW)
+
+**`app/` — UI**
+
+* Komponenty Vue są **presentational**.
+* ❌ Brak fetch w komponentach i sekcjach.
+* UI oparte o **Nuxt UI**.
+* Animacje tylko przez **motion-v**.
+
+**`app/composables/resources/`**
+
+* ✅ JEDYNE miejsce komunikacji frontend ↔ backend.
+* Wrappery nad API (`useContactResource`, `useAuthResource`, itd.).
+
+**`server/` — backend**
+
+* `server/api/*` = kontrolery HTTP (parse → validate → use-case → DTO).
+* ❌ Brak logiki biznesowej w `server/api`.
+* DB tylko przez Prisma (repozytoria / serwisy).
+
+**`domain/`**
+
+* Jedyna lokalizacja logiki biznesowej (use-case’y, reguły).
+* ❌ Nie zależy od UI ani Nuxt UI.
+
+**`shared/`**
+
+* Kontrakty: **Valibot schemas**, DTO, utils.
+
+**`content/`**
+
+* Tylko treść (pages, blog, portfolio).
+* ❌ Brak logiki aplikacyjnej.
+
+---
+
+### 3️⃣ Formularze
+
+* Wszystkie formularze używają **`useForm()`**.
+* `useForm` = single source of truth dla:
+
+  * values, pending, errors, formError
+  * walidacji (Valibot)
+  * mapowania błędów API
+* Integracja z **Nuxt UI `UForm`**.
+* ❌ Brak ręcznej obsługi submit/pending w komponentach.
+
+---
+
+### 4️⃣ Sekcje stron (Page Builder)
+
+* Strony są **content-driven** (`PageSchema + sections[]`).
+* Każda sekcja:
+
+  * dziedziczy z `SectionBaseSchema`,
+  * renderowana przez `SectionsRenderer`.
+* **`PageSection.vue` (UPageSection)** = jedyny wrapper sekcji.
+* `enabled: false` wyłącza sekcję.
+* Page CTA > Global CTA (bez duplikacji).
+
+---
+
+### 5️⃣ API & błędy
+
+* Jeden format odpowiedzi API (success / error).
+* Walidacja inputów **zawsze** przez Valibot.
+* `422 VALIDATION_ERROR` → `issues[]` mapowane do błędów pól w `useForm`.
+* Komponenty UI **nie interpretują** błędów API — robi to `useForm`.
+
+---
+
+## 🧠 Zasady Nuxt — AUTO-IMPORTY (OBOWIĄZUJĄCE)
+
+### 6️⃣ Auto-importy — co wolno
+
+* Korzystaj z auto-importów dla:
+
+  * Vue (`ref`, `computed`, `watch`, itd.)
+  * Nuxt composables (`useRoute`, `useFetch`, `useAsyncData`)
+  * plików z `composables/`, `utils/`
+* Komponenty z `components/` są auto-importowane.
+
+---
+
+### 7️⃣ Auto-importy — co KONFIGURUJEMY ŚWIADOMIE
+
+* Dodatkowe katalogi do auto-importów dodajemy jawnie w `nuxt.config`:
+
+  ```ts
+  imports: {
+    dirs: ['constants']
+  }
+  ```
+* Dla komponentów z prefiksem:
+
+  ```ts
+  components: [
+    { path: 'app/components', prefix: 'App' }
+  ]
+  ```
+* Jeśli definiujesz `components.dirs` ręcznie → **musisz dodać domyślne katalogi z powrotem**.
+
+---
+
+### 8️⃣ Nitro (backend) — osobne auto-importy
+
+* Kod serwerowy korzysta z:
+
+  * `nitro.imports`
+* Typy H3 (`H3Event`, `EventHandler`) są dostępne przez preset — nie importuj ich ręcznie, jeśli nie trzeba.
+
+---
+
+### 9️⃣ Ograniczenia auto-importów (WAŻNE)
+
+* ❌ Nie polegaj na auto-importach w:
+
+  * `nuxt.config.ts`
+  * Nuxt modules
+  * layers
+* Tam używaj jawnych importów lub `#imports`.
+
+---
+
+### 🔟 Czytelność > wygoda
+
+* Auto-importy są OK dla rzeczy **oczywistych**.
+* Dla logiki biznesowej (`domain/*`) i ważnych funkcji:
+
+  * preferuj **jawne importy**.
+* Jeśli auto-import utrudnia zrozumienie „skąd to jest” → **nie używaj go**.
+
+---
+
+## 📂 TODO & decyzje
+
+* TODO zapisujemy **wyłącznie jako pliki** w `.cursor/todo/`.
+* ❌ Nie zostawiamy TODO w komentarzach kodu.
+* Odłożone decyzje architektoniczne = TODO typu „decision”.
+
+---
+
+### Złota zasada
+
+> **Jeśli rozwiązanie łamie którąkolwiek z powyższych reguł — jest błędne, nawet jeśli działa.**
+
+---
+
+Jeśli chcesz, mogę:
+
+* skrócić to jeszcze do **ultra-krótkiej wersji (10 linijek)**
+* albo przygotować **wersję README / docs/ARCHITECTURE.md**, którą Cursor też będzie automatycznie „łapał”

@@ -1,6 +1,5 @@
 <template>
   <div
-    v-if="isDev"
     class="bg-yellow-100 border border-yellow-300 p-4 rounded-lg text-yellow-800 text-sm leading-relaxed shadow-md"
   >
     Rendering the <code>script</code> element is dangerous and is disabled by default. Consider
@@ -15,7 +14,7 @@ defineProps({
     default: ''
   }
 })
-const isDev = import.meta.dev
+// const isDev = import.meta.dev
 </script>
 
 <style scoped>

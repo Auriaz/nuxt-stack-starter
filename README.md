@@ -232,6 +232,8 @@ Database
 
 ## ⚠️ Zasady systemowe
 
+> 📖 **Pełna dokumentacja architektury**: Zobacz [ARCHITECTURE.md](./content/docs/ARCHITECTURE.md) oraz [.cursor/remember.md](./.cursor/remember.md) dla szczegółowych zasad i decyzji architektonicznych.
+
 **KRYTYCZNE - bez wyjątków:**
 
 1. **Komponenty Vue** (`app/components`, `app/pages`):

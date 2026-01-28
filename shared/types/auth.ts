@@ -1,6 +1,14 @@
 import type { InferOutput } from 'valibot'
-import type { RoleSchema, PermissionSchema, UserRoleSchema } from '../schemas/auth'
+import type {
+  LoginInputSchema,
+  RegisterInputSchema,
+  ForgotPasswordInputSchema,
+  ResetPasswordInputSchema,
+  AuthOutputSchema
+} from '../schemas/auth'
 
-export type Role = InferOutput<typeof RoleSchema>
-export type Permission = InferOutput<typeof PermissionSchema>
-export type UserRole = InferOutput<typeof UserRoleSchema>
+export type LoginInput = InferOutput<typeof LoginInputSchema>
+export type RegisterInput = InferOutput<typeof RegisterInputSchema>
+export type ForgotPasswordInput = InferOutput<typeof ForgotPasswordInputSchema>
+export type ResetPasswordInput = InferOutput<typeof ResetPasswordInputSchema>
+export type AuthOutput = InferOutput<typeof AuthOutputSchema>

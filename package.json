@@ -3,29 +3,29 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "bun run nuxt build",
-    "dev": "bun run nuxt dev",
-    "preview": "bun run nuxt preview",
-    "postinstall": "bun run nuxt prepare",
-    "lint": "bun run eslint .",
-    "lint:fix": "bun run eslint . --fix",
-    "format": "bun run prettier --write .",
-    "format:check": "bun run prettier --check .",
-    "typecheck": "bun run nuxt typecheck",
-    "test": "bun run vitest",
-    "test:watch": "bun run vitest --watch",
-    "test:unit": "bun run vitest --project unit",
-    "test:nuxt": "bun run vitest --project nuxt",
-    "test:e2e": "bun run playwright test",
-    "test:e2e:ui": "bun run playwright test --ui",
-    "prepare": "bun run husky",
-    "db:generate": "bun run prisma generate",
-    "db:migrate": "bun run prisma migrate dev",
-    "db:studio": "bun run prisma studio"
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "nuxt typecheck",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:unit": "vitest --project unit",
+    "test:nuxt": "vitest --project nuxt",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "prepare": "husky",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
-    "@iconify-json/lucide": "^1.2.86",
-    "@iconify-json/simple-icons": "^1.2.67",
+    "@iconify-json/lucide": "^1.2.87",
+    "@iconify-json/simple-icons": "^1.2.68",
     "@nuxt/a11y": "1.0.0-alpha.1",
     "@nuxt/content": "3.10.0",
     "@nuxt/hints": "1.0.0-alpha.5",
@@ -45,8 +45,10 @@
     "dayjs": "^1.11.19",
     "fuse.js": "^7.1.0",
     "lint-staged": "^16.2.7",
-    "motion-v": "^1.10.0",
+    "motion-v": "^1.10.2",
+    "vite": "https://pkg.pr.new/vitejs/vite@42f2ab3",
     "nuxt": "^4.3.0",
+    "nuxt-auth-utils": "0.5.27",
     "pg": "^8.17.2"
   },
   "devDependencies": {
@@ -59,7 +61,7 @@
     "@vue/test-utils": "^2.4.6",
     "dotenv": "^17.2.3",
     "eslint": "^9.39.2",
-    "happy-dom": "^20.3.7",
+    "happy-dom": "^20.3.9",
     "husky": "^9.1.7",
     "playwright-core": "^1.58.0",
     "prettier": "3.7.4",
@@ -69,7 +71,10 @@
     "valibot": "^1.2.0",
     "vitest": "^4.0.18",
     "zod": "^3.25.76",
-    "vue-tsc": "^3.2.3"
+    "vue-tsc": "^3.2.4"
+  },
+  "resolutions": {
+    "vite": "https://pkg.pr.new/vitejs/vite@42f2ab3"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,vue}": [
