@@ -4,5 +4,77 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "prisma.pinToPrisma6": false
+  "prisma.pinToPrisma6": false,
+  "todo-tree.general.tags": [
+    "TODO",
+    "FIXME",
+    "BUG",
+    "HACK",
+    "NOTE",
+    "OPTIMIZE",
+    "PERF",
+    "SECURITY"
+  ],
+  "todo-tree.highlights.defaultHighlight": {
+    "icon": "alert",
+    "type": "text",
+    "foreground": "red",
+    "background": "white",
+    "opacity": 50,
+    "iconColour": "blue"
+  },
+  "todo-tree.highlights.customHighlight": {
+    "TODO": {
+      "icon": "check",
+      "type": "line",
+      "foreground": "white",
+      "background": "green"
+    },
+    "FIXME": {
+      "foreground": "black",
+      "iconColour": "yellow",
+      "gutterIcon": true,
+      "background": "yellow",
+      "type": "line"
+    },
+    "BUG": {
+      "icon": "bug",
+      "foreground": "white",
+      "background": "red",
+      "type": "line"
+    },
+    "HACK": {
+      "icon": "tools",
+      "foreground": "black",
+      "background": "orange",
+      "type": "line"
+    },
+    "NOTE": {
+      "icon": "note",
+      "foreground": "black",
+      "background": "lightskyblue",
+      "type": "line"
+    },
+    "OPTIMIZE": {
+      "icon": "zap",
+      "foreground": "white",
+      "background": "purple",
+      "type": "line"
+    },
+    "PERF": {
+      "icon": "pulse",
+      "foreground": "white",
+      "background": "indigo",
+      "type": "line"
+    },
+    "SECURITY": {
+      "foreground": "white",
+      "background": "red",
+      "type": "line",
+      "icon": "shield"
+    }
+  },
+  "cSpell.words": [
+    "Użytkownicy"
+  ]
 }

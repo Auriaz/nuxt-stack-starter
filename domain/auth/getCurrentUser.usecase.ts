@@ -12,7 +12,7 @@ export async function getCurrentUserUseCase(
   _userRepository: UserRepository
 ): Promise<SessionUser | null> {
   // MVP: Sesja zawiera wystarczające dane do wyświetlenia w UI.
-  // W przyszłości można opcjonalnie użyć userRepository do dociągnięcia pełnego profilu.
+  // TODO[area=auth,priority=low]: W przyszłości można opcjonalnie użyć userRepository do dociągnięcia pełnego profilu.
   if (!sessionUser) {
     return null
   }

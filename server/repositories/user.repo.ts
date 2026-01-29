@@ -1,5 +1,19 @@
 import { prisma } from '../services/prisma'
-import type { User } from '../../prisma/generated/client.js'
+import type { Prisma, User } from '../../prisma/generated/client.js'
+
+export type UserWithRolePermissions = Prisma.UserGetPayload<{
+  include: {
+    roleRef: {
+      include: {
+        permissions: {
+          include: {
+            permission: true
+          }
+        }
+      }
+    }
+  }
+}>
 
 /**
  * Repository dla operacji na użytkownikach
@@ -10,6 +24,10 @@ import type { User } from '../../prisma/generated/client.js'
 export interface UserRepository {
   findByEmail(email: string): Promise<User | null>
   findByUsername(username: string): Promise<User | null>
+  findById(id: number): Promise<User | null>
+  findByEmailWithRolePermissions(email: string): Promise<UserWithRolePermissions | null>
+  findByIdWithRolePermissions(id: number): Promise<UserWithRolePermissions | null>
+  findAllWithRoles(): Promise<UserWithRolePermissions[]>
   create(data: { email: string, username: string, password: string }): Promise<User>
   createFromOAuth(data: {
     email?: string
@@ -17,7 +35,9 @@ export interface UserRepository {
     username?: string
     avatarUrl?: string
     role?: string
+    roleId?: number | null
   }): Promise<User>
+  updateRoleId(id: number, roleId: number | null, roleName?: string): Promise<UserWithRolePermissions>
   updatePassword(id: number, password: string): Promise<User>
   updateEmailVerifiedAt(id: number, emailVerifiedAt: Date): Promise<User>
   updatePasswordChangedAt(id: number, passwordChangedAt: Date): Promise<User>
@@ -36,6 +56,62 @@ export const userRepository: UserRepository = {
     })
   },
 
+  async findById(id: number) {
+    return await prisma.user.findUnique({
+      where: { id }
+    })
+  },
+
+  async findByEmailWithRolePermissions(email: string) {
+    return await prisma.user.findUnique({
+      where: { email },
+      include: {
+        roleRef: {
+          include: {
+            permissions: {
+              include: {
+                permission: true
+              }
+            }
+          }
+        }
+      }
+    })
+  },
+
+  async findByIdWithRolePermissions(id: number) {
+    return await prisma.user.findUnique({
+      where: { id },
+      include: {
+        roleRef: {
+          include: {
+            permissions: {
+              include: {
+                permission: true
+              }
+            }
+          }
+        }
+      }
+    })
+  },
+
+  async findAllWithRoles() {
+    return await prisma.user.findMany({
+      include: {
+        roleRef: {
+          include: {
+            permissions: {
+              include: {
+                permission: true
+              }
+            }
+          }
+        }
+      }
+    })
+  },
+
   async create(data) {
     return await prisma.user.create({
       data
@@ -51,7 +127,29 @@ export const userRepository: UserRepository = {
         password: '', // OAuth users may not have local password
         name: data.name ?? null,
         avatarUrl: data.avatarUrl ?? null,
-        role: data.role ?? 'user'
+        role: data.role ?? 'user',
+        roleId: data.roleId ?? undefined
+      }
+    })
+  },
+
+  async updateRoleId(id, roleId, roleName) {
+    return await prisma.user.update({
+      where: { id },
+      data: {
+        roleId,
+        ...(roleName ? { role: roleName } : {})
+      },
+      include: {
+        roleRef: {
+          include: {
+            permissions: {
+              include: {
+                permission: true
+              }
+            }
+          }
+        }
       }
     })
   },

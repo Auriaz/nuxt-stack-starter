@@ -3,6 +3,7 @@ import { ResetPasswordInputSchema } from '#shared/schemas/auth'
 import { resetPasswordUseCase } from '~~/domain/auth/resetPassword.usecase'
 import { userRepository } from '~~/server/repositories/user.repo'
 import { passwordResetTokenRepository } from '~~/server/repositories/passwordResetToken.repo'
+import { roleRepository } from '~~/server/repositories/role.repo'
 import { isErr } from '~~/domain/shared/result'
 // setUserSession jest auto-importowane przez nuxt-auth-utils
 
@@ -36,7 +37,8 @@ export default defineEventHandler(async (event) => {
   const useCaseResult = await resetPasswordUseCase(
     inputResult.output,
     passwordResetTokenRepository,
-    userRepository
+    userRepository,
+    roleRepository
   )
 
   // Obsługa błędów z Result pattern

@@ -1,6 +1,8 @@
 import type { OAuthProfile, SessionUser } from './auth.types'
 import type { UserRepository } from '~~/server/repositories/user.repo'
 import type { OAuthAccountRepository } from '~~/server/repositories/oauthAccount.repo'
+import type { RoleRepository } from '~~/server/repositories/role.repo'
+import type { PermissionKey } from '~~/shared/permissions'
 
 /**
  * Use-case: utworzenie lub odnalezienie użytkownika na podstawie profilu OAuth.
@@ -12,7 +14,8 @@ import type { OAuthAccountRepository } from '~~/server/repositories/oauthAccount
 export async function upsertOAuthUserUseCase(
   profile: OAuthProfile,
   userRepository: UserRepository,
-  oauthAccountRepository: OAuthAccountRepository
+  oauthAccountRepository: OAuthAccountRepository,
+  roleRepository: RoleRepository
 ): Promise<SessionUser> {
   // 1. Sprawdź, czy istnieje already linked OAuthAccount
   const existingAccount = await oauthAccountRepository.findByProviderAccount(
@@ -21,11 +24,23 @@ export async function upsertOAuthUserUseCase(
   )
 
   if (existingAccount) {
-    const user = existingAccount.user
+    const user = await userRepository.findByIdWithRolePermissions(existingAccount.userId)
+    if (!user) {
+      throw new Error('User not found for OAuth account')
+    }
+    const roleName = user.roleRef?.name ?? user.role
+    let permissions: PermissionKey[] = []
+    if (user.roleRef?.permissions) {
+      permissions = user.roleRef.permissions.map(rolePermission => rolePermission.permission.key as PermissionKey)
+    } else if (roleName) {
+      const roleWithPermissions = await roleRepository.findByNameWithPermissions(roleName)
+      permissions = roleWithPermissions?.permissions.map(rolePermission => rolePermission.permission.key as PermissionKey) ?? []
+    }
 
     return {
       id: user.id,
-      role: user.role,
+      role: roleName,
+      permissions,
       name: user.name ?? undefined,
       avatarUrl: user.avatarUrl ?? undefined
     }
@@ -56,9 +71,14 @@ export async function upsertOAuthUserUseCase(
   })
 
   // 5. Zwróć minimalny SessionUser do zapisania w sesji
+  const userWithRole = await userRepository.findByIdWithRolePermissions(user.id)
+  const roleName = userWithRole?.roleRef?.name ?? user.role
+  const permissions = userWithRole?.roleRef?.permissions.map(rolePermission => rolePermission.permission.key as PermissionKey) ?? []
+
   return {
     id: user.id,
-    role: user.role,
+    role: roleName,
+    permissions,
     name: user.name ?? undefined,
     avatarUrl: user.avatarUrl ?? undefined
   }

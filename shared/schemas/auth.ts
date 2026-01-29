@@ -7,8 +7,11 @@ import {
   email,
   pipe,
   boolean,
-  union
+  union,
+  array,
+  enum_
 } from 'valibot'
+import { PERMISSIONS } from '../permissions'
 
 /**
  * Schemat inputu dla logowania
@@ -63,8 +66,12 @@ export const ResetPasswordInputSchema = object({
 export const AuthOutputSchema = object({
   user: object({
     id: number(),
-    username: string(),
-    email: string()
+    username: optional(string()),
+    email: optional(string()),
+    name: optional(string()),
+    avatarUrl: optional(string()),
+    role: string(),
+    permissions: array(enum_(PERMISSIONS))
   })
 })
 

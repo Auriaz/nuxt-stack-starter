@@ -49,13 +49,13 @@ export function useAuthResource() {
     return response as { ok: true }
   }
 
-  async function getMe(): Promise<AuthOutput['user']> {
-    const response = await apiClient.request<{ data: { user: AuthOutput['user'] } } | { user: AuthOutput['user'] }>('/api/auth/me')
+  async function getMe(): Promise<AuthOutput['user'] | null> {
+    const response = await apiClient.request<{ data: { user: AuthOutput['user'] | null } } | { user: AuthOutput['user'] | null }>('/api/auth/me')
     // Obsługa formatu { data: ... } lub bezpośredniego obiektu
     if (response && typeof response === 'object' && 'data' in response) {
-      return (response as { data: { user: AuthOutput['user'] } }).data.user
+      return (response as { data: { user: AuthOutput['user'] | null } }).data.user
     }
-    return (response as { user: AuthOutput['user'] }).user
+    return (response as { user: AuthOutput['user'] | null }).user
   }
 
   async function forgotPassword(input: ForgotPasswordInput): Promise<{ ok: true }> {

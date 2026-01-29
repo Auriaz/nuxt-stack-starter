@@ -76,6 +76,8 @@ Database
 4. Jeden format błędów API (patrz sekcja "Format odpowiedzi API").
 5. Sekcje stron renderowane przez `SectionsRenderer` i opakowane `PageSection` (UPageSection).
 6. TODO nie w komentarzach i nie „w głowie” → tylko jako pliki w `.cursor/todo/`.
+   - Wyjątek: komentarze o przyszłej rozbudowie funkcji oznaczamy zawsze jako `TODO: ...`.
+   - Dodatkowe tagi dla Todo Tree: `FIXME`, `BUG`, `HACK`, `NOTE`, `OPTIMIZE`, `PERF`, `SECURITY`.
 
 ## Format odpowiedzi API (kontrakt)
 

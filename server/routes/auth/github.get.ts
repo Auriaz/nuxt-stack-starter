@@ -12,6 +12,7 @@
 import { upsertOAuthUserUseCase } from '~~/domain/auth/upsertOAuthUser.usecase'
 import { userRepository } from '~~/server/repositories/user.repo'
 import { oauthAccountRepository } from '~~/server/repositories/oauthAccount.repo'
+import { roleRepository } from '~~/server/repositories/role.repo'
 
 export default defineOAuthGitHubEventHandler({
   config: {
@@ -32,7 +33,8 @@ export default defineOAuthGitHubEventHandler({
         avatarUrl: user.avatar_url || undefined
       },
       userRepository,
-      oauthAccountRepository
+      oauthAccountRepository,
+      roleRepository
     )
 
     await setUserSession(event, {

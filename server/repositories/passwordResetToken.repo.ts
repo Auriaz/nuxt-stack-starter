@@ -11,7 +11,7 @@ export interface PasswordResetTokenRepository {
   }): Promise<PasswordResetToken>
 
   findByTokenHash(tokenHash: string): Promise<(PasswordResetToken & {
-    user: { id: number, email: string, username: string }
+    user: { id: number, email: string, username: string, role: string }
   }) | null>
 
   markUsed(id: number, usedAt: Date): Promise<PasswordResetToken>
@@ -39,7 +39,8 @@ export const passwordResetTokenRepository: PasswordResetTokenRepository = {
           select: {
             id: true,
             email: true,
-            username: true
+            username: true,
+            role: true
           }
         }
       }

@@ -2,6 +2,8 @@
  * Typy dla autoryzacji i autentykacji
  */
 
+import type { PermissionKey } from '~~/shared/permissions'
+
 export interface LoginInput {
   email: string
   password: string
@@ -30,14 +32,20 @@ export interface ResetPasswordOutput {
     id: number
     username: string
     email: string
+    role: string
+    permissions: PermissionKey[]
   }
 }
 
 export interface AuthOutput {
   user: {
     id: number
-    username: string
-    email: string
+    username?: string
+    email?: string
+    name?: string
+    avatarUrl?: string
+    role: string
+    permissions: PermissionKey[]
   }
 }
 
@@ -76,6 +84,7 @@ export interface OAuthProfile {
 export interface SessionUser {
   id: number
   role: string
+  permissions: PermissionKey[]
   name?: string
   avatarUrl?: string
 }

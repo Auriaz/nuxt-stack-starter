@@ -22,6 +22,8 @@ declare module '#auth-utils' {
     avatarUrl?: string
     /** Rola użytkownika (np. user, admin) */
     role: string
+    /** Uprawnienia użytkownika */
+    permissions: string[]
   }
 
   /**
@@ -40,8 +42,6 @@ declare module '#auth-utils' {
   interface SecureSessionData {
     /** Token API (jeśli będzie potrzebny w przyszłości) */
     apiToken?: string
-    /** Uprawnienia użytkownika (jeśli będzie system autoryzacji) */
-    permissions?: string[]
     /** Token odświeżania (jeśli będzie potrzebny w przyszłości) */
     refreshToken?: string
   }

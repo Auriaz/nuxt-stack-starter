@@ -8,6 +8,7 @@ import type {
   VerifyEmailInputSchema,
   ResendVerificationInputSchema
 } from '../schemas/auth'
+import type { PermissionKey } from '../permissions'
 
 export type LoginInput = InferOutput<typeof LoginInputSchema>
 export type RegisterInput = InferOutput<typeof RegisterInputSchema>
@@ -24,5 +25,30 @@ export interface ResetPasswordOutput {
     id: number
     username: string
     email: string
+    role: string
+    permissions: PermissionKey[]
   }
+}
+
+export interface UserDTO {
+  id: number
+  email?: string | null
+  name?: string | null
+  username?: string | null
+  avatarUrl?: string | null
+  role: string
+  permissions: PermissionKey[]
+}
+
+export interface RoleDTO {
+  id: number
+  name: string
+  description?: string | null
+  permissions: PermissionKey[]
+}
+
+export interface PermissionDTO {
+  key: PermissionKey
+  label?: string | null
+  group?: string | null
 }

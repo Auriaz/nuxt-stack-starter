@@ -22,7 +22,11 @@ model User {
   // Profil użytkownika (do OAuth i dashboardu)
   name      String?
   avatarUrl String?
-  role      String  @default("user")
+  role      String  @default("user") // tekstowa nazwa roli (dla zgodności wstecznej)
+
+  // Główna rola powiązana przez tabelę Role (MVP: jedna rola per user)
+  roleId  Int?
+  roleRef Role? @relation("UserRole", fields: [roleId], references: [id])
 
   emailVerifiedAt   DateTime?
   passwordChangedAt DateTime?
@@ -33,6 +37,40 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  users       User[]           @relation("UserRole")
+  permissions RolePermission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Permission {
+  id    Int     @id @default(autoincrement())
+  key   String  @unique
+  label String?
+  group String?
+
+  roles RolePermission[]
+
+  createdAt DateTime @default(now())
+}
+
+model RolePermission {
+  roleId       Int
+  permissionId Int
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
 }
 
 model ContactMessage {

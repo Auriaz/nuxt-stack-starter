@@ -56,6 +56,9 @@ Ma zapobiegać chaosowi i przypadkowemu łamaniu konwencji.
 4. Jeden format błędów API (patrz sekcja 6).
 5. Sekcje stron renderowane przez `SectionsRenderer` i opakowane `PageSection` (UPageSection).
 6. TODO nie w komentarzach i nie „w głowie” → tylko jako pliki w `.cursor/todo/`.
+   - Wyjątek: komentarze o przyszłej rozbudowie funkcji oznaczamy zawsze jako `TODO: ...`
+     (dla Todo Tree / szybkiej nawigacji).
+7. Po zakończeniu działu/planu zawsze przypominamy o uruchomieniu testów (min. unit + API, jeśli dotyczy).
 
 ## 4) Formularze (standard)
 
@@ -198,6 +201,30 @@ Każdy TODO ma sekcje:
 - `decision/` — decyzje architektoniczne odłożone na później
 - `automation/` — automatyzacje (generowanie, integracja)
 - `debt/` — dług techniczny do spłacenia
+
+### Todo Tree (VS Code)
+
+- Komentarze rozwojowe oznaczamy tagami:
+  - `TODO` (planowane zmiany), `FIXME` (błędy), `BUG` (defekt),
+  - `HACK` (obejście), `NOTE` (ważna notatka),
+  - `OPTIMIZE` / `PERF` (wydajność), `SECURITY` (bezpieczeństwo).
+- Dla większej precyzji używamy metadanych:
+  - `TODO[area=auth,priority=high]: ...`
+  - `FIXME[area=server,priority=medium]: ...`
+- Sposób użycia:
+  - zainstaluj rozszerzenie **Todo Tree** (Gruntfuggly.todo-tree),
+  - ustaw `todo-tree.general.tags` na powyższe tagi,
+  - opcjonalnie włącz `todo-tree.highlights.defaultHighlight` i `todo-tree.highlights.customHighlight`.
+- Przykładowe ustawienia (w `settings.json`):
+  - `todo-tree.general.tags`: `["TODO","FIXME","BUG","HACK","NOTE","OPTIMIZE","PERF","SECURITY"]`
+  - `todo-tree.highlights.defaultHighlight`: `{ "icon": "alert", "type": "text" }`
+  - `todo-tree.highlights.customHighlight`:
+    - `TODO`: `{ "icon": "check", "type": "line" }`
+    - `FIXME`: `{ "foreground": "black", "iconColour": "yellow", "gutterIcon": true }`
+    - `SECURITY`: `{ "foreground": "white", "background": "red", "type": "line" }`
+- Raporty TODO (przydatne do pracy i LLM):
+  - uruchamiaj `bun run todo:report` (cross-platform, Node),
+  - opcjonalnie `bun run todo:report:ps1` (PowerShell).
 
 ## 8) Jak dodać nową rzecz (checklisty)
 

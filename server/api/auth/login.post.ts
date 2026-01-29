@@ -2,6 +2,7 @@ import { safeParse } from 'valibot'
 import { LoginInputSchema } from '#shared/schemas/auth'
 import { loginUseCase } from '~~/domain/auth/login.usecase'
 import { userRepository } from '~~/server/repositories/user.repo'
+import { roleRepository } from '~~/server/repositories/role.repo'
 import { isErr } from '~~/domain/shared/result'
 import { useRuntimeConfig } from '#imports'
 // setUserSession jest auto-importowane przez nuxt-auth-utils
@@ -35,7 +36,7 @@ export default defineEventHandler(async (event) => {
   const shouldRemember = !!remember
 
   // Złożona logika → use-case
-  const useCaseResult = await loginUseCase(loginInput, userRepository)
+  const useCaseResult = await loginUseCase(loginInput, userRepository, roleRepository)
 
   // Obsługa błędów z Result pattern
   if (isErr(useCaseResult)) {
