@@ -6,6 +6,8 @@ const isScrolled = ref(false)
 
 // Auth state
 const { user, isLoggedIn, logout } = useAuth()
+/** Pełny URL avatara (origin + ścieżka), żeby UAvatar poprawnie ładował /api/media/:id/serve */
+const headerAvatarSrc = useAvatarSrc(computed(() => user.value?.avatarUrl ?? undefined))
 
 // Globalny system filtrów
 
@@ -164,7 +166,7 @@ const handleLogout = async () => {
                 <template #leading>
                   <UAvatar
                     v-if="user?.avatarUrl"
-                    :src="user.avatarUrl"
+                    :src="headerAvatarSrc"
                     :alt="user?.name || user?.username || user?.email || 'Użytkownik'"
                     size="xs"
                   />
@@ -185,7 +187,7 @@ const handleLogout = async () => {
                 <div class="flex items-center gap-3 text-left">
                   <UAvatar
                     v-if="user?.avatarUrl"
-                    :src="user.avatarUrl"
+                    :src="headerAvatarSrc"
                     :alt="user?.name || user?.username || user?.email || 'Użytkownik'"
                     size="sm"
                   />

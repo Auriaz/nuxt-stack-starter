@@ -15,7 +15,12 @@ const permissionsSeed: Array<{ key: PermissionKey, label: string, group: string 
   { key: PERMISSIONS.PORTFOLIO_READ, label: 'Podgląd portfolio', group: 'Portfolio' },
   { key: PERMISSIONS.PORTFOLIO_MANAGE, label: 'Zarządzanie portfolio', group: 'Portfolio' },
   { key: PERMISSIONS.CONTENT_READ, label: 'Podgląd treści', group: 'Content' },
-  { key: PERMISSIONS.CONTENT_MANAGE, label: 'Zarządzanie treściami', group: 'Content' }
+  { key: PERMISSIONS.CONTENT_MANAGE, label: 'Zarządzanie treściami', group: 'Content' },
+  { key: PERMISSIONS.MEDIA_READ, label: 'Podgląd własnych mediów', group: 'Media' },
+  { key: PERMISSIONS.MEDIA_CREATE, label: 'Upload mediów', group: 'Media' },
+  { key: PERMISSIONS.MEDIA_UPDATE, label: 'Edycja metadanych mediów', group: 'Media' },
+  { key: PERMISSIONS.MEDIA_DELETE, label: 'Usuwanie mediów', group: 'Media' },
+  { key: PERMISSIONS.MEDIA_MANAGE, label: 'Zarządzanie wszystkimi mediami', group: 'Media' }
 ]
 
 const rolePermissionsSeed: Record<string, PermissionKey[]> = {
@@ -28,11 +33,20 @@ const rolePermissionsSeed: Record<string, PermissionKey[]> = {
     PERMISSIONS.PORTFOLIO_READ,
     PERMISSIONS.PORTFOLIO_MANAGE,
     PERMISSIONS.CONTENT_READ,
-    PERMISSIONS.CONTENT_MANAGE
+    PERMISSIONS.CONTENT_MANAGE,
+    PERMISSIONS.MEDIA_READ,
+    PERMISSIONS.MEDIA_CREATE,
+    PERMISSIONS.MEDIA_UPDATE,
+    PERMISSIONS.MEDIA_DELETE,
+    PERMISSIONS.MEDIA_MANAGE
   ],
   user: [
     PERMISSIONS.PORTFOLIO_READ,
-    PERMISSIONS.CONTENT_READ
+    PERMISSIONS.CONTENT_READ,
+    PERMISSIONS.MEDIA_READ,
+    PERMISSIONS.MEDIA_CREATE,
+    PERMISSIONS.MEDIA_UPDATE,
+    PERMISSIONS.MEDIA_DELETE
   ]
 }
 

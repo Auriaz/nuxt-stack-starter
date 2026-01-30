@@ -30,6 +30,11 @@ export async function loginUseCase(
     return err(new UnauthorizedError('Invalid email or password'))
   }
 
+  // 2b. Reaktywacja: jeśli konto było dezaktywowane, logowanie je przywraca
+  if ((user as { deactivatedAt?: Date | null }).deactivatedAt) {
+    await repository.setDeactivatedAt(user.id, null)
+  }
+
   const roleName = user.roleRef?.name ?? user.role
   let permissions: PermissionKey[] = []
   if (user.roleRef?.permissions) {

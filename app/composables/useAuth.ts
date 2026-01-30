@@ -1,5 +1,6 @@
 // useUserSession jest auto-importowane przez nuxt-auth-utils
 import { useAuthResource } from './resources/useAuthResource'
+import { useProfile } from './resources/useProfile'
 import type { LoginInput, RegisterInput, ForgotPasswordInput, ResetPasswordInput } from '#shared/types/auth'
 // useToast jest auto-importowane przez @nuxt/ui
 
@@ -35,6 +36,10 @@ export function useAuth() {
       // Odśwież sesję (nuxt-auth-utils automatycznie odczyta z cookies)
       await session.fetch()
 
+      // Wyczyść stan profilu poprzedniego użytkownika – nowy fetch pobierze dane zalogowanego
+      const { clearProfile } = useProfile()
+      clearProfile()
+
       toast.add({
         title: 'Sukces',
         description: 'Zalogowano pomyślnie',
@@ -66,6 +71,9 @@ export function useAuth() {
       // Odśwież sesję
       await session.fetch()
 
+      const { clearProfile } = useProfile()
+      clearProfile()
+
       toast.add({
         title: 'Sukces',
         description: 'Konto zostało utworzone',
@@ -95,6 +103,10 @@ export function useAuth() {
 
     // Następnie wyczyść lokalny stan sesji (nuxt-auth-utils)
     await session.clear()
+
+    // Wyczyść stan profilu (useState), żeby nie pokazywać danych poprzedniego użytkownika
+    const { clearProfile } = useProfile()
+    clearProfile()
 
     toast.add({
       title: 'Wylogowano',
@@ -164,6 +176,9 @@ export function useAuth() {
       session.openInPopup(url)
       // Po powrocie odśwież sesję
       await session.fetch()
+
+      const { clearProfile } = useProfile()
+      clearProfile()
 
       await router.push(returnTo)
     } catch (error: unknown) {

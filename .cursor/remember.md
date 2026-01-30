@@ -60,7 +60,18 @@ Ma zapobiegać chaosowi i przypadkowemu łamaniu konwencji.
      (dla Todo Tree / szybkiej nawigacji).
 7. Po zakończeniu działu/planu zawsze przypominamy o uruchomieniu testów (min. unit + API, jeśli dotyczy).
 
-## 4) Formularze (standard)
+## 4) Modal potwierdzenia (ModalConfirmation)
+
+- Reużywalny modal do potwierdzania akcji (usuwanie, zatwierdzanie itd.).
+- Komponent: `app/components/Modal/Confirmation/ModalConfirmation.vue` (bazuje na `Modal.vue`).
+- Użycie:
+  - ref na komponent → `modalRef.open(arg?)` / `modalRef.close()`.
+  - Propsy: `title`, `description`, `confirmLabel`, `cancelLabel`, `variant` (`neutral` | `primary` | `danger`).
+  - Eventy: `@confirm` (z argumentem przekazanym do `open()`), `@cancel`.
+- Dla akcji destrukcyjnych (np. usuwanie zdjęcia) używaj `variant="danger"`.
+- Pełna dokumentacja: `content/docs/ModalConfirmation.md`.
+
+## 5) Formularze (standard)
 
 - Wszystkie formularze używają `useForm()`:
   - values, pending, errors, formError
@@ -119,7 +130,7 @@ Ma zapobiegać chaosowi i przypadkowemu łamaniu konwencji.
   - alertAppear: opacity 0→1, y 6→0
   - buttonHover: scale 1.01 / y -1 (opcjonalnie)
 
-## 5) Sekcje stron (Page Builder)
+## 6) Sekcje stron (Page Builder)
 
 - Strony content-driven: `PageSchema` zawiera `sections[]`
 - Każda sekcja dziedziczy z `SectionBaseSchema`
@@ -127,7 +138,7 @@ Ma zapobiegać chaosowi i przypadkowemu łamaniu konwencji.
 - `enabled: false` wyłącza sekcję
 - Global CTA renderowane tylko gdy strona nie ma własnej CTA (unikamy duplikacji)
 
-## 6) Format odpowiedzi API (kontrakt)
+## 7) Format odpowiedzi API (kontrakt)
 
 ### Sukces
 
@@ -162,7 +173,7 @@ Ma zapobiegać chaosowi i przypadkowemu łamaniu konwencji.
 }
 ```
 
-## 7) TODO System (jak zapisujemy zadania)
+## 8) TODO System (jak zapisujemy zadania)
 
 ### Struktura
 
@@ -226,7 +237,7 @@ Każdy TODO ma sekcje:
   - uruchamiaj `bun run todo:report` (cross-platform, Node),
   - opcjonalnie `bun run todo:report:ps1` (PowerShell).
 
-## 8) Jak dodać nową rzecz (checklisty)
+## 9) Jak dodać nową rzecz (checklisty)
 
 ### Nowy endpoint
 
@@ -249,20 +260,20 @@ Każdy TODO ma sekcje:
 - [ ] Resource composable dla API
 - [ ] Endpoint API z walidacją
 
-## 9) Zasada minimalizmu
+## 10) Zasada minimalizmu
 
 - Najpierw MVP, potem rozszerzenia.
 - Unikamy „frameworku w frameworku”.
 - Granice i zakazy > mnożenie abstrakcji.
 
-## 10) Prisma Migrations
+## 11) Prisma Migrations
 
 - Migracje tworzone automatycznie przez `prisma migrate dev`
 - Po każdej migracji: `prisma generate` (obecnie ręcznie przez `bun run db:generate`)
 - **TODO**: Automatyzacja `prisma generate` po migracji (patrz `.cursor/todo/automation/automatyzacja-prisma-generate.md`)
 - Nazewnictwo migracji: `akcja_obiekt` w snake_case (np. `add_password_to_user`)
 
-## 11) Auto-importy w Nuxt (zasady)
+## 12) Auto-importy w Nuxt (zasady)
 
 ### Domyślnie włączone
 

@@ -22,6 +22,26 @@ export * from './enums.js';
  */
 export type User = Prisma.UserModel
 /**
+ * Model UserSession
+ * Sesje użytkownika (do zakładki Activity: Current Session, Other sessions, logout others).
+ */
+export type UserSession = Prisma.UserSessionModel
+/**
+ * Model LoginEvent
+ * Ostatnie logowania (do zakładki Activity: Ostatnie logowania).
+ */
+export type LoginEvent = Prisma.LoginEventModel
+/**
+ * Model ActivityLog
+ * Logi aktywności (do zakładki Activity: Ostatnie akcje).
+ */
+export type ActivityLog = Prisma.ActivityLogModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
  * Model Role
  * 
  */
@@ -56,3 +76,8 @@ export type PasswordResetToken = Prisma.PasswordResetTokenModel
  * 
  */
 export type OAuthAccount = Prisma.OAuthAccountModel
+/**
+ * Model MediaAsset
+ * 
+ */
+export type MediaAsset = Prisma.MediaAssetModel

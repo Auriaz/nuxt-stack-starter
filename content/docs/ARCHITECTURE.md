@@ -122,6 +122,12 @@ Database
 - Integracja z Nuxt UI `UForm` / `UAuthForm`
 - Dokumentacja: [useForm.md](./useForm.md)
 
+### Modal potwierdzenia (ModalConfirmation)
+
+- Do potwierdzania akcji (usuwanie, zatwierdzanie) używaj komponentu `ModalConfirmation` zamiast `window.confirm()`
+- Komponent: `app/components/Modal/Confirmation/ModalConfirmation.vue` (bazuje na `Modal.vue`)
+- Dokumentacja: [ModalConfirmation.md](./ModalConfirmation.md)
+
 ### Sekcje stron (Page Builder)
 
 - Strony content-driven: `PageSchema` zawiera `sections[]`
@@ -173,4 +179,5 @@ Database
 
 - [.cursor/remember.md](../../.cursor/remember.md) - Pełna "pamięć projektu" z wszystkimi zasadami
 - [useForm.md](./useForm.md) - Dokumentacja `useForm` composable
+- [ModalConfirmation.md](./ModalConfirmation.md) - Dokumentacja modala potwierdzenia
 - [README.md](../../README.md) - Ogólna dokumentacja projektu

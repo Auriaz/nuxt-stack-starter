@@ -41,6 +41,10 @@ export interface UserRepository {
   updatePassword(id: number, password: string): Promise<User>
   updateEmailVerifiedAt(id: number, emailVerifiedAt: Date): Promise<User>
   updatePasswordChangedAt(id: number, passwordChangedAt: Date): Promise<User>
+  updateProfile(id: number, data: { name?: string | null, avatarUrl?: string | null, bio?: string | null }): Promise<User>
+  updatePrivacy(id: number, data: { showEmail?: boolean }): Promise<void>
+  setDeactivatedAt(id: number, deactivatedAt: Date | null): Promise<User>
+  delete(id: number): Promise<User>
 }
 
 export const userRepository: UserRepository = {
@@ -172,6 +176,39 @@ export const userRepository: UserRepository = {
     return await prisma.user.update({
       where: { id },
       data: { passwordChangedAt }
+    })
+  },
+
+  async updateProfile(id, data) {
+    return await prisma.user.update({
+      where: { id },
+      data: {
+        ...(data.name !== undefined && { name: data.name }),
+        ...(data.avatarUrl !== undefined && { avatarUrl: data.avatarUrl }),
+        ...(data.bio !== undefined && { bio: data.bio })
+      }
+    })
+  },
+
+  async updatePrivacy(id, data) {
+    if (data.showEmail === undefined) return
+    await prisma.$executeRawUnsafe(
+      'UPDATE "User" SET "showEmail" = $1 WHERE id = $2',
+      data.showEmail,
+      id
+    )
+  },
+
+  async setDeactivatedAt(id, deactivatedAt) {
+    return await prisma.user.update({
+      where: { id },
+      data: { deactivatedAt }
+    })
+  },
+
+  async delete(id) {
+    return await prisma.user.delete({
+      where: { id }
     })
   }
 }

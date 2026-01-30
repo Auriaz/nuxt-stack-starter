@@ -22,6 +22,7 @@ model User {
   // Profil użytkownika (do OAuth i dashboardu)
   name      String?
   avatarUrl String?
+  bio       String? // krótki opis użytkownika
   role      String  @default("user") // tekstowa nazwa roli (dla zgodności wstecznej)
 
   // Główna rola powiązana przez tabelę Role (MVP: jedna rola per user)
@@ -30,13 +31,83 @@ model User {
 
   emailVerifiedAt   DateTime?
   passwordChangedAt DateTime?
+  deactivatedAt     DateTime? // tymczasowa dezaktywacja; logowanie reaktywuje konto
+  showEmail         Boolean   @default(true) // czy pokazywać email w profilu publicznym
 
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens     PasswordResetToken[]
   oauthAccounts           OAuthAccount[]
+  notifications           Notification[]
+  mediaAssets             MediaAsset[]
+  userSessions            UserSession[]
+  loginEvents             LoginEvent[]
+  activityLogs            ActivityLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+/// Sesje użytkownika (do zakładki Activity: Current Session, Other sessions, logout others).
+model UserSession {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  sessionToken   String   @unique // identyfikator sesji (w cookie app_session_id)
+  ipAddress      String?
+  userAgent      String?
+  location       String?
+  deviceType     String? // np. Mobile, Desktop
+  lastActivityAt DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@index([userId, lastActivityAt])
+}
+
+/// Ostatnie logowania (do zakładki Activity: Ostatnie logowania).
+model LoginEvent {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  ipAddress String?
+  location  String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, createdAt])
+}
+
+/// Logi aktywności (do zakładki Activity: Ostatnie akcje).
+model ActivityLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  action      String // login | logout | password_change | profile_update | ...
+  description String?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, createdAt])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  type      String // info | success | warning | error
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  actionUrl String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, read])
 }
 
 model Role {
@@ -128,4 +199,32 @@ model OAuthAccount {
 
   @@unique([provider, providerAccountId])
   @@index([userId])
+}
+
+model MediaAsset {
+  id              String    @id @default(cuid())
+  ownerId         Int
+  type            String // 'image' | 'video' | 'file'
+  status          String    @default("ready") // 'processing' | 'ready' | 'failed'
+  originalName    String
+  mimeType        String
+  sizeBytes       Int
+  width           Int?
+  height          Int?
+  durationSeconds Int? // video
+  checksum        String?
+  storageProvider String    @default("local") // 'local' | 's3'
+  storagePath     String // relative path in storage
+  alt             String?
+  caption         String?
+  tags            String[]
+  deletedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId, createdAt])
+  @@index([ownerId, type])
+  @@index([deletedAt])
 }

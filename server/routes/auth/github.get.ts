@@ -9,10 +9,15 @@
  * https://github.com/atinux/nuxt-auth-utils#oauth-event-handlers
  */
 
+import { getRequestHeader, setCookie } from 'h3'
 import { upsertOAuthUserUseCase } from '~~/domain/auth/upsertOAuthUser.usecase'
 import { userRepository } from '~~/server/repositories/user.repo'
 import { oauthAccountRepository } from '~~/server/repositories/oauthAccount.repo'
 import { roleRepository } from '~~/server/repositories/role.repo'
+import { userSessionRepository } from '~~/server/repositories/userSession.repo'
+import { loginEventRepository } from '~~/server/repositories/loginEvent.repo'
+import { activityLogRepository } from '~~/server/repositories/activityLog.repo'
+import { APP_SESSION_ID_COOKIE } from '~~/server/utils/session-cookie'
 
 export default defineOAuthGitHubEventHandler({
   config: {
@@ -40,6 +45,29 @@ export default defineOAuthGitHubEventHandler({
     await setUserSession(event, {
       user: sessionUser,
       loggedInAt: new Date()
+    })
+
+    const userId = sessionUser.id
+    const forwarded = getRequestHeader(event, 'x-forwarded-for')
+    const ipAddress = forwarded ? forwarded.split(',')[0].trim() : null
+    const userAgent = getRequestHeader(event, 'user-agent') ?? null
+    const deviceType = userAgent && /mobile/i.test(userAgent) ? 'Mobile' : 'Desktop'
+    const sessionToken = crypto.randomUUID()
+    await userSessionRepository.create({
+      userId,
+      sessionToken,
+      ipAddress,
+      userAgent,
+      location: null,
+      deviceType
+    })
+    await loginEventRepository.create({ userId, ipAddress, location: null })
+    await activityLogRepository.create({ userId, action: 'login', description: 'GitHub OAuth' })
+    setCookie(event, APP_SESSION_ID_COOKIE, sessionToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      path: '/',
+      secure: process.env.NODE_ENV === 'production'
     })
 
     const query = getQuery(event)

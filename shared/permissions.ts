@@ -7,7 +7,12 @@ export const PERMISSIONS = {
   PORTFOLIO_READ: 'portfolio.read',
   PORTFOLIO_MANAGE: 'portfolio.manage',
   CONTENT_READ: 'content.read',
-  CONTENT_MANAGE: 'content.manage'
+  CONTENT_MANAGE: 'content.manage',
+  MEDIA_READ: 'media.read',
+  MEDIA_CREATE: 'media.create',
+  MEDIA_UPDATE: 'media.update',
+  MEDIA_DELETE: 'media.delete',
+  MEDIA_MANAGE: 'media.manage'
 } as const
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]
@@ -21,5 +26,10 @@ export const PERMISSION_META: Record<PermissionKey, { label: string, group: stri
   'portfolio.read': { label: 'Podgląd portfolio', group: 'Portfolio' },
   'portfolio.manage': { label: 'Zarządzanie portfolio', group: 'Portfolio' },
   'content.read': { label: 'Podgląd treści', group: 'Content' },
-  'content.manage': { label: 'Zarządzanie treściami', group: 'Content' }
+  'content.manage': { label: 'Zarządzanie treściami', group: 'Content' },
+  'media.read': { label: 'Podgląd własnych mediów', group: 'Media' },
+  'media.create': { label: 'Upload mediów', group: 'Media' },
+  'media.update': { label: 'Edycja metadanych mediów', group: 'Media' },
+  'media.delete': { label: 'Usuwanie mediów', group: 'Media' },
+  'media.manage': { label: 'Zarządzanie wszystkimi mediami', group: 'Media' }
 }

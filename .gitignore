@@ -28,3 +28,6 @@ playwright-report/
 test-results/
 
 /app/generated/prisma
+
+# Media storage (local uploads)
+storage/uploads

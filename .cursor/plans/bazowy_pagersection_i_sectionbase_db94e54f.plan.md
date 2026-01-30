@@ -33,7 +33,7 @@ isProject: false
 - **Aktualny stan**:
 - `PageSection.vue` w `app/components/Page/Section/PageSection.vue` jest cienką nakładką na `UPageSection` z własnymi propsami (type/id/ref/headline/...); nie jest jeszcze centralnym wrapperem.
 - `Section.vue` w `app/components/ui/Section.vue` odpowiada za layout (spacing, theme, background, container) i jest zewnętrznym wrapperem `<section><div class="container">` używanym przez sekcje (`SectionsHero`, `SectionsFeatures`, itd.).
-- `SectionBaseSchema` w [`shared/schemas/sections.ts`](shared/schemas/sections.ts) ma część pól wspólnych (type/as/icon/id/ref/enabled/headline/title/description/links/orientation/features/reverse/ui), ale konkretne schemy sekcji duplikują większość z nich ręcznie.
+- `SectionBaseSchema` w `[shared/schemas/sections.ts](shared/schemas/sections.ts)` ma część pól wspólnych (type/as/icon/id/ref/enabled/headline/title/description/links/orientation/features/reverse/ui), ale konkretne schemy sekcji duplikują większość z nich ręcznie.
 - `SectionsRenderer.vue` renderuje bezpośrednio komponenty sekcji (`SectionsHero`, `SectionsFeatures`, ...) wybierane po `section.type`, bez globalnego wrappera `PageSection`.
 - **Stan docelowy**:
 - `PageSection.vue` staje się **single source of truth** dla layoutu i API sekcji, oparty o `UPageSection` jako root i przyjmujący jeden prop `section` typu `SectionBase`.
@@ -43,13 +43,13 @@ isProject: false
 
 ## 2. Rozszerzenie i ujednolicenie SectionBaseSchema
 
-- **2.1. Rozszerzenie pól layoutu w SectionBaseSchema** w [`shared/schemas/sections.ts`](shared/schemas/sections.ts):
+- **2.1. Rozszerzenie pól layoutu w SectionBaseSchema** w `[shared/schemas/sections.ts](shared/schemas/sections.ts)`:
 - Dodać pola:
 - `spacing: optional(picklist(['xs','sm','md','lg','xl','2xl'] as const))`
 - `theme: optional(picklist(['light','dark','brand','neutral'] as const))`
 - `background: optional(picklist(['none','subtle','muted','surface'] as const))`
 - `container: optional(picklist(['default','narrow','wide','full'] as const))`
-- `align: optional(picklist(['left','center'] as const)) `(mapowane na wyrównanie tekstu / contentu w `UPageSection` przez `ui` lub przyszłe propsy).
+- `align: optional(picklist(['left','center'] as const))` (mapowane na wyrównanie tekstu / contentu w `UPageSection` przez `ui` lub przyszłe propsy).
 - `schema: optional(any())` (lub bardziej restrykcyjny obiekt w przyszłości) na potrzeby konfiguracji schema.org.
 - Rozszerzyć istniejący `ui` tak, aby mógł przekazać klasy do `UPageSection`/container:
 - Uzupełnić o pola dla layoutu (np. `section`, `background`, `spacing`, `container`, `align`), jeśli będą potrzebne w implementacji.
@@ -62,7 +62,7 @@ isProject: false
 
 ## 3. Nowy PageSection.vue oparty o UPageSection + SectionBase
 
-- **3.1. API komponentu** w [`app/components/Page/Section/PageSection.vue`](app/components/Page/Section/PageSection.vue):
+- **3.1. API komponentu** w `[app/components/Page/Section/PageSection.vue](app/components/Page/Section/PageSection.vue)`:
 - Zmienić propsy komponentu na:
 - `section: { type: Object as PropType<SectionBase>, required: true }` (lub `defineProps<{ section: SectionBase }>()`).
 - Usunąć wszystkie dotychczasowe pojedyncze propsy (`type`, `id`, `enabled`, `headline`, itp.), które teraz będą brane z `section`.
@@ -86,7 +86,7 @@ isProject: false
 
 ## 4. Refaktoryzacja SectionsRenderer do korzystania z PageSection
 
-- **4.1. Aktualizacja renderera** w [`app/components/sections/SectionsRenderer.vue`](app/components/sections/SectionsRenderer.vue):
+- **4.1. Aktualizacja renderera** w `[app/components/sections/SectionsRenderer.vue](app/components/sections/SectionsRenderer.vue)`:
 - Zachować istniejący filtr `enabledSections` po `section.enabled !== false`.
 - Rozszerzyć logikę renderowania tak, żeby:
 - Dla każdej `section`:
@@ -107,28 +107,28 @@ isProject: false
 - przygotowuje dane specyficzne (np. `image`, `plans`, `accordionItems`, schema.org),
 - **nie** używa `Section.vue` ani nie opakowuje się w własne `<section>`/`UPageSection`,
 - renderuje wyłącznie zawartość w ramach odpowiednich slotów `PageSection` (udostępnionych przez `SectionsRenderer`).
-- **5.2. Sekcja Hero** ([`app/components/Sections/Hero/SectionsHero.vue`](app/components/Sections/Hero/SectionsHero.vue)):
+- **5.2. Sekcja Hero** (`[app/components/Sections/Hero/SectionsHero.vue](app/components/Sections/Hero/SectionsHero.vue)`):
 - Usunąć wrapper `<Section>` i wewnętrzne `<UPageHero>` jako główne źródło layoutu.
 - Przenieść `UPageHero` do odpowiedniego slotu `PageSection` (np. `#body` lub `#default`) – w praktyce: `SectionsRenderer` w slocie `default/body` renderuje `<SectionsHero>`; a `SectionsHero` wewnątrz zwraca tylko `UPageHero` + obraz.
 - Pozostawić konfigurację `image` oraz motion (`Motion`, `fadeUp`), ale bez kontroli spacingu/container – to zapewnia `PageSection`.
-- **5.3. Sekcja Features** ([`app/components/Sections/Features/SectionsFeatures.vue`](app/components/Sections/Features/SectionsFeatures.vue)):
+- **5.3. Sekcja Features** (`[app/components/Sections/Features/SectionsFeatures.vue](app/components/Sections/Features/SectionsFeatures.vue)`):
 - Usunąć zewnętrzny `<Section>` i wewnętrzny `<UPageSection>`.
 - `UCard` + `Motion` pozostają jako zawartość sekcji w slocie `body`/`features`:
 - `PageSection` zapewnia `headline/title/description/links/orientation` przez własne propsy; tam, gdzie do tej pory robił to lokalny `UPageSection`, przesuwamy tę odpowiedzialność do `PageSection`.
 - Zredukować `config` do wartości potrzebnych wewnątrz (np. `features`, `ui.body`).
-- **5.4. Sekcja CTA** ([`app/components/Sections/CTA/SectionsCTA.vue`](app/components/Sections/CTA/SectionsCTA.vue)):
+- **5.4. Sekcja CTA** (`[app/components/Sections/CTA/SectionsCTA.vue](app/components/Sections/CTA/SectionsCTA.vue)`):
 - Usunąć `<Section>` i `<UPageCTA>` jako element opakowujący layout sekcji.
 - Zostawić `UPageCTA` jako część treści sekcji w slocie odpowiednim (np. `body`), a layout (spacing, container, tło) przenieść do `PageSection`.
 - Mapowanie `variant`, `orientation`, `links` nadal odbywa się w `SectionsCTA`, ale tylko na poziomie `UPageCTA`.
-- **5.5. Sekcja Pricing** ([`app/components/Sections/Pricing/SectionsPricing.vue`](app/components/Sections/Pricing/SectionsPricing.vue)):
+- **5.5. Sekcja Pricing** (`[app/components/Sections/Pricing/SectionsPricing.vue](app/components/Sections/Pricing/SectionsPricing.vue)`):
 - Usunąć `<Section>` i lokalny `<UPageSection>`.
 - Logika budowy `plans` z typem `PricingPlanProps` zostaje w sekcji.
 - `UPageGrid` + `UPricingPlan` stają się zawartością slotu `features` lub `body`, natomiast `headline/title/description/links` pochodzą z `PageSection`.
-- **5.6. Sekcja FAQ** ([`app/components/Sections/FAQ/SectionsFAQ.vue`](app/components/Sections/FAQ/SectionsFAQ.vue)):
+- **5.6. Sekcja FAQ** (`[app/components/Sections/FAQ/SectionsFAQ.vue](app/components/Sections/FAQ/SectionsFAQ.vue)`):
 - Usunąć `<Section>` i lokalny `<UPageSection>`.
 - Zostawić logikę `accordionItems` i `useSchemaOrg`.
 - `UAccordion` renderować jako zawartość slotu `body`/`features`, podczas gdy `PageSection` kontroluje nagłówek.
-- **5.7. Sekcja Testimonials** ([`app/components/Sections/Testimonials/SectionsTestimonials.vue`](app/components/Sections/Testimonials/SectionsTestimonials.vue)):
+- **5.7. Sekcja Testimonials** (`[app/components/Sections/Testimonials/SectionsTestimonials.vue](app/components/Sections/Testimonials/SectionsTestimonials.vue)`):
 - Usunąć `<Section>` i lokalny `<UPageSection>`.
 - Zostawić logikę `reviewSchema` i `useSchemaOrg`.
 - `Motion + CardTestimonial` (grid) oraz `UCarousel + CardTestimonial` (carousel) stają się zawartością slotu sekcji.
@@ -149,7 +149,7 @@ isProject: false
 - Zaktualizować `#shared/types/sections` (jeśli korzysta z `SectionBaseSchema`/`Section*Schema`) tak, by:
 - `SectionBase` odzwierciedlał nowe pola layoutu.
 - `SectionHero`, `SectionFeatures`, itd. były rozszerzeniami `SectionBase` (np. przez `&` z dodatkowymi polami), a nie równoległymi definicjami.
-- **7.2. PageSection bez `any`**:
+- **7.2. PageSection bez `any**`:
 - Użyć `SectionBase` jako typu propsa `section` i unikać `any` w obliczeniach (np. w computed i mapowaniach ui).
 - **7.3. Przeniesienie logiki warunkowej**:
 - Tam, gdzie obecnie sekcje zawierają logikę warunkową layoutu (np. `orientation` domyślne, `enabled` domyślne, mapowanie ui), przenieść ją do `PageSection`/SectionBase tak, aby komponenty sekcji skupiały się uniquement na treści i specyficznych interakcjach.
@@ -183,5 +183,5 @@ isProject: false
 - wyrównanie.
 - **9.2. Typy i linter**:
 - Uruchomić linter/TS (np. `pnpm lint`/`pnpm typecheck` według konfiguracji projektu) i poprawić ewentualne błędy typu.
-- **9.3. Treść ze `content/`**:
+- **9.3. Treść ze `content/**`:
 - Upewnić się, że dane generowane przez Content Layer pasują do nowych schem sekcji i że renderowanie z `SectionsRenderer` działa poprawnie dla wszystkich typów sekcji.
