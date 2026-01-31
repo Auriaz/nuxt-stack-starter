@@ -20,7 +20,8 @@ const permissionsSeed: Array<{ key: PermissionKey, label: string, group: string 
   { key: PERMISSIONS.MEDIA_CREATE, label: 'Upload mediów', group: 'Media' },
   { key: PERMISSIONS.MEDIA_UPDATE, label: 'Edycja metadanych mediów', group: 'Media' },
   { key: PERMISSIONS.MEDIA_DELETE, label: 'Usuwanie mediów', group: 'Media' },
-  { key: PERMISSIONS.MEDIA_MANAGE, label: 'Zarządzanie wszystkimi mediami', group: 'Media' }
+  { key: PERMISSIONS.MEDIA_MANAGE, label: 'Zarządzanie wszystkimi mediami', group: 'Media' },
+  { key: PERMISSIONS.ANALYTICS_READ, label: 'Podgląd analityki', group: 'Analytics' }
 ]
 
 const rolePermissionsSeed: Record<string, PermissionKey[]> = {
@@ -38,7 +39,8 @@ const rolePermissionsSeed: Record<string, PermissionKey[]> = {
     PERMISSIONS.MEDIA_CREATE,
     PERMISSIONS.MEDIA_UPDATE,
     PERMISSIONS.MEDIA_DELETE,
-    PERMISSIONS.MEDIA_MANAGE
+    PERMISSIONS.MEDIA_MANAGE,
+    PERMISSIONS.ANALYTICS_READ
   ],
   user: [
     PERMISSIONS.PORTFOLIO_READ,

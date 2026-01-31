@@ -1,14 +1,16 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
+import { PERMISSIONS } from '#shared/permissions'
 import { getDashboardMenuItems } from '~/utils/dashboardNavigation'
 
 export const useDashboardNavigation = () => {
   const route = useRoute()
-  const { isLoggedIn, hasRole } = useAccess()
+  const config = useRuntimeConfig()
+  const { isLoggedIn, hasRole, can } = useAccess()
 
   const menuItems = computed<NavigationMenuItem[][]>(() => {
-    // Sprawdź czy użytkownik ma rolę admin (tylko po stronie klienta)
     const hasAdminRole = isLoggedIn.value && hasRole('admin')
-    const itemsGroups = getDashboardMenuItems(hasAdminRole)
+    const showAnalytics = config.public.analyticsEnabled === true && can(PERMISSIONS.ANALYTICS_READ)
+    const itemsGroups = getDashboardMenuItems({ hasAdminRole, showAnalytics })
 
     // Ustaw aktywny element na podstawie aktualnej trasy
     const setActive = (items: NavigationMenuItem[]): NavigationMenuItem[] => {

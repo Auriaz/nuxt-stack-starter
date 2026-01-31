@@ -12,7 +12,8 @@ export const PERMISSIONS = {
   MEDIA_CREATE: 'media.create',
   MEDIA_UPDATE: 'media.update',
   MEDIA_DELETE: 'media.delete',
-  MEDIA_MANAGE: 'media.manage'
+  MEDIA_MANAGE: 'media.manage',
+  ANALYTICS_READ: 'analytics.read'
 } as const
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]
@@ -31,5 +32,6 @@ export const PERMISSION_META: Record<PermissionKey, { label: string, group: stri
   'media.create': { label: 'Upload mediów', group: 'Media' },
   'media.update': { label: 'Edycja metadanych mediów', group: 'Media' },
   'media.delete': { label: 'Usuwanie mediów', group: 'Media' },
-  'media.manage': { label: 'Zarządzanie wszystkimi mediami', group: 'Media' }
+  'media.manage': { label: 'Zarządzanie wszystkimi mediami', group: 'Media' },
+  'analytics.read': { label: 'Podgląd analityki', group: 'Analytics' }
 }

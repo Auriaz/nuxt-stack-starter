@@ -26,6 +26,7 @@
     "todo:report:ps1": "powershell -NoProfile -File scripts/todo-report.ps1"
   },
   "dependencies": {
+    "@google-analytics/data": "^5.2.1",
     "@iconify-json/lucide": "^1.2.87",
     "@iconify-json/simple-icons": "^1.2.68",
     "@nuxt/a11y": "1.0.0-alpha.1",

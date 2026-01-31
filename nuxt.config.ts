@@ -57,9 +57,16 @@ export default defineNuxtConfig({
       // Ilość dni ważności sesji przy opcji „Zapamiętaj mnie”
       rememberMeDays: process.env.AUTH_REMEMBER_ME_DAYS ? Number(process.env.AUTH_REMEMBER_ME_DAYS) : 30
     },
+    analytics: {
+      gaPropertyId: process.env.GA_PROPERTY_ID || '',
+      gaClientEmail: process.env.GA_CLIENT_EMAIL || '',
+      gaPrivateKey: process.env.GA_PRIVATE_KEY || '',
+      enabled: process.env.ANALYTICS_ENABLED !== 'false'
+    },
     public: {
       plausibleDomain: process.env.NUXT_PUBLIC_PLAUSIBLE_DOMAIN || '',
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+      analyticsEnabled: process.env.NUXT_PUBLIC_ANALYTICS_ENABLED === 'true'
     }
   },
 

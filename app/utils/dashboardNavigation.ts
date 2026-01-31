@@ -2,10 +2,20 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 
 type DashboardNavigationItem = NavigationMenuItem & {
   adminOnly?: boolean
+  analyticsOnly?: boolean
 }
 
-export const getDashboardMenuItems = (hasAdminRole: boolean = false): NavigationMenuItem[][] => {
-  const items: DashboardNavigationItem[] = [
+export interface DashboardMenuOptions {
+  hasAdminRole?: boolean
+  showAnalytics?: boolean
+}
+
+export const getDashboardMenuItems = (options: boolean | DashboardMenuOptions = false): NavigationMenuItem[][] => {
+  const opts: DashboardMenuOptions = typeof options === 'boolean' ? { hasAdminRole: options } : options
+  const hasAdminRole = opts.hasAdminRole ?? false
+  const showAnalytics = opts.showAnalytics ?? false
+
+  const baseItems: DashboardNavigationItem[] = [
     {
       label: 'Dashboard',
       icon: 'i-lucide-layout-dashboard',
@@ -29,6 +39,13 @@ export const getDashboardMenuItems = (hasAdminRole: boolean = false): Navigation
       icon: 'i-lucide-image',
       to: '/dashboard/media',
       active: false
+    },
+    {
+      label: 'Analityka',
+      icon: 'i-lucide-bar-chart-3',
+      to: '/dashboard/analytics',
+      active: false,
+      analyticsOnly: true
     }
     // {
     //   label: 'Portfolio',
@@ -79,9 +96,11 @@ export const getDashboardMenuItems = (hasAdminRole: boolean = false): Navigation
     // }
   ]
 
-  const filteredItems: NavigationMenuItem[] = hasAdminRole
-    ? items
-    : items.filter(item => !item.adminOnly)
+  const filteredItems: NavigationMenuItem[] = baseItems.filter((item) => {
+    if (item.adminOnly && !hasAdminRole) return false
+    if (item.analyticsOnly && !showAnalytics) return false
+    return true
+  })
 
   return [[
     ...filteredItems

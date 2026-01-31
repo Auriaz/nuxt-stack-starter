@@ -71,6 +71,21 @@ Ma zapobiegać chaosowi i przypadkowemu łamaniu konwencji.
 - Dla akcji destrukcyjnych (np. usuwanie zdjęcia) używaj `variant="danger"`.
 - Pełna dokumentacja: `content/docs/ModalConfirmation.md`.
 
+## 5A) NuxtLayout i layout Dashboard (MUST)
+
+- Strony z `definePageMeta({ layout: 'dashboard' })` **muszą** owijać treść w `<NuxtLayout name="dashboard">`.
+- `definePageMeta` sam z siebie nie renderuje layoutu — to `NuxtLayout` w szablonie strony wstrzykuje layout (sidebar, navbar, panel).
+- **Bez** opakowania strony w `<NuxtLayout name="dashboard">` cała mechanika layoutu Dashboard (boczne menu, nagłówek, panel) **znika** — strona renderuje się bez layoutu.
+- Wzorzec: w pliku strony (np. `app/pages/dashboard/analytics/index.vue`) template ma postać:
+  ```vue
+  <template>
+    <NuxtLayout name="dashboard">
+      <DashboardPanel ...> ... </DashboardPanel>
+    </NuxtLayout>
+  </template>
+  ```
+- ❌ Nie usuwać `NuxtLayout` z szablonu strony dashboardu w przekonaniu, że `definePageMeta({ layout: 'dashboard' })` wystarczy — to nieprawda.
+
 ## 5) Formularze (standard)
 
 - Wszystkie formularze używają `useForm()`:
