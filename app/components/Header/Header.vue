@@ -46,7 +46,7 @@ const handleLogout = async () => {
     }"
   >
     <template #title>
-      <div class="flex items-center justify-center shrink-0 relative left-4 md:left-10 -translate-x-1/2">
+      <div class="flex items-center justify-center shrink-0 relative left-4 md:left-10 -translate-x-1/2 w-20 h-20">
         <Logo />
       </div>
     </template>
@@ -138,7 +138,7 @@ const handleLogout = async () => {
                   {
                     label: 'Profil',
                     icon: 'i-lucide-user',
-                    to: '/dashboard/settings/profile'
+                    to: '/dashboard/profile'
                   },
                   {
                     label: 'Ustawienia',

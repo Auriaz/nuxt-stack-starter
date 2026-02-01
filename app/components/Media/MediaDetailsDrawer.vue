@@ -242,6 +242,7 @@ const formError = editForm.formError
             <UInput
               :model-value="formValues?.alt ?? ''"
               placeholder="Tekst alternatywny"
+              class="w-full"
               @update:model-value="editForm.setField('alt', $event)"
             />
           </UFormField>
@@ -252,6 +253,7 @@ const formError = editForm.formError
             <UInput
               :model-value="formValues?.caption ?? ''"
               placeholder="Caption"
+              class="w-full"
               @update:model-value="editForm.setField('caption', $event)"
             />
           </UFormField>
@@ -262,6 +264,7 @@ const formError = editForm.formError
             <UInput
               :model-value="Array.isArray(formValues?.tags) ? formValues.tags.join(', ') : ''"
               placeholder="tag1, tag2"
+              class="w-full"
               @update:model-value="setTagsFromString(typeof $event === 'string' ? $event : '')"
             />
           </UFormField>
@@ -270,19 +273,21 @@ const formError = editForm.formError
             color="error"
             variant="soft"
             :title="formError"
-            class="text-sm"
+            class="text-sm w-full"
           />
-          <div class="flex gap-2">
+          <div class="flex gap-2 w-full">
             <UButton
               size="sm"
               :loading="isSaving"
+              class="w-full flex items-center justify-center"
               @click="save"
             >
               Zapisz
             </UButton>
             <UButton
-              variant="ghost"
+              variant="outline"
               size="sm"
+              class="w-full flex items-center justify-center"
               @click="isEditing = false"
             >
               Anuluj

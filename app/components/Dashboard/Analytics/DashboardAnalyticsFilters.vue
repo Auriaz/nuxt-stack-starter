@@ -144,7 +144,7 @@ function setPreset(p: '7d' | '30d') {
       size="sm"
       color="primary"
       :loading="loading"
-      class="w-full"
+      class="w-full flex items-center justify-center"
       @click="emit('apply')"
     >
       Zastosuj

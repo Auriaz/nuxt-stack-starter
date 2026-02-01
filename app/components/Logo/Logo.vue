@@ -1,11 +1,14 @@
 <script lang="ts" setup></script>
 
 <template>
-  <div class="flex items-center gap-2">
+  <ULink
+    class="flex items-center gap-2"
+    to="/"
+  >
     <img
       src="/favicon.ico"
       alt="Logo"
-      class="w-10 h-10"
+      class="w-full h-full"
     >
-  </div>
+  </ULink>
 </template>

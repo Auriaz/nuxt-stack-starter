@@ -117,6 +117,7 @@ function onSelect(asset: MediaAssetDTO) {
 
 function openPreview() {
   previewOpen.value = true
+  drawerOpen.value = false
 }
 
 function onPreviewClose() {
