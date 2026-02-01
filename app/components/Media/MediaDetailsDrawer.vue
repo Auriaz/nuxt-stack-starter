@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import type { MediaAssetDTO, UpdateMediaMetadata } from '#shared/types'
+import type { MediaAssetDTO } from '#shared/types'
+import { UpdateMediaMetadataSchema } from '#shared/schemas/media'
 import { useMediaResource } from '~/composables/resources/useMediaResource'
 import { useToast } from '#imports'
 
@@ -12,32 +13,35 @@ const emit = defineEmits<{
   'update:modelValue': [value: boolean]
   'deleted': [id: string]
   'updated': [asset: MediaAssetDTO]
+  'openPreview': []
 }>()
 
 const mediaResource = useMediaResource()
 const toast = useToast()
+const requestURL = useRequestURL()
 const isEditing = ref(false)
 const isSaving = ref(false)
 const isDeleting = ref(false)
-const formValues = ref<UpdateMediaMetadata>({
-  alt: '',
-  caption: '',
-  tags: []
+const deleteConfirmOpen = ref(false)
+
+const editForm = useForm(UpdateMediaMetadataSchema, {
+  initialValues: { alt: '', caption: '', tags: [] }
 })
 
 const serveUrl = computed(() => props.asset ? mediaResource.serveUrl(props.asset.id) : '')
 const isImage = computed(() => props.asset?.type === 'image')
 const isVideo = computed(() => props.asset?.type === 'video')
+const canPreview = computed(() => isImage.value || isVideo.value)
 
 watch(
   () => props.asset,
   (a) => {
     if (a) {
-      formValues.value = {
+      editForm.setValues({
         alt: a.alt ?? '',
         caption: a.caption ?? '',
         tags: a.tags ?? []
-      }
+      })
       isEditing.value = false
     }
   },
@@ -52,25 +56,37 @@ async function save() {
   if (!props.asset) return
   isSaving.value = true
   try {
-    const updated = await mediaResource.update(props.asset.id, formValues.value)
-    if (updated) {
-      emit('updated', updated)
-      toast.add({
-        title: 'Zapisano',
-        description: 'Metadane zostały zaktualizowane',
-        color: 'success'
-      })
-      isEditing.value = false
-    }
+    const handler = editForm.handleSubmit(async (values) => {
+      const updated = await mediaResource.update(props.asset!.id, values)
+      if (updated) {
+        emit('updated', updated)
+        toast.add({
+          title: 'Zapisano',
+          description: 'Metadane zostały zaktualizowane',
+          color: 'success'
+        })
+        isEditing.value = false
+      }
+    })
+    await handler({
+      preventDefault: () => {},
+      data: editForm.values.value
+    } as unknown as Parameters<ReturnType<typeof editForm.handleSubmit>>[0])
+  } catch {
+    // Błędy API są mapowane w handleSubmit przez setErrorsFromApi
   } finally {
     isSaving.value = false
   }
 }
 
-async function remove() {
+function openDeleteConfirm() {
+  deleteConfirmOpen.value = true
+}
+
+async function doRemove() {
   if (!props.asset) return
-  if (!confirm('Czy na pewno usunąć ten plik?')) return
   isDeleting.value = true
+  deleteConfirmOpen.value = false
   try {
     const ok = await mediaResource.remove(props.asset.id)
     if (ok) {
@@ -88,11 +104,25 @@ async function remove() {
 }
 
 function setTagsFromString(value: string) {
-  formValues.value = {
-    ...formValues.value,
-    tags: value.split(',').map(s => s.trim()).filter(Boolean)
-  }
+  editForm.setField('tags', value.split(',').map(s => s.trim()).filter(Boolean))
 }
+
+function copyServeUrl() {
+  const url = serveUrl.value
+  if (!url) return
+  const fullUrl = requestURL.origin + url
+  navigator.clipboard.writeText(fullUrl).then(() => {
+    toast.add({
+      title: 'Skopiowano',
+      description: 'URL skopiowany do schowka',
+      color: 'success'
+    })
+  })
+}
+
+const formValues = editForm.values
+const formErrors = editForm.errors
+const formError = editForm.formError
 </script>
 
 <template>
@@ -142,11 +172,20 @@ function setTagsFromString(value: string) {
           </div>
         </div>
 
-        <div class="text-sm text-basic-600 dark:text-basic-400">
+        <div class="text-sm text-basic-600 dark:text-basic-400 space-y-1">
           <p class="font-medium text-basic-900 dark:text-basic-100">
             {{ asset.originalName }}
           </p>
           <p>{{ asset.type }} · {{ (asset.sizeBytes / 1024).toFixed(1) }} KB</p>
+          <UButton
+            variant="ghost"
+            size="xs"
+            icon="i-lucide-copy"
+            class="mt-1"
+            @click="copyServeUrl"
+          >
+            Kopiuj URL
+          </UButton>
         </div>
 
         <div
@@ -162,7 +201,16 @@ function setTagsFromString(value: string) {
           <p v-if="asset.tags?.length">
             <span class="text-basic-500">Tagi:</span> {{ asset.tags.join(', ') }}
           </p>
-          <div class="flex gap-2 pt-2">
+          <div class="flex flex-wrap gap-2 pt-2">
+            <UButton
+              v-if="canPreview"
+              variant="soft"
+              size="sm"
+              icon="i-lucide-maximize-2"
+              @click="emit('openPreview')"
+            >
+              Podgląd pełnoekranowy
+            </UButton>
             <UButton
               variant="soft"
               size="sm"
@@ -177,7 +225,7 @@ function setTagsFromString(value: string) {
               size="sm"
               icon="i-lucide-trash-2"
               :loading="isDeleting"
-              @click="remove"
+              @click="openDeleteConfirm"
             >
               Usuń
             </UButton>
@@ -187,25 +235,43 @@ function setTagsFromString(value: string) {
           v-else
           class="space-y-3"
         >
-          <UFormField label="Alt">
+          <UFormField
+            label="Alt"
+            :error="formErrors?.alt"
+          >
             <UInput
-              v-model="formValues.alt"
+              :model-value="formValues?.alt ?? ''"
               placeholder="Tekst alternatywny"
+              @update:model-value="editForm.setField('alt', $event)"
             />
           </UFormField>
-          <UFormField label="Opis">
+          <UFormField
+            label="Opis"
+            :error="formErrors?.caption"
+          >
             <UInput
-              v-model="formValues.caption"
+              :model-value="formValues?.caption ?? ''"
               placeholder="Caption"
+              @update:model-value="editForm.setField('caption', $event)"
             />
           </UFormField>
-          <UFormField label="Tagi (oddzielone przecinkami)">
+          <UFormField
+            label="Tagi (oddzielone przecinkami)"
+            :error="formErrors?.tags"
+          >
             <UInput
-              :model-value="Array.isArray(formValues.tags) ? formValues.tags.join(', ') : ''"
+              :model-value="Array.isArray(formValues?.tags) ? formValues.tags.join(', ') : ''"
               placeholder="tag1, tag2"
               @update:model-value="setTagsFromString(typeof $event === 'string' ? $event : '')"
             />
           </UFormField>
+          <UAlert
+            v-if="formError"
+            color="error"
+            variant="soft"
+            :title="formError"
+            class="text-sm"
+          />
           <div class="flex gap-2">
             <UButton
               size="sm"
@@ -226,4 +292,29 @@ function setTagsFromString(value: string) {
       </div>
     </template>
   </USlideover>
+
+  <UModal
+    v-model:open="deleteConfirmOpen"
+    title="Usuń plik"
+    description="Czy na pewno usunąć ten plik? Tej operacji nie można cofnąć."
+  >
+    <template #footer>
+      <div class="flex justify-end gap-2">
+        <UButton
+          variant="ghost"
+          color="neutral"
+          @click="deleteConfirmOpen = false"
+        >
+          Anuluj
+        </UButton>
+        <UButton
+          color="error"
+          :loading="isDeleting"
+          @click="doRemove"
+        >
+          Usuń
+        </UButton>
+      </div>
+    </template>
+  </UModal>
 </template>

@@ -4,6 +4,7 @@ import { useMediaResource } from '~/composables/resources/useMediaResource'
 
 const emit = defineEmits<{
   uploaded: [asset: MediaAssetDTO]
+  uploadsComplete: []
 }>()
 
 const mediaResource = useMediaResource()
@@ -11,6 +12,7 @@ const isDragging = ref(false)
 const isUploading = ref(false)
 const progress = ref(0)
 const error = ref<string | null>(null)
+const fileErrors = ref<Array<{ name: string, message: string }>>([])
 
 const ALLOWED_TYPES = 'image/jpeg,image/png,image/webp,image/gif,video/mp4'
 const MAX_IMAGE_MB = 10
@@ -29,36 +31,63 @@ function validateFile(file: File): string | null {
   return null
 }
 
+async function uploadOne(file: File): Promise<MediaAssetDTO | null> {
+  const interval = setInterval(() => {
+    progress.value = Math.min(progress.value + 8, 95)
+  }, 150)
+  try {
+    const asset = await mediaResource.upload(file)
+    return asset
+  } finally {
+    clearInterval(interval)
+  }
+}
+
 async function handleFiles(files: FileList | File[]) {
   const list = Array.isArray(files) ? files : Array.from(files)
   if (!list.length) return
   error.value = null
-  const file = list[0]
-  const err = validateFile(file)
-  if (err) {
-    error.value = err
-    return
-  }
+  fileErrors.value = []
   isUploading.value = true
   progress.value = 0
-  const interval = setInterval(() => {
-    progress.value = Math.min(progress.value + 15, 90)
-  }, 200)
-  try {
-    const asset = await mediaResource.upload(file)
-    progress.value = 100
-    if (asset) {
-      emit('uploaded', asset)
+  const toUpload: File[] = []
+  for (const file of list) {
+    const err = validateFile(file)
+    if (err) {
+      fileErrors.value.push({ name: file.name, message: err })
     } else {
-      error.value = 'Upload nie powiódł się'
+      toUpload.push(file)
     }
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Błąd uploadu'
-  } finally {
-    clearInterval(interval)
-    isUploading.value = false
-    progress.value = 0
   }
+  const total = toUpload.length
+  let done = 0
+  for (const file of toUpload) {
+    try {
+      const asset = await uploadOne(file)
+      if (asset) {
+        emit('uploaded', asset)
+      } else {
+        fileErrors.value.push({ name: file.name, message: 'Upload nie powiódł się' })
+      }
+    } catch (e) {
+      fileErrors.value.push({
+        name: file.name,
+        message: e instanceof Error ? e.message : 'Błąd uploadu'
+      })
+    }
+    done += 1
+    progress.value = total > 0 ? Math.round((done / total) * 100) : 100
+  }
+  progress.value = 100
+  if (fileErrors.value.length > 0) {
+    const first = fileErrors.value[0]
+    error.value = fileErrors.value.length === 1 && first
+      ? first.message
+      : `${fileErrors.value.length} plików z błędami`
+  }
+  isUploading.value = false
+  progress.value = 0
+  emit('uploadsComplete')
 }
 
 function onDrop(e: DragEvent) {
@@ -70,6 +99,7 @@ function onDrop(e: DragEvent) {
 function onInput(e: Event) {
   const input = e.target as HTMLInputElement
   if (input.files?.length) handleFiles(input.files)
+  input.value = ''
 }
 </script>
 
@@ -85,14 +115,15 @@ function onInput(e: Event) {
       @dragleave.prevent="isDragging = false"
       @drop.prevent="onDrop"
     >
-      <input
-        type="file"
-        class="hidden"
-        accept="image/jpeg,image/png,image/webp,image/gif,video/mp4"
-        :disabled="isUploading"
-        @change="onInput"
-      >
       <label class="cursor-pointer block">
+        <input
+          type="file"
+          class="hidden"
+          multiple
+          accept="image/jpeg,image/png,image/webp,image/gif,video/mp4"
+          :disabled="isUploading"
+          @change="onInput"
+        >
         <UIcon
           v-if="!isUploading"
           name="i-lucide-upload-cloud"
@@ -104,7 +135,7 @@ function onInput(e: Event) {
           class="w-12 h-12 mx-auto text-primary-500 animate-spin mb-2"
         />
         <p class="text-sm text-basic-600 dark:text-basic-400">
-          {{ isUploading ? 'Przesyłanie...' : 'Przeciągnij plik tutaj lub kliknij, aby wybrać' }}
+          {{ isUploading ? 'Przesyłanie...' : 'Przeciągnij pliki tutaj lub kliknij, aby wybrać' }}
         </p>
         <p class="text-xs text-basic-500 dark:text-basic-500 mt-1">
           Obrazy (JPEG, PNG, WebP, GIF) do {{ MAX_IMAGE_MB }} MB, wideo MP4 do {{ MAX_VIDEO_MB }} MB
@@ -124,5 +155,21 @@ function onInput(e: Event) {
       icon="i-lucide-alert-circle"
       class="mt-2"
     />
+    <div
+      v-if="fileErrors.length > 0"
+      class="mt-2 space-y-1"
+    >
+      <p class="text-xs font-medium text-error-600 dark:text-error-400">
+        Błędy per plik:
+      </p>
+      <ul class="text-xs text-basic-600 dark:text-basic-400 list-disc list-inside">
+        <li
+          v-for="(item, i) in fileErrors"
+          :key="i"
+        >
+          {{ item.name }}: {{ item.message }}
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
