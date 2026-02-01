@@ -44,6 +44,11 @@ export { Prisma }
  */
 export type User = Prisma.UserModel
 /**
+ * Model UserSettings
+ * Ustawienia użytkownika (1:1 z User): język, motyw, powiadomienia e-mail itd.
+ */
+export type UserSettings = Prisma.UserSettingsModel
+/**
  * Model UserSession
  * Sesje użytkownika (do zakładki Activity: Current Session, Other sessions, logout others).
  */

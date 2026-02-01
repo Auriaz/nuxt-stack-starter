@@ -17,6 +17,8 @@ export function toRoleDTO(role: RoleWithPermissions): RoleDTO {
 export function toUserDTO(user: UserWithRolePermissions): UserDTO {
   const roleName = user.roleRef?.name ?? user.role
   const permissions = user.roleRef?.permissions.map(rolePermission => rolePermission.permission.key as PermissionKey) ?? []
+  const status = user.deactivatedAt ? ('blocked' as const) : ('active' as const)
+  const deactivatedAt = user.deactivatedAt ? user.deactivatedAt.toISOString() : null
 
   return {
     id: user.id,
@@ -25,7 +27,10 @@ export function toUserDTO(user: UserWithRolePermissions): UserDTO {
     username: user.username ?? null,
     avatarUrl: user.avatarUrl ?? null,
     role: roleName,
-    permissions
+    permissions,
+    roleId: user.roleId ?? null,
+    status,
+    deactivatedAt
   }
 }
 

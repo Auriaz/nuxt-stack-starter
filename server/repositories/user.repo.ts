@@ -45,6 +45,7 @@ export interface UserRepository {
   updatePrivacy(id: number, data: { showEmail?: boolean }): Promise<void>
   setDeactivatedAt(id: number, deactivatedAt: Date | null): Promise<User>
   delete(id: number): Promise<User>
+  count(): Promise<number>
 }
 
 export const userRepository: UserRepository = {
@@ -114,6 +115,38 @@ export const userRepository: UserRepository = {
         }
       }
     })
+  },
+
+  async findAllPaginated(offset, limit, search) {
+    const where = search?.trim()
+      ? {
+          OR: [
+            { email: { contains: search.trim(), mode: 'insensitive' as const } },
+            { username: { contains: search.trim(), mode: 'insensitive' as const } }
+          ]
+        }
+      : undefined
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        include: {
+          roleRef: {
+            include: {
+              permissions: {
+                include: {
+                  permission: true
+                }
+              }
+            }
+          }
+        },
+        orderBy: { id: 'asc' },
+        skip: offset,
+        take: limit
+      }),
+      prisma.user.count({ where })
+    ])
+    return { users, total }
   },
 
   async create(data) {
@@ -210,5 +243,9 @@ export const userRepository: UserRepository = {
     return await prisma.user.delete({
       where: { id }
     })
+  },
+
+  async count() {
+    return await prisma.user.count()
   }
 }

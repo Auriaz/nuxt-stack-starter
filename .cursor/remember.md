@@ -86,6 +86,14 @@ Ma zapobiegać chaosowi i przypadkowemu łamaniu konwencji.
   ```
 - ❌ Nie usuwać `NuxtLayout` z szablonu strony dashboardu w przekonaniu, że `definePageMeta({ layout: 'dashboard' })` wystarczy — to nieprawda.
 
+## 5B) Panel Admin (`/dashboard/admin`)
+
+- Dostęp tylko z permission `admin.access`. Wszystkie endpointy pod `/api/admin/*` wymagają `requirePermission(ADMIN_ACCESS)` oraz szczegółowego permission (`users.read`/`users.manage`, `roles.read`/`roles.manage`).
+- UI panelu: layout dashboard, DashboardPanel, nawigacja wewnętrzna (Przegląd, Użytkownicy, Role, Uprawnienia). Brak fetch w komponentach — tylko przez `useAdminResource`.
+- Nie wolno pozwalać na odebranie sobie roli z dostępem do panelu (admin) ani na zmianę nazwy roli systemowej (`admin`). Reguły egzekwowane w domain (assignUserRole, updateRole).
+- **Permissions:** Single source of truth: `shared/permissions.ts`. Nowe klucze tylko tam + seed. W API używamy wyłącznie stałych z `PERMISSIONS`.
+- **Zmiana ról:** Efekt zmiany roli użytkownika (przez innego admina) pełnio widoczny po odświeżeniu sesji / ponownym logowaniu tego użytkownika.
+
 ## 5) Formularze (standard)
 
 - Wszystkie formularze używają `useForm()`:

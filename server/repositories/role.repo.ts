@@ -18,6 +18,7 @@ export interface RoleRepository {
   create(data: { name: string, description?: string | null }): Promise<Role>
   update(id: number, data: { name?: string, description?: string | null }): Promise<Role>
   setPermissions(roleId: number, permissionIds: number[]): Promise<RoleWithPermissions>
+  count(): Promise<number>
 }
 
 export const roleRepository: RoleRepository = {
@@ -102,5 +103,9 @@ export const roleRepository: RoleRepository = {
     }
 
     return role
+  },
+
+  async count() {
+    return await prisma.role.count()
   }
 }

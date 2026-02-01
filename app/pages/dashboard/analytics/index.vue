@@ -71,7 +71,7 @@ onMounted(() => {
       title="Analityka"
       icon="i-lucide-bar-chart-3"
     >
-      <template #left>
+      <template #sidebar>
         <DashboardAnalyticsFilters
           :date-from="dateFrom"
           :date-to="dateTo"

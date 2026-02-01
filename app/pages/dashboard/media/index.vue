@@ -11,12 +11,14 @@ useSeoMeta({
 </script>
 
 <template>
-  <DashboardPanel
-    title="Biblioteka mediów"
-    icon="i-lucide-image"
-  >
-    <template #body>
-      <MediaLibrary />
-    </template>
-  </DashboardPanel>
+  <NuxtLayout>
+    <DashboardPanel
+      title="Biblioteka mediów"
+      icon="i-lucide-image"
+    >
+      <template #body>
+        <MediaLibrary />
+      </template>
+    </DashboardPanel>
+  </NuxtLayout>
 </template>

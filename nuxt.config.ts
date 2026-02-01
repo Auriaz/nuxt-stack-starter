@@ -124,6 +124,11 @@ export default defineNuxtConfig({
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_redirected'
+    },
+    experimental: {
+      // Wyłączenie zapobiega błędom "Nuxt I18n server context has not been set up yet"
+      // gdy hook render:before uruchamia się przed ustawieniem kontekstu (Nitro/asyncContext).
+      nitroContextDetection: false
     }
   },
 

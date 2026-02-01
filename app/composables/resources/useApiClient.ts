@@ -28,9 +28,12 @@ export function useApiClient() {
       method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
       body?: BodyInit | Record<string, unknown> | null
       headers?: Record<string, string>
+      /** Gdy false, zwraca cały obiekt odpowiedzi (np. { data, meta }) zamiast tylko response.data */
+      unwrap?: boolean
     }
   ): Promise<T> {
     try {
+      const unwrap = options?.unwrap !== false
       const response = await $fetch<ApiResponse<T> | T>(url, {
         method: options?.method || 'GET',
         body: options?.body,
@@ -50,8 +53,11 @@ export function useApiClient() {
             }
           })
         }
-        if (apiResponse.data !== undefined) {
+        if (unwrap && apiResponse.data !== undefined) {
           return apiResponse.data
+        }
+        if (!unwrap) {
+          return response as T
         }
       }
 

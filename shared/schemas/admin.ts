@@ -1,5 +1,9 @@
-import { array, enum_, minLength, number, object, optional, pipe, string } from 'valibot'
+import { array, enum_, minLength, number, object, optional, pipe, picklist, string } from 'valibot'
 import { PERMISSIONS } from '../permissions'
+
+export const AdminUserStatusSchema = object({
+  status: picklist(['active', 'blocked'], 'Status musi być active lub blocked')
+})
 
 export const CreateRoleInputSchema = object({
   name: pipe(string(), minLength(2, 'Nazwa roli jest za krótka')),

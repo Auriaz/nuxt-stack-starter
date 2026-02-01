@@ -23,7 +23,7 @@ const open = ref(false)
           <UDashboardToolbar :ui="{ root: 'border-none' }">
             <template #left>
               <slot name="left" />
-              <UColorModeSelect />
+              <ColorModeButton />
             </template>
             <template #right>
               <div class="flex items-center gap-2">

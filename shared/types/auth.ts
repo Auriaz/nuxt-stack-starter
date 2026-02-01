@@ -30,6 +30,8 @@ export interface ResetPasswordOutput {
   }
 }
 
+export type UserStatus = 'active' | 'blocked'
+
 export interface UserDTO {
   id: number
   email?: string | null
@@ -38,6 +40,9 @@ export interface UserDTO {
   avatarUrl?: string | null
   role: string
   permissions: PermissionKey[]
+  roleId?: number | null
+  status?: UserStatus
+  deactivatedAt?: string | null
 }
 
 export interface RoleDTO {

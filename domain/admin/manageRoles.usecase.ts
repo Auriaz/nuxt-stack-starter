@@ -1,6 +1,6 @@
 import type { RoleRepository } from '~~/server/repositories/role.repo'
 import type { PermissionRepository } from '~~/server/repositories/permission.repo'
-import { NotFoundError, ValidationError } from '../shared/errors'
+import { ForbiddenError, NotFoundError, ValidationError } from '../shared/errors'
 
 export async function listRolesUseCase(roleRepository: RoleRepository) {
   return await roleRepository.findAllWithPermissions()
@@ -16,6 +16,9 @@ export async function createRoleUseCase(
   })
 }
 
+/**
+ * Aktualizuje nazwę/opis roli. Nie pozwala zmienić nazwy roli systemowej (admin).
+ */
 export async function updateRoleUseCase(
   id: number,
   input: { name?: string, description?: string | null },
@@ -24,6 +27,10 @@ export async function updateRoleUseCase(
   const existing = await roleRepository.findByIdWithPermissions(id)
   if (!existing) {
     throw new NotFoundError('Role not found')
+  }
+
+  if (existing.name === 'admin' && input.name !== undefined && input.name !== existing.name) {
+    throw new ForbiddenError('Nazwa roli systemowej (admin) nie może być zmieniona')
   }
 
   await roleRepository.update(id, {

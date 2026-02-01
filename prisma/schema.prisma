@@ -42,9 +42,27 @@ model User {
   userSessions            UserSession[]
   loginEvents             LoginEvent[]
   activityLogs            ActivityLog[]
+  userSettings            UserSettings?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+/// Ustawienia użytkownika (1:1 z User): język, motyw, powiadomienia e-mail itd.
+model UserSettings {
+  id                 Int      @id @default(autoincrement())
+  userId             Int      @unique
+  locale             String?  @default("pl") // pl | en
+  timezone           String?  @default("Europe/Warsaw")
+  appearanceTheme    String?  @default("system") // system | light | dark
+  emailNotifications Boolean @default(true)
+  marketingEmails    Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 /// Sesje użytkownika (do zakładki Activity: Current Session, Other sessions, logout others).

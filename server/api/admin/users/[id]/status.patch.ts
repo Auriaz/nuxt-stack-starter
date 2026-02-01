@@ -1,12 +1,13 @@
+import { getRouterParam, readBody } from 'h3'
 import { safeParse } from 'valibot'
-import { AssignUserRolesSchema } from '#shared/schemas/admin'
-import { assignUserRoleUseCase } from '~~/domain/admin/manageUsers.usecase'
+import { AdminUserStatusSchema } from '#shared/schemas/admin'
+import { updateUserStatusUseCase } from '~~/domain/admin/updateUserStatus.usecase'
 import { userRepository } from '~~/server/repositories/user.repo'
-import { roleRepository } from '~~/server/repositories/role.repo'
 import { requirePermission } from '~~/server/utils/access'
 import { PERMISSIONS } from '~~/shared/permissions'
 import { DomainError } from '~~/domain/shared/errors'
 import { toUserDTO } from '~~/server/utils/adminDto'
+import type { SessionUser } from '~~/domain/auth/auth.types'
 
 function parseUserId(event: H3Event): number {
   const param = getRouterParam(event, 'id')
@@ -28,12 +29,12 @@ function parseUserId(event: H3Event): number {
 }
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, PERMISSIONS.ADMIN_ACCESS)
+  const sessionUser = await requirePermission(event, PERMISSIONS.ADMIN_ACCESS)
   await requirePermission(event, PERMISSIONS.USERS_MANAGE)
 
   const userId = parseUserId(event)
   const body = await readBody(event)
-  const parseResult = safeParse(AssignUserRolesSchema, body)
+  const parseResult = safeParse(AdminUserStatusSchema, body)
   if (!parseResult.success) {
     throw createError({
       status: 422,
@@ -48,12 +49,15 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const currentUser = sessionUser as SessionUser
+  const currentUserId = currentUser.id
+
   try {
-    const user = await assignUserRoleUseCase(
+    const user = await updateUserStatusUseCase(
       userId,
-      parseResult.output.roleId,
-      userRepository,
-      roleRepository
+      parseResult.output.status,
+      currentUserId,
+      userRepository
     )
     return { data: toUserDTO(user) }
   } catch (error) {

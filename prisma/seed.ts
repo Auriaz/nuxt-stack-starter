@@ -21,7 +21,9 @@ const permissionsSeed: Array<{ key: PermissionKey, label: string, group: string 
   { key: PERMISSIONS.MEDIA_UPDATE, label: 'Edycja metadanych mediów', group: 'Media' },
   { key: PERMISSIONS.MEDIA_DELETE, label: 'Usuwanie mediów', group: 'Media' },
   { key: PERMISSIONS.MEDIA_MANAGE, label: 'Zarządzanie wszystkimi mediami', group: 'Media' },
-  { key: PERMISSIONS.ANALYTICS_READ, label: 'Podgląd analityki', group: 'Analytics' }
+  { key: PERMISSIONS.ANALYTICS_READ, label: 'Podgląd analityki', group: 'Analytics' },
+  { key: PERMISSIONS.SETTINGS_READ, label: 'Podgląd ustawień', group: 'Settings' },
+  { key: PERMISSIONS.SETTINGS_UPDATE, label: 'Edycja ustawień', group: 'Settings' }
 ]
 
 const rolePermissionsSeed: Record<string, PermissionKey[]> = {
@@ -40,10 +42,14 @@ const rolePermissionsSeed: Record<string, PermissionKey[]> = {
     PERMISSIONS.MEDIA_UPDATE,
     PERMISSIONS.MEDIA_DELETE,
     PERMISSIONS.MEDIA_MANAGE,
-    PERMISSIONS.ANALYTICS_READ
+    PERMISSIONS.ANALYTICS_READ,
+    PERMISSIONS.SETTINGS_READ,
+    PERMISSIONS.SETTINGS_UPDATE
   ],
   user: [
     PERMISSIONS.PORTFOLIO_READ,
+    PERMISSIONS.SETTINGS_READ,
+    PERMISSIONS.SETTINGS_UPDATE,
     PERMISSIONS.CONTENT_READ,
     PERMISSIONS.MEDIA_READ,
     PERMISSIONS.MEDIA_CREATE,

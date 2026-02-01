@@ -3,6 +3,7 @@ import { computed, onMounted, watch } from 'vue'
 import type { DropdownMenuItem } from '@nuxt/ui'
 import { useAuth } from '~/composables/useAuth'
 import { useProfile } from '~/composables/resources/useProfile'
+import { getDashboardMenuItemsForFooter } from '~/utils/dashboardNavigation'
 
 const { user, isLoggedIn, logout } = useAuth()
 const { profile, fetchProfile } = useProfile()
@@ -78,133 +79,22 @@ const getInitials = computed(() => {
 /** Pełny URL avatara (origin + ścieżka), żeby UAvatar poprawnie ładował /api/media/:id/serve */
 const avatarSrc = useAvatarSrc(() => profile.value?.avatarUrl ?? undefined)
 
-// Menu items dla UDropdownMenu
+// Menu items dla UDropdownMenu — jedna źródłowa definicja w dashboardNavigation.ts
 const menuItems = computed<DropdownMenuItem[][]>(() => {
   if (!isLoggedIn.value || !user.value) {
     return []
   }
 
-  return [
-    // Sekcja 1: Nagłówek z avatarem i emailem
-    [
-      {
-        label: user.value.email || '',
-        slot: 'account',
-        disabled: true,
-        avatar: {
-          src: avatarSrc.value,
-          alt: getFullName.value,
-          text: getInitials.value
-        }
-      }
-    ],
-    // Sekcja 2: Profil i bezpieczeństwo
-    [
-      {
-        label: 'Mój profil',
-        icon: 'i-heroicons-user-circle',
-        to: '/dashboard/profile',
-        children: [
-          {
-            label: 'Przegląd',
-            icon: 'i-heroicons-home',
-            to: '/dashboard/profile?tab=overview',
-            active: route.path === '/dashboard/profile' && (route.query.tab === 'overview' || !route.query.tab)
-          },
-          {
-            label: 'Ustawienia',
-            icon: 'i-heroicons-cog-6-tooth',
-            to: '/dashboard/profile?tab=settings',
-            active: route.path === '/dashboard/profile' && route.query.tab === 'settings'
-          },
-          {
-            label: 'Bezpieczeństwo',
-            icon: 'i-heroicons-shield-check',
-            to: '/dashboard/profile?tab=security',
-            active: route.path === '/dashboard/profile' && route.query.tab === 'security'
-          },
-          {
-            label: 'Prywatność',
-            icon: 'i-heroicons-lock-closed',
-            to: '/dashboard/profile?tab=privacy',
-            active: route.path === '/dashboard/profile' && route.query.tab === 'privacy'
-          },
-          {
-            label: 'Aktywność',
-            icon: 'i-heroicons-chart-bar',
-            to: '/dashboard/profile?tab=activity',
-            active: route.path === '/dashboard/profile' && route.query.tab === 'activity'
-          },
-          {
-            label: 'Treść',
-            icon: 'i-heroicons-document-text',
-            to: '/dashboard/profile?tab=content',
-            active: route.path === '/dashboard/profile' && route.query.tab === 'content'
-          }
-        ]
-      }
-    ],
-    // Sekcja 3: Nawigacja
-    [
-      {
-        label: 'Analytics',
-        icon: 'i-lucide-bar-chart',
-        to: '/dashboard/analytics'
-      },
-      {
-        label: 'Ustawienia',
-        icon: 'i-lucide-settings',
-        to: '/dashboard/settings',
-        children: [
-          {
-            label: 'Ogólne',
-            icon: 'i-lucide-settings',
-            to: '/dashboard/settings'
-          },
-          {
-            label: 'Zespół',
-            icon: 'i-lucide-users',
-            to: '/dashboard/settings/team'
-          }
-        ]
-      },
-      // Warunkowo dodaj link do panelu administracyjnego dla admina
-      ...(hasRole('admin')
-        ? [{
-            label: 'Panel administracyjny',
-            icon: 'i-heroicons-shield-check',
-            to: '/dashboard/admin',
-            children: [
-              {
-                label: 'Zarządzanie',
-                icon: 'i-heroicons-shield-check',
-                to: '/dashboard/admin'
-              },
-              {
-                label: 'Użytkownicy',
-                icon: 'i-lucide-users',
-                to: '/dashboard/admin/users'
-              },
-              {
-                label: 'Role',
-                icon: 'i-lucide-shield',
-                to: '/dashboard/admin/roles'
-              }
-
-            ]
-          }]
-        : [])
-    ],
-    // Sekcja 4: Wyloguj (z separatorem przed)
-    [
-      {
-        label: 'Wyloguj się',
-        icon: 'i-heroicons-arrow-right-on-rectangle',
-        color: 'error' as const,
-        onSelect: () => handleLogout()
-      }
-    ]
-  ]
+  return getDashboardMenuItemsForFooter({
+    userEmail: user.value.email ?? '',
+    avatarSrc: avatarSrc.value,
+    fullName: getFullName.value,
+    initials: getInitials.value,
+    routePath: route.path,
+    routeQuery: route.query as Record<string, unknown>,
+    hasAdminRole: hasRole('admin'),
+    onLogout: handleLogout
+  }) as DropdownMenuItem[][]
 })
 
 // Sprawdź czy menu powinno być widoczne

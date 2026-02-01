@@ -5,10 +5,10 @@ import { getDashboardMenuItems } from '~/utils/dashboardNavigation'
 export const useDashboardNavigation = () => {
   const route = useRoute()
   const config = useRuntimeConfig()
-  const { isLoggedIn, hasRole, can } = useAccess()
+  const { isLoggedIn, can } = useAccess()
 
   const menuItems = computed<NavigationMenuItem[][]>(() => {
-    const hasAdminRole = isLoggedIn.value && hasRole('admin')
+    const hasAdminRole = isLoggedIn.value && can(PERMISSIONS.ADMIN_ACCESS)
     const showAnalytics = config.public.analyticsEnabled === true && can(PERMISSIONS.ANALYTICS_READ)
     const itemsGroups = getDashboardMenuItems({ hasAdminRole, showAnalytics })
 
