@@ -22,6 +22,36 @@ export * from './enums.js';
  */
 export type User = Prisma.UserModel
 /**
+ * Model ChatThread
+ * 
+ */
+export type ChatThread = Prisma.ChatThreadModel
+/**
+ * Model ChatThreadTopic
+ * 
+ */
+export type ChatThreadTopic = Prisma.ChatThreadTopicModel
+/**
+ * Model ChatParticipant
+ * 
+ */
+export type ChatParticipant = Prisma.ChatParticipantModel
+/**
+ * Model ChatMessage
+ * 
+ */
+export type ChatMessage = Prisma.ChatMessageModel
+/**
+ * Model ChatMessageLink
+ * 
+ */
+export type ChatMessageLink = Prisma.ChatMessageLinkModel
+/**
+ * Model ChatThreadInvite
+ * 
+ */
+export type ChatThreadInvite = Prisma.ChatThreadInviteModel
+/**
  * Model UserSettings
  * Ustawienia użytkownika (1:1 z User): język, motyw, powiadomienia e-mail itd.
  */
@@ -86,3 +116,18 @@ export type OAuthAccount = Prisma.OAuthAccountModel
  * 
  */
 export type MediaAsset = Prisma.MediaAssetModel
+/**
+ * Model BlogTag
+ * Tag blogowy (słownik tagów do wyboru przy tworzeniu/edycji posta).
+ */
+export type BlogTag = Prisma.BlogTagModel
+/**
+ * Model BlogPost
+ * Post blogowy (Prisma) — tytuł, slug, treść MD, autor, tagi, SEO, data publikacji.
+ */
+export type BlogPost = Prisma.BlogPostModel
+/**
+ * Model BlogAnchor
+ * Kotwica posta (link w aside: e.g. "Spis treści" → #toc, zewnętrzny link itd.).
+ */
+export type BlogAnchor = Prisma.BlogAnchorModel

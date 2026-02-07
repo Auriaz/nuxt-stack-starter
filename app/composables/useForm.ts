@@ -5,7 +5,7 @@ import type { FormSubmitEvent } from '@nuxt/ui'
 /**
  * Opcje konfiguracji dla useForm
  */
-export interface UseFormOptions<T extends BaseSchema> {
+export interface UseFormOptions<T extends BaseSchema<unknown, unknown, unknown>> {
   initialValues?: Partial<InferInput<T>>
   onSubmit?: (values: InferOutput<T>) => Promise<void> | void
 }
@@ -13,7 +13,7 @@ export interface UseFormOptions<T extends BaseSchema> {
 /**
  * Zwracany interfejs z useForm
  */
-export interface UseFormReturn<T extends BaseSchema> {
+export interface UseFormReturn<T extends BaseSchema<unknown, unknown, unknown>> {
   // Stan
   values: Ref<Partial<InferInput<T>>>
   errors: Ref<Record<string, string>>
@@ -66,7 +66,7 @@ interface ApiError {
  * <UForm :schema="LoginInputSchema" :state="form.values" @submit="form.handleSubmit(onSubmit)">
  * ```
  */
-export function useForm<T extends BaseSchema>(
+export function useForm<T extends BaseSchema<unknown, unknown, unknown>>(
   schema: T,
   options?: UseFormOptions<T>
 ): UseFormReturn<T> {
@@ -87,11 +87,11 @@ export function useForm<T extends BaseSchema>(
   /**
    * Mapuje błędy Valibot do formatu errors
    */
-  function mapValibotIssuesToErrors(issues: ValiError['issues']): Record<string, string> {
+  function mapValibotIssuesToErrors(issues: ValiError<T>['issues']): Record<string, string> {
     const mappedErrors: Record<string, string> = {}
     for (const issue of issues) {
       // issue.path to array: [{ key: 'email' }, { key: '0' }] dla nested
-      const path = issue.path?.map(p => String(p.key)).join('.') || 'root'
+      const path = issue.path?.map((p: { key: string | number }) => String(p.key)).join('.') || 'root'
       mappedErrors[path] = issue.message
     }
     return mappedErrors

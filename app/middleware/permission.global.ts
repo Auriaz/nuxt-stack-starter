@@ -8,7 +8,11 @@ export default defineNuxtRouteMiddleware((to) => {
 
   const { can, isLoggedIn } = useAccess()
 
-  if (!isLoggedIn.value || !can(requiredPermission)) {
+  if (!isLoggedIn.value) {
     return navigateTo(`/auth/login?redirect=${encodeURIComponent(to.fullPath)}`)
+  }
+
+  if (!can(requiredPermission)) {
+    return navigateTo(`/forbidden?permission=${encodeURIComponent(String(requiredPermission))}`)
   }
 })

@@ -201,6 +201,8 @@ onMounted(() => {
             <DashboardSettingsIntegrations
               v-show="activeTab === 'integrations'"
               v-motion-fade
+              :settings="settings"
+              @updated="onSettingsUpdated"
             />
           </template>
         </div>

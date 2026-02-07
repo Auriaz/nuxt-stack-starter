@@ -34,10 +34,22 @@ export function useApiClient() {
   ): Promise<T> {
     try {
       const unwrap = options?.unwrap !== false
+      const headers = { ...options?.headers }
+      if (import.meta.server) {
+        const requestHeaders = useRequestHeaders(['cookie'])
+        if (requestHeaders.cookie && !('cookie' in headers)) {
+          headers.cookie = requestHeaders.cookie
+        }
+      }
+      /** Na SSR względne /api/... musi iść pod origin bieżącego requestu, żeby odświeżenie strony działało. */
+      const apiClient = useRuntimeConfig().public.siteUrl
+      const baseURL: string | undefined = import.meta.server ? apiClient : undefined
+
       const response = await $fetch<ApiResponse<T> | T>(url, {
+        baseURL,
         method: options?.method || 'GET',
         body: options?.body,
-        headers: options?.headers
+        headers
       })
 
       // Obsługa formatu { data: ... } lub bezpośredniego zwrotu

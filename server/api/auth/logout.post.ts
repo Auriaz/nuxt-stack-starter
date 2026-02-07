@@ -1,7 +1,7 @@
 /**
  * POST /api/auth/logout
  *
- * Zapisuje akcję logout w ActivityLog, czyści sesję (nuxt-auth-utils).
+ * Zapisuje akcję logout w ActivityLog, czyści sesję (nuxt-auth-utils) oraz sesję Nuxt Studio.
  */
 import { activityLogRepository } from '~~/server/repositories/activityLog.repo'
 
@@ -13,6 +13,12 @@ export default defineEventHandler(async (event) => {
   }
 
   await clearUserSession(event)
+
+  try {
+    await clearStudioUserSession(event)
+  } catch {
+    // Sesja Studio może nie istnieć lub moduł nie być skonfigurowany — nie blokujemy wylogowania
+  }
 
   return {
     data: {

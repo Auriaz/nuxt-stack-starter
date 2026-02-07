@@ -10,7 +10,8 @@ export const useDashboardNavigation = () => {
   const menuItems = computed<NavigationMenuItem[][]>(() => {
     const hasAdminRole = isLoggedIn.value && can(PERMISSIONS.ADMIN_ACCESS)
     const showAnalytics = config.public.analyticsEnabled === true && can(PERMISSIONS.ANALYTICS_READ)
-    const itemsGroups = getDashboardMenuItems({ hasAdminRole, showAnalytics })
+    const hasContentManage = isLoggedIn.value && can(PERMISSIONS.CONTENT_MANAGE)
+    const itemsGroups = getDashboardMenuItems({ hasAdminRole, showAnalytics, hasContentManage })
 
     // Ustaw aktywny element na podstawie aktualnej trasy
     const setActive = (items: NavigationMenuItem[]): NavigationMenuItem[] => {

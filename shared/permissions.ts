@@ -15,7 +15,13 @@ export const PERMISSIONS = {
   MEDIA_MANAGE: 'media.manage',
   ANALYTICS_READ: 'analytics.read',
   SETTINGS_READ: 'settings.read',
-  SETTINGS_UPDATE: 'settings.update'
+  SETTINGS_UPDATE: 'settings.update',
+  CHAT_USE: 'chat.use',
+  CHAT_DM_CREATE: 'chat.dm.create',
+  CHAT_AI_USE: 'chat.ai.use',
+  CHAT_MODERATE: 'chat.moderate',
+  NOTIFICATIONS_READ: 'notifications.read',
+  NOTIFICATIONS_MANAGE: 'notifications.manage'
 } as const
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]
@@ -37,5 +43,11 @@ export const PERMISSION_META: Record<PermissionKey, { label: string, group: stri
   'media.manage': { label: 'Zarządzanie wszystkimi mediami', group: 'Media' },
   'analytics.read': { label: 'Podgląd analityki', group: 'Analytics' },
   'settings.read': { label: 'Podgląd ustawień', group: 'Settings' },
-  'settings.update': { label: 'Edycja ustawień', group: 'Settings' }
+  'settings.update': { label: 'Edycja ustawień', group: 'Settings' },
+  'chat.use': { label: 'Korzystanie z czatu', group: 'Chat' },
+  'chat.dm.create': { label: 'Tworzenie DM', group: 'Chat' },
+  'chat.ai.use': { label: 'Korzystanie z AI chat', group: 'Chat' },
+  'chat.moderate': { label: 'Moderacja czatu', group: 'Chat' },
+  'notifications.read': { label: 'Odczyt powiadomień', group: 'Notifications' },
+  'notifications.manage': { label: 'Zarządzanie powiadomieniami', group: 'Notifications' }
 }

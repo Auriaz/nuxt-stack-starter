@@ -94,17 +94,27 @@ export function useAuth() {
   }
 
   async function logout(): Promise<void> {
-    // Najpierw wyczyść sesję po stronie serwera (cookie) przez API
+    // Najpierw wyczyść sesję Studio z klienta (odpowiedź z Set-Cookie czyści ciasteczka w przeglądarce)
+    try {
+      await $fetch('/api/studio/logout', {
+        method: 'POST',
+        headers: { Accept: 'application/json' }
+      })
+    } catch {
+      // Brak sesji Studio — ignoruj
+    }
+
+    // Wyczyść sesję aplikacji po stronie serwera
     try {
       await authResource.logout()
     } catch {
       // Ignorujemy błąd API, ponieważ i tak wyczyścimy stan lokalny
     }
 
-    // Następnie wyczyść lokalny stan sesji (nuxt-auth-utils)
+    // Wyczyść lokalny stan sesji (nuxt-auth-utils)
     await session.clear()
 
-    // Wyczyść stan profilu (useState), żeby nie pokazywać danych poprzedniego użytkownika
+    // Wyczyść stan profilu (useState)
     const { clearProfile } = useProfile()
     clearProfile()
 
@@ -114,7 +124,8 @@ export function useAuth() {
       color: 'success'
     })
 
-    await router.push('/auth/login')
+    // Pełne przeładowanie strony — resetuje useState('studio-session') w pluginie nuxt-studio, więc panel Studio znika
+    await navigateTo('/auth/login', { external: true })
   }
 
   async function forgotPassword(input: ForgotPasswordInput): Promise<boolean> {

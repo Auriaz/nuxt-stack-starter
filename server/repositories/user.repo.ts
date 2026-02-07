@@ -28,6 +28,7 @@ export interface UserRepository {
   findByEmailWithRolePermissions(email: string): Promise<UserWithRolePermissions | null>
   findByIdWithRolePermissions(id: number): Promise<UserWithRolePermissions | null>
   findAllWithRoles(): Promise<UserWithRolePermissions[]>
+  findAllPaginated(offset: number, limit: number, search?: string): Promise<{ users: UserWithRolePermissions[], total: number }>
   create(data: { email: string, username: string, password: string }): Promise<User>
   createFromOAuth(data: {
     email?: string

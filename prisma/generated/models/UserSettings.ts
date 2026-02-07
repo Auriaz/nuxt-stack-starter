@@ -43,6 +43,8 @@ export type UserSettingsMinAggregateOutputType = {
   appearanceTheme: string | null
   emailNotifications: boolean | null
   marketingEmails: boolean | null
+  llmApiKey: string | null
+  llmSystemPrompt: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -55,6 +57,8 @@ export type UserSettingsMaxAggregateOutputType = {
   appearanceTheme: string | null
   emailNotifications: boolean | null
   marketingEmails: boolean | null
+  llmApiKey: string | null
+  llmSystemPrompt: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -67,6 +71,9 @@ export type UserSettingsCountAggregateOutputType = {
   appearanceTheme: number
   emailNotifications: number
   marketingEmails: number
+  llmApiKey: number
+  llmProviders: number
+  llmSystemPrompt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -91,6 +98,8 @@ export type UserSettingsMinAggregateInputType = {
   appearanceTheme?: true
   emailNotifications?: true
   marketingEmails?: true
+  llmApiKey?: true
+  llmSystemPrompt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -103,6 +112,8 @@ export type UserSettingsMaxAggregateInputType = {
   appearanceTheme?: true
   emailNotifications?: true
   marketingEmails?: true
+  llmApiKey?: true
+  llmSystemPrompt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -115,6 +126,9 @@ export type UserSettingsCountAggregateInputType = {
   appearanceTheme?: true
   emailNotifications?: true
   marketingEmails?: true
+  llmApiKey?: true
+  llmProviders?: true
+  llmSystemPrompt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -214,6 +228,9 @@ export type UserSettingsGroupByOutputType = {
   appearanceTheme: string | null
   emailNotifications: boolean
   marketingEmails: boolean
+  llmApiKey: string | null
+  llmProviders: runtime.JsonValue | null
+  llmSystemPrompt: string | null
   createdAt: Date
   updatedAt: Date
   _count: UserSettingsCountAggregateOutputType | null
@@ -249,6 +266,9 @@ export type UserSettingsWhereInput = {
   appearanceTheme?: Prisma.StringNullableFilter<"UserSettings"> | string | null
   emailNotifications?: Prisma.BoolFilter<"UserSettings"> | boolean
   marketingEmails?: Prisma.BoolFilter<"UserSettings"> | boolean
+  llmApiKey?: Prisma.StringNullableFilter<"UserSettings"> | string | null
+  llmProviders?: Prisma.JsonNullableFilter<"UserSettings">
+  llmSystemPrompt?: Prisma.StringNullableFilter<"UserSettings"> | string | null
   createdAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -262,6 +282,9 @@ export type UserSettingsOrderByWithRelationInput = {
   appearanceTheme?: Prisma.SortOrderInput | Prisma.SortOrder
   emailNotifications?: Prisma.SortOrder
   marketingEmails?: Prisma.SortOrder
+  llmApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  llmProviders?: Prisma.SortOrderInput | Prisma.SortOrder
+  llmSystemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -278,6 +301,9 @@ export type UserSettingsWhereUniqueInput = Prisma.AtLeast<{
   appearanceTheme?: Prisma.StringNullableFilter<"UserSettings"> | string | null
   emailNotifications?: Prisma.BoolFilter<"UserSettings"> | boolean
   marketingEmails?: Prisma.BoolFilter<"UserSettings"> | boolean
+  llmApiKey?: Prisma.StringNullableFilter<"UserSettings"> | string | null
+  llmProviders?: Prisma.JsonNullableFilter<"UserSettings">
+  llmSystemPrompt?: Prisma.StringNullableFilter<"UserSettings"> | string | null
   createdAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -291,6 +317,9 @@ export type UserSettingsOrderByWithAggregationInput = {
   appearanceTheme?: Prisma.SortOrderInput | Prisma.SortOrder
   emailNotifications?: Prisma.SortOrder
   marketingEmails?: Prisma.SortOrder
+  llmApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  llmProviders?: Prisma.SortOrderInput | Prisma.SortOrder
+  llmSystemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserSettingsCountOrderByAggregateInput
@@ -311,6 +340,9 @@ export type UserSettingsScalarWhereWithAggregatesInput = {
   appearanceTheme?: Prisma.StringNullableWithAggregatesFilter<"UserSettings"> | string | null
   emailNotifications?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
   marketingEmails?: Prisma.BoolWithAggregatesFilter<"UserSettings"> | boolean
+  llmApiKey?: Prisma.StringNullableWithAggregatesFilter<"UserSettings"> | string | null
+  llmProviders?: Prisma.JsonNullableWithAggregatesFilter<"UserSettings">
+  llmSystemPrompt?: Prisma.StringNullableWithAggregatesFilter<"UserSettings"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
 }
@@ -321,6 +353,9 @@ export type UserSettingsCreateInput = {
   appearanceTheme?: string | null
   emailNotifications?: boolean
   marketingEmails?: boolean
+  llmApiKey?: string | null
+  llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  llmSystemPrompt?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutUserSettingsInput
@@ -334,6 +369,9 @@ export type UserSettingsUncheckedCreateInput = {
   appearanceTheme?: string | null
   emailNotifications?: boolean
   marketingEmails?: boolean
+  llmApiKey?: string | null
+  llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  llmSystemPrompt?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -344,6 +382,9 @@ export type UserSettingsUpdateInput = {
   appearanceTheme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingEmails?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  llmSystemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutUserSettingsNestedInput
@@ -357,6 +398,9 @@ export type UserSettingsUncheckedUpdateInput = {
   appearanceTheme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingEmails?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  llmSystemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -369,6 +413,9 @@ export type UserSettingsCreateManyInput = {
   appearanceTheme?: string | null
   emailNotifications?: boolean
   marketingEmails?: boolean
+  llmApiKey?: string | null
+  llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  llmSystemPrompt?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -379,6 +426,9 @@ export type UserSettingsUpdateManyMutationInput = {
   appearanceTheme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingEmails?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  llmSystemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -391,6 +441,9 @@ export type UserSettingsUncheckedUpdateManyInput = {
   appearanceTheme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingEmails?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  llmSystemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -408,6 +461,9 @@ export type UserSettingsCountOrderByAggregateInput = {
   appearanceTheme?: Prisma.SortOrder
   emailNotifications?: Prisma.SortOrder
   marketingEmails?: Prisma.SortOrder
+  llmApiKey?: Prisma.SortOrder
+  llmProviders?: Prisma.SortOrder
+  llmSystemPrompt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -425,6 +481,8 @@ export type UserSettingsMaxOrderByAggregateInput = {
   appearanceTheme?: Prisma.SortOrder
   emailNotifications?: Prisma.SortOrder
   marketingEmails?: Prisma.SortOrder
+  llmApiKey?: Prisma.SortOrder
+  llmSystemPrompt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -437,6 +495,8 @@ export type UserSettingsMinOrderByAggregateInput = {
   appearanceTheme?: Prisma.SortOrder
   emailNotifications?: Prisma.SortOrder
   marketingEmails?: Prisma.SortOrder
+  llmApiKey?: Prisma.SortOrder
+  llmSystemPrompt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -484,6 +544,9 @@ export type UserSettingsCreateWithoutUserInput = {
   appearanceTheme?: string | null
   emailNotifications?: boolean
   marketingEmails?: boolean
+  llmApiKey?: string | null
+  llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  llmSystemPrompt?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -495,6 +558,9 @@ export type UserSettingsUncheckedCreateWithoutUserInput = {
   appearanceTheme?: string | null
   emailNotifications?: boolean
   marketingEmails?: boolean
+  llmApiKey?: string | null
+  llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  llmSystemPrompt?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -521,6 +587,9 @@ export type UserSettingsUpdateWithoutUserInput = {
   appearanceTheme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingEmails?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  llmSystemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -532,6 +601,9 @@ export type UserSettingsUncheckedUpdateWithoutUserInput = {
   appearanceTheme?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   marketingEmails?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  llmSystemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -546,6 +618,9 @@ export type UserSettingsSelect<ExtArgs extends runtime.Types.Extensions.Internal
   appearanceTheme?: boolean
   emailNotifications?: boolean
   marketingEmails?: boolean
+  llmApiKey?: boolean
+  llmProviders?: boolean
+  llmSystemPrompt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -559,6 +634,9 @@ export type UserSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   appearanceTheme?: boolean
   emailNotifications?: boolean
   marketingEmails?: boolean
+  llmApiKey?: boolean
+  llmProviders?: boolean
+  llmSystemPrompt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -572,6 +650,9 @@ export type UserSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   appearanceTheme?: boolean
   emailNotifications?: boolean
   marketingEmails?: boolean
+  llmApiKey?: boolean
+  llmProviders?: boolean
+  llmSystemPrompt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -585,11 +666,14 @@ export type UserSettingsSelectScalar = {
   appearanceTheme?: boolean
   emailNotifications?: boolean
   marketingEmails?: boolean
+  llmApiKey?: boolean
+  llmProviders?: boolean
+  llmSystemPrompt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "locale" | "timezone" | "appearanceTheme" | "emailNotifications" | "marketingEmails" | "createdAt" | "updatedAt", ExtArgs["result"]["userSettings"]>
+export type UserSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "locale" | "timezone" | "appearanceTheme" | "emailNotifications" | "marketingEmails" | "llmApiKey" | "llmProviders" | "llmSystemPrompt" | "createdAt" | "updatedAt", ExtArgs["result"]["userSettings"]>
 export type UserSettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -613,6 +697,9 @@ export type $UserSettingsPayload<ExtArgs extends runtime.Types.Extensions.Intern
     appearanceTheme: string | null
     emailNotifications: boolean
     marketingEmails: boolean
+    llmApiKey: string | null
+    llmProviders: runtime.JsonValue | null
+    llmSystemPrompt: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["userSettings"]>
@@ -1046,6 +1133,9 @@ export interface UserSettingsFieldRefs {
   readonly appearanceTheme: Prisma.FieldRef<"UserSettings", 'String'>
   readonly emailNotifications: Prisma.FieldRef<"UserSettings", 'Boolean'>
   readonly marketingEmails: Prisma.FieldRef<"UserSettings", 'Boolean'>
+  readonly llmApiKey: Prisma.FieldRef<"UserSettings", 'String'>
+  readonly llmProviders: Prisma.FieldRef<"UserSettings", 'Json'>
+  readonly llmSystemPrompt: Prisma.FieldRef<"UserSettings", 'String'>
   readonly createdAt: Prisma.FieldRef<"UserSettings", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"UserSettings", 'DateTime'>
 }

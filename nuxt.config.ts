@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import appMeta from './app/app.meta'
-import { definePerson, defineImage } from 'nuxt-schema-org/schema'
+import { definePerson } from 'nuxt-schema-org/schema'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - auto-importowane przez Nuxt
 export default defineNuxtConfig({
@@ -18,13 +18,14 @@ export default defineNuxtConfig({
     '@nuxtjs/mcp-toolkit',
     '@nuxtjs/seo',
     '@vueuse/nuxt',
-    'nuxt-auth-utils'
+    'nuxt-auth-utils',
+    'nuxt-studio',
+    '@pinia/nuxt'
   ],
 
   devtools: {
     enabled: true
   },
-
   app: {
     head: {
       link: [
@@ -86,7 +87,8 @@ export default defineNuxtConfig({
 
   nitro: {
     experimental: {
-      wasm: true
+      wasm: true,
+      websocket: true
     },
     rollupConfig: {
       external: [/^@prisma\//, /\.wasm$/]
@@ -100,7 +102,18 @@ export default defineNuxtConfig({
     },
     prerender: {
       routes: ['/sitemap.xml', '/robots.txt'],
-      ignore: ['/__nuxt_content/content/query']
+      ignore: ['/__nuxt_content/content/query', '/_studio', '/_studio/**', '/api/studio/**']
+    }
+  },
+  vite: {
+    optimizeDeps: {
+      include: [
+        '@nuxt/ui > prosemirror-state',
+        '@nuxt/ui > prosemirror-transform',
+        '@nuxt/ui > prosemirror-model',
+        '@nuxt/ui > prosemirror-view',
+        '@nuxt/ui > prosemirror-gapcursor'
+      ]
     }
   },
 
@@ -115,7 +128,7 @@ export default defineNuxtConfig({
 
   i18n: {
     locales: [
-      { code: 'pl', iso: 'pl-PL', file: 'pl.json', name: 'Polski' },
+      { code: 'pl', iso: 'pl-PL', file: 'pl.ts', name: 'Polski' },
       { code: 'en', iso: 'en-US', file: 'en.json', name: 'English' }
     ],
     defaultLocale: 'pl',
@@ -131,14 +144,25 @@ export default defineNuxtConfig({
       nitroContextDetection: false
     }
   },
+  pinia: {
+  },
 
   schemaOrg: {
-    identity: definePerson(appMeta.author),
-    publisher: definePerson(appMeta.author),
-    logo: defineImage({
-      url: appMeta.icon,
-      alt: appMeta.name
-    }),
-    sameAs: appMeta.sameAs
+    identity: definePerson(appMeta.author)
+  },
+
+  studio: {
+    route: '/_studio',
+    // dev: false — wymusza sprawdzanie sesji Studio także lokalnie; bez tego w dev Studio jest widoczne dla wszystkich (floating button).
+    dev: false,
+    repository: {
+      provider: 'github',
+      owner: process.env.STUDIO_GIT_OWNER || '',
+      repo: process.env.STUDIO_GIT_REPO || '',
+      branch: process.env.STUDIO_GIT_BRANCH || 'main'
+    },
+    i18n: {
+      defaultLocale: 'pl'
+    }
   }
 })

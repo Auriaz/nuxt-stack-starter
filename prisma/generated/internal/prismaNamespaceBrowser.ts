@@ -51,6 +51,12 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  ChatThread: 'ChatThread',
+  ChatThreadTopic: 'ChatThreadTopic',
+  ChatParticipant: 'ChatParticipant',
+  ChatMessage: 'ChatMessage',
+  ChatMessageLink: 'ChatMessageLink',
+  ChatThreadInvite: 'ChatThreadInvite',
   UserSettings: 'UserSettings',
   UserSession: 'UserSession',
   LoginEvent: 'LoginEvent',
@@ -63,7 +69,10 @@ export const ModelName = {
   EmailVerificationToken: 'EmailVerificationToken',
   PasswordResetToken: 'PasswordResetToken',
   OAuthAccount: 'OAuthAccount',
-  MediaAsset: 'MediaAsset'
+  MediaAsset: 'MediaAsset',
+  BlogTag: 'BlogTag',
+  BlogPost: 'BlogPost',
+  BlogAnchor: 'BlogAnchor'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -103,6 +112,83 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const ChatThreadScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  title: 'title',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  lastMessageAt: 'lastMessageAt'
+} as const
+
+export type ChatThreadScalarFieldEnum = (typeof ChatThreadScalarFieldEnum)[keyof typeof ChatThreadScalarFieldEnum]
+
+
+export const ChatThreadTopicScalarFieldEnum = {
+  id: 'id',
+  threadId: 'threadId',
+  slug: 'slug',
+  label: 'label',
+  order: 'order',
+  createdAt: 'createdAt'
+} as const
+
+export type ChatThreadTopicScalarFieldEnum = (typeof ChatThreadTopicScalarFieldEnum)[keyof typeof ChatThreadTopicScalarFieldEnum]
+
+
+export const ChatParticipantScalarFieldEnum = {
+  id: 'id',
+  threadId: 'threadId',
+  userId: 'userId',
+  role: 'role',
+  joinedAt: 'joinedAt',
+  leftAt: 'leftAt',
+  lastReadAt: 'lastReadAt',
+  mutedUntil: 'mutedUntil'
+} as const
+
+export type ChatParticipantScalarFieldEnum = (typeof ChatParticipantScalarFieldEnum)[keyof typeof ChatParticipantScalarFieldEnum]
+
+
+export const ChatMessageScalarFieldEnum = {
+  id: 'id',
+  threadId: 'threadId',
+  senderId: 'senderId',
+  type: 'type',
+  content: 'content',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type ChatMessageScalarFieldEnum = (typeof ChatMessageScalarFieldEnum)[keyof typeof ChatMessageScalarFieldEnum]
+
+
+export const ChatMessageLinkScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  meta: 'meta',
+  createdAt: 'createdAt'
+} as const
+
+export type ChatMessageLinkScalarFieldEnum = (typeof ChatMessageLinkScalarFieldEnum)[keyof typeof ChatMessageLinkScalarFieldEnum]
+
+
+export const ChatThreadInviteScalarFieldEnum = {
+  id: 'id',
+  threadId: 'threadId',
+  invitedUserId: 'invitedUserId',
+  invitedById: 'invitedById',
+  status: 'status',
+  createdAt: 'createdAt',
+  respondedAt: 'respondedAt'
+} as const
+
+export type ChatThreadInviteScalarFieldEnum = (typeof ChatThreadInviteScalarFieldEnum)[keyof typeof ChatThreadInviteScalarFieldEnum]
+
+
 export const UserSettingsScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -111,6 +197,9 @@ export const UserSettingsScalarFieldEnum = {
   appearanceTheme: 'appearanceTheme',
   emailNotifications: 'emailNotifications',
   marketingEmails: 'marketingEmails',
+  llmApiKey: 'llmApiKey',
+  llmProviders: 'llmProviders',
+  llmSystemPrompt: 'llmSystemPrompt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -277,12 +366,62 @@ export const MediaAssetScalarFieldEnum = {
 export type MediaAssetScalarFieldEnum = (typeof MediaAssetScalarFieldEnum)[keyof typeof MediaAssetScalarFieldEnum]
 
 
+export const BlogTagScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt'
+} as const
+
+export type BlogTagScalarFieldEnum = (typeof BlogTagScalarFieldEnum)[keyof typeof BlogTagScalarFieldEnum]
+
+
+export const BlogPostScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  title: 'title',
+  description: 'description',
+  bodyMd: 'bodyMd',
+  imageUrl: 'imageUrl',
+  publishedAt: 'publishedAt',
+  authorId: 'authorId',
+  tags: 'tags',
+  seoTitle: 'seoTitle',
+  seoDesc: 'seoDesc',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BlogPostScalarFieldEnum = (typeof BlogPostScalarFieldEnum)[keyof typeof BlogPostScalarFieldEnum]
+
+
+export const BlogAnchorScalarFieldEnum = {
+  id: 'id',
+  blogPostId: 'blogPostId',
+  label: 'label',
+  to: 'to',
+  order: 'order',
+  icon: 'icon',
+  target: 'target',
+  createdAt: 'createdAt'
+} as const
+
+export type BlogAnchorScalarFieldEnum = (typeof BlogAnchorScalarFieldEnum)[keyof typeof BlogAnchorScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -299,4 +438,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

@@ -3,17 +3,20 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 type DashboardNavigationItem = NavigationMenuItem & {
   adminOnly?: boolean
   analyticsOnly?: boolean
+  contentManageOnly?: boolean
 }
 
 export interface DashboardMenuOptions {
   hasAdminRole?: boolean
   showAnalytics?: boolean
+  hasContentManage?: boolean
 }
 
 export const getDashboardMenuItems = (options: boolean | DashboardMenuOptions = false): NavigationMenuItem[][] => {
   const opts: DashboardMenuOptions = typeof options === 'boolean' ? { hasAdminRole: options } : options
   const hasAdminRole = opts.hasAdminRole ?? false
   const showAnalytics = opts.showAnalytics ?? false
+  const hasContentManage = opts.hasContentManage ?? false
 
   const baseItems: DashboardNavigationItem[] = [
     {
@@ -23,10 +26,29 @@ export const getDashboardMenuItems = (options: boolean | DashboardMenuOptions = 
       active: false
     },
     {
+      label: 'Czat',
+      icon: 'i-lucide-message-square',
+      to: '/dashboard/chat',
+      active: false
+    },
+    {
       label: 'Media',
       icon: 'i-lucide-image',
       to: '/dashboard/media',
       active: false
+    },
+    {
+      label: 'Blog',
+      icon: 'i-lucide-book-open',
+      to: '/dashboard/blog',
+      active: false
+    },
+    {
+      label: 'Treści (Studio)',
+      icon: 'i-lucide-file-edit',
+      contentManageOnly: true,
+      // Pełne przeładowanie — Studio jest obsługiwane przez Nitro, nie Vue Router
+      onSelect: () => navigateTo('/_studio', { external: true })
     }
     // {
     //   label: 'Portfolio',
@@ -80,6 +102,7 @@ export const getDashboardMenuItems = (options: boolean | DashboardMenuOptions = 
   const filteredItems: NavigationMenuItem[] = baseItems.filter((item) => {
     if (item.adminOnly && !hasAdminRole) return false
     if (item.analyticsOnly && !showAnalytics) return false
+    if (item.contentManageOnly && !hasContentManage) return false
     return true
   })
 
@@ -153,26 +176,28 @@ export const getDashboardMenuItemsForFooter = (context: DashboardFooterMenuConte
     ],
     // Sekcja 3: Nawigacja
     [
-      {
-        label: 'Analytics',
-        icon: 'i-lucide-bar-chart',
-        to: '/dashboard/analytics'
-      },
-      {
-        label: 'Ustawienia',
-        icon: 'i-lucide-settings',
-        to: '/dashboard/settings',
-        children: [
-          { label: 'Ogólne', icon: 'i-lucide-settings', to: '/dashboard/settings?tab=general', active: isSettings && tab === 'general' },
-          { label: 'Powiadomienia', icon: 'i-lucide-bell', to: '/dashboard/settings?tab=notifications', active: isSettings && tab === 'notifications' },
-          { label: 'Prywatność', icon: 'i-lucide-lock', to: '/dashboard/settings?tab=privacy', active: isSettings && tab === 'privacy' },
-          { label: 'Bezpieczeństwo', icon: 'i-lucide-shield', to: '/dashboard/settings?tab=security', active: isSettings && tab === 'security' },
-          { label: 'Wygląd', icon: 'i-lucide-palette', to: '/dashboard/settings?tab=appearance', active: isSettings && tab === 'appearance' },
-          { label: 'Integracje', icon: 'i-lucide-puzzle', to: '/dashboard/settings?tab=integrations', active: isSettings && tab === 'integrations' }
-        ]
-      },
+
       ...(hasAdminRole
         ? [{
+            label: 'Analytics',
+            icon: 'i-lucide-bar-chart',
+            to: '/dashboard/analytics'
+          },
+          {
+            label: 'Ustawienia',
+            icon: 'i-lucide-settings',
+            to: '/dashboard/settings',
+            children: [
+              { label: 'Ogólne', icon: 'i-lucide-settings', to: '/dashboard/settings?tab=general', active: isSettings && tab === 'general' },
+              { label: 'Powiadomienia', icon: 'i-lucide-bell', to: '/dashboard/settings?tab=notifications', active: isSettings && tab === 'notifications' },
+              { label: 'Prywatność', icon: 'i-lucide-lock', to: '/dashboard/settings?tab=privacy', active: isSettings && tab === 'privacy' },
+              { label: 'Bezpieczeństwo', icon: 'i-lucide-shield', to: '/dashboard/settings?tab=security', active: isSettings && tab === 'security' },
+              { label: 'Wygląd', icon: 'i-lucide-palette', to: '/dashboard/settings?tab=appearance', active: isSettings && tab === 'appearance' },
+              { label: 'Integracje', icon: 'i-lucide-puzzle', to: '/dashboard/settings?tab=integrations', active: isSettings && tab === 'integrations' }
+            ]
+          },
+
+          {
             label: 'Panel administracyjny',
             icon: 'i-heroicons-shield-check',
             to: '/dashboard/admin',

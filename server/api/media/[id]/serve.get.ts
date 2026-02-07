@@ -3,27 +3,28 @@
  * Serwowanie pliku (stream) po sprawdzeniu sesji i owner/media.manage.
  */
 import { getRouterParam } from 'h3'
-import type { SessionUser } from '~~/domain/auth/auth.types'
+// import type { SessionUser } from '~~/domain/auth/auth.types'
 import { mediaAssetRepository } from '~~/server/repositories/mediaAsset.repo'
 import { getStorageService } from '~~/server/services/storage/storage.service'
-import { PERMISSIONS } from '~~/shared/permissions'
+// import { PERMISSIONS } from '~~/shared/permissions'
 
 export default defineEventHandler(async (event) => {
-  const session = await requireUserSession(event)
-  const user = session.user as SessionUser | undefined
-  if (!user?.id) {
-    throw createError({
-      status: 401,
-      statusText: 'Unauthorized',
-      data: {
-        error: {
-          code: 'UNAUTHORIZED',
-          message: 'Session has no user'
-        }
-      }
-    })
-  }
-  const bypassOwner = Array.isArray(user.permissions) && user.permissions.includes(PERMISSIONS.MEDIA_MANAGE)
+  // const session = await requireUserSession(event)
+  // const user = session.user as SessionUser | undefined
+  // if (!user?.id) {
+  //   throw createError({
+  //     status: 401,
+  //     statusText: 'Unauthorized',
+  //     data: {
+  //       error: {
+  //         code: 'UNAUTHORIZED',
+  //         message: 'Session has no user'
+  //       }
+  //     }
+  //   })
+  // }
+  // const bypassOwner = Array.isArray(user?.permissions) && user?.permissions.includes(PERMISSIONS.MEDIA_MANAGE) ? true : false
+  // Tymczasowo zezwól na dostęp bez sesji
   const id = getRouterParam(event, 'id')
   if (!id) {
     throw createError({
@@ -38,9 +39,12 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const record = bypassOwner
-    ? await mediaAssetRepository.findById(id)
-    : await mediaAssetRepository.findByIdForOwner(id, user.id)
+  // const record = bypassOwner
+  //   ? await mediaAssetRepository.findById(id)
+  //   : await mediaAssetRepository.findByIdForOwner(id, user?.id)
+
+  const record = await mediaAssetRepository.findById(id)
+
   if (!record) {
     const anyRecord = await mediaAssetRepository.findById(id)
     throw createError({

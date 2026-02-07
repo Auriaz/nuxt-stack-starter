@@ -1,8 +1,17 @@
 <script setup lang="ts">
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-// @ts-nocheck - Top-level await is supported w Nuxt 3/4 przez Vite
-import type { BlogPostEntry } from '#shared/types/content'
 import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
+
+/** Kształt posta dla siatki: Nuxt Content (BlogPostEntry) lub zmapowane DTO z API (Prisma). */
+export interface BlogPostGridItem {
+  _id: string
+  path: string
+  title: string
+  description?: string
+  image?: { src: string, alt?: string }
+  date?: string | Date
+  authors?: Array<{ name?: string, avatar?: { src?: string, alt?: string } }>
+  tags?: string[]
+}
 
 const breakpoints = useBreakpoints(breakpointsTailwind)
 
@@ -11,7 +20,7 @@ const isTablet = computed(() => breakpoints.between('md', 'lg').value)
 const isDesktop = computed(() => breakpoints.greaterOrEqual('lg').value)
 
 interface Props {
-  posts: BlogPostEntry[]
+  posts: BlogPostGridItem[]
   showFilters?: boolean
 }
 
@@ -123,7 +132,7 @@ const resetFilters = () => {
     <UBlogPosts>
       <UBlogPost
         v-for="(post, index) in filteredPosts"
-        :key="post._id || index"
+        :key="post._id ?? index"
         :to="post.path"
         :title="post.title"
         :description="post.description"

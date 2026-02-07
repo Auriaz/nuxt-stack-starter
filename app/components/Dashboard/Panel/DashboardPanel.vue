@@ -22,12 +22,15 @@ const open = ref(false)
           <slot name="right" />
           <UDashboardToolbar :ui="{ root: 'border-none' }">
             <template #left>
-              <slot name="left" />
-              <ColorModeButton />
+              <div class="flex items-center justify-center gap-2">
+                <slot name="left" />
+                <ColorModeButton />
+              </div>
             </template>
             <template #right>
               <div class="flex items-center gap-2">
                 <DashboardNotificationsBell />
+                <ChatButton />
                 <UButton
                   size="sm"
                   square
@@ -48,7 +51,9 @@ const open = ref(false)
 
       <USlideover v-model:open="open">
         <template #content>
-          <slot name="sidebar" />
+          <div class="w-full p-4 border-t border-neutral-300 dark:border-neutral-700 overflow-y-auto">
+            <slot name="sidebar" />
+          </div>
         </template>
       </USlideover>
     </template>

@@ -31,6 +31,11 @@ export default defineEventHandler(async (event) => {
   // Znormalizowana ścieżka bez query string (np. ?token=...)
   const normalizedPath = rawPath.split('?')[0]
 
+  // WebSocket endpoints have their own auth checks in the WS handler
+  if (normalizedPath.startsWith('/api/ws/')) {
+    return
+  }
+
   // Pomiń middleware dla publicznych endpointów auth
   const publicPaths = [
     '/api/auth/login',
@@ -40,8 +45,14 @@ export default defineEventHandler(async (event) => {
     '/api/auth/verify-email',
     '/api/auth/resend-verification',
     '/api/health',
+
     // Publiczny endpoint formularza kontaktowego
-    '/api/contact'
+    '/api/contact',
+    // Studio Custom Auth — handler sam sprawdza sesję i przekierowuje niezalogowanych
+    '/api/studio/login',
+    // Publiczne endpointy bloga
+    '/api/blog',
+    '/api/media'
   ]
   // @ts-expect-error normalizedPath jest zawsze zdefiniowane po ustawieniu rawPath
   if (normalizedPath.startsWith('/api/_nuxt_icon')) {

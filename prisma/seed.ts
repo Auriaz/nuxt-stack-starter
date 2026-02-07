@@ -23,7 +23,13 @@ const permissionsSeed: Array<{ key: PermissionKey, label: string, group: string 
   { key: PERMISSIONS.MEDIA_MANAGE, label: 'Zarządzanie wszystkimi mediami', group: 'Media' },
   { key: PERMISSIONS.ANALYTICS_READ, label: 'Podgląd analityki', group: 'Analytics' },
   { key: PERMISSIONS.SETTINGS_READ, label: 'Podgląd ustawień', group: 'Settings' },
-  { key: PERMISSIONS.SETTINGS_UPDATE, label: 'Edycja ustawień', group: 'Settings' }
+  { key: PERMISSIONS.SETTINGS_UPDATE, label: 'Edycja ustawień', group: 'Settings' },
+  { key: PERMISSIONS.CHAT_USE, label: 'Korzystanie z czatu', group: 'Chat' },
+  { key: PERMISSIONS.CHAT_DM_CREATE, label: 'Tworzenie DM', group: 'Chat' },
+  { key: PERMISSIONS.CHAT_AI_USE, label: 'Korzystanie z AI chat', group: 'Chat' },
+  { key: PERMISSIONS.CHAT_MODERATE, label: 'Moderacja czatu', group: 'Chat' },
+  { key: PERMISSIONS.NOTIFICATIONS_READ, label: 'Odczyt powiadomień', group: 'Notifications' },
+  { key: PERMISSIONS.NOTIFICATIONS_MANAGE, label: 'Zarządzanie powiadomieniami', group: 'Notifications' }
 ]
 
 const rolePermissionsSeed: Record<string, PermissionKey[]> = {
@@ -44,7 +50,13 @@ const rolePermissionsSeed: Record<string, PermissionKey[]> = {
     PERMISSIONS.MEDIA_MANAGE,
     PERMISSIONS.ANALYTICS_READ,
     PERMISSIONS.SETTINGS_READ,
-    PERMISSIONS.SETTINGS_UPDATE
+    PERMISSIONS.SETTINGS_UPDATE,
+    PERMISSIONS.CHAT_USE,
+    PERMISSIONS.CHAT_DM_CREATE,
+    PERMISSIONS.CHAT_AI_USE,
+    PERMISSIONS.CHAT_MODERATE,
+    PERMISSIONS.NOTIFICATIONS_READ,
+    PERMISSIONS.NOTIFICATIONS_MANAGE
   ],
   user: [
     PERMISSIONS.PORTFOLIO_READ,
@@ -54,7 +66,9 @@ const rolePermissionsSeed: Record<string, PermissionKey[]> = {
     PERMISSIONS.MEDIA_READ,
     PERMISSIONS.MEDIA_CREATE,
     PERMISSIONS.MEDIA_UPDATE,
-    PERMISSIONS.MEDIA_DELETE
+    PERMISSIONS.MEDIA_DELETE,
+    PERMISSIONS.CHAT_USE,
+    PERMISSIONS.NOTIFICATIONS_READ
   ]
 }
 

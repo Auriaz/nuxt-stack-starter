@@ -1,2 +1,2 @@
-export { PERMISSIONS } from '~~/shared/permissions'
-export type { PermissionKey } from '~~/shared/permissions'
+export { PERMISSIONS } from '../../shared/permissions'
+export type { PermissionKey } from '../../shared/permissions'

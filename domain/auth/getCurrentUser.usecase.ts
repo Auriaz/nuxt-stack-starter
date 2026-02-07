@@ -1,5 +1,5 @@
 import type { SessionUser } from './auth.types'
-import type { UserRepository } from '~~/server/repositories/user.repo'
+import type { UserRepository } from '../../server/repositories/user.repo'
 
 /**
  * Use-case: pobranie aktualnego użytkownika.

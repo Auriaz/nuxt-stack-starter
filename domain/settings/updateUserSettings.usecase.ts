@@ -19,7 +19,10 @@ export async function updateUserSettingsUseCase(
     timezone: payload.timezone,
     appearanceTheme: payload.appearanceTheme,
     emailNotifications: payload.emailNotifications,
-    marketingEmails: payload.marketingEmails
+    marketingEmails: payload.marketingEmails,
+    llmApiKey: payload.llmApiKey,
+    llmProviders: payload.llmProviders,
+    llmSystemPrompt: payload.llmSystemPrompt
   })
 
   return await getUserSettingsUseCase(userId, settingsRepository, userRepository)

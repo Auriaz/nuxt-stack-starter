@@ -1,13 +1,21 @@
 <script lang="ts" setup>
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+import { PERMISSIONS } from '#shared/permissions'
+
 // @ts-nocheck - Top-level await is supported in Nuxt 3/4 via Vite
 // const { locale } = useI18n()
 const isScrolled = ref(false)
 
 // Auth state
 const { user, isLoggedIn, logout } = useAuth()
+const { can } = useAccess()
 /** Pełny URL avatara (origin + ścieżka), żeby UAvatar poprawnie ładował /api/media/:id/serve */
 const headerAvatarSrc = useAvatarSrc(computed(() => user.value?.avatarUrl ?? undefined))
+
+const canUseChat = computed(() => {
+  if (!isLoggedIn.value) return false
+  if (!Array.isArray(user.value?.permissions)) return true
+  return can(PERMISSIONS.CHAT_USE)
+})
 
 // Globalny system filtrów
 
@@ -57,6 +65,8 @@ const handleLogout = async () => {
       <div class="hidden md:flex items-center gap-2 mr-5">
         <!-- Przycisk filtrów (widoczny tylko gdy strona ma filtry) -->
         <FiltersButton />
+
+        <ChatButton v-if="canUseChat" />
 
         <ColorModeButton />
 
@@ -208,6 +218,10 @@ const handleLogout = async () => {
 
       <!-- Przycisk filtrów (mobile) -->
       <FiltersButton class="md:hidden" />
+      <ChatButton
+        v-if="canUseChat"
+        class="md:hidden"
+      />
     </template>
 
     <template #body>

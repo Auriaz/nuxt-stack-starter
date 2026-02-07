@@ -94,6 +94,19 @@ Ma zapobiegać chaosowi i przypadkowemu łamaniu konwencji.
 - **Permissions:** Single source of truth: `shared/permissions.ts`. Nowe klucze tylko tam + seed. W API używamy wyłącznie stałych z `PERMISSIONS`.
 - **Zmiana ról:** Efekt zmiany roli użytkownika (przez innego admina) pełnio widoczny po odświeżeniu sesji / ponownym logowaniu tego użytkownika.
 
+## 5C) Nuxt Studio (treści Content)
+
+- Dostęp do Nuxt Studio (`/_studio`) tylko dla użytkowników z uprawnieniem `content.manage`.
+- **`studio.dev: false`** w `nuxt.config.ts` — bez tego w trybie dev moduł nuxt-studio zawsze aktywuje Studio (floating button) dla wszystkich; z `dev: false` plugin aktywacji sprawdza sesję Studio (cookie), więc Studio widać tylko po zalogowaniu przez Custom Auth.
+- Logowanie do Studio: Custom Auth — GET `/api/studio/login` (sesja aplikacji + `content.manage` → setStudioUserSession). Brak OAuth Studio (GitHub/Google) do logowania użytkowników. **Po zalogowaniu redirect na `/`** (nie na `/_studio`), bo edytor Studio montuje się w głównej aplikacji Nuxt (plugin nuxt-studio); strona `/_studio` to tylko statyczny formularz logowania.
+- Wejście z dashboardu: pozycja menu „Treści (Studio)” (widoczna gdy `can('content.manage')`), link do `/_studio`.
+- Ochrona trasy: `server/middleware/studio-guard.ts` — brak sesji Studio → redirect na `/api/studio/login?returnTo=/_studio`.
+- Wylogowanie z aplikacji: w `server/api/auth/logout.post.ts` przy wylogowaniu wywoływane jest też `clearStudioUserSession(event)`, żeby wyczyścić ciasteczka Studio i ukryć panel.
+- Media: na MVP Studio Media i Media DB działają równolegle; unifikacja ewentualna w v2 (TODO).
+- Produkcja: wymagany `STUDIO_GITHUB_TOKEN` (lub `STUDIO_GITLAB_TOKEN`) do publikacji i do ustawienia sesji Studio (moduł nuxt-studio wymaga tokenu przy setStudioUserSession).
+- **Dlaczego „Missing access token for github”?** Nuxt Studio ma **osobny** system auth niż aplikacja (nuxt-auth-utils). Studio obsługuje: GitHub OAuth, GitLab OAuth, Google OAuth albo **Custom Auth**. Przy Custom Auth Studio **nie** dostaje tokenu Git z logowania — więc wewnętrznie w `setStudioUserSession` czyta `process.env.STUDIO_GITHUB_TOKEN` i zapisuje go w sesji Studio do pusha do repo. Nie da się „przekazać” tokenu z nuxt-auth-utils: aplikacja używa nuxt-auth-utils (sesja użytkownika, uprawnienia), Studio używa własnej sesji i **zawsze** przy Custom Auth bierze token Git z ENV. Rozwiązanie: ustawić `STUDIO_GITHUB_TOKEN` w `.env` (Personal Access Token GitHub z uprawnieniem Contents read+write). Zob. [Nuxt Studio — Git Providers](https://nuxt.studio/git-providers).
+- **Dlaczego „No authentication provider found”?** Handler trasy `/_studio` w nuxt-studio sprawdza tylko OAuth (STUDIO_GITHUB_CLIENT_ID, STUDIO_GITLAB_APPLICATION_ID, STUDIO_GOOGLE_CLIENT_ID). Przy Custom Auth żadnego nie ustawiamy, więc moduł rzuca ten błąd. **Workaround:** ustawić placeholderowe wartości `STUDIO_GITHUB_CLIENT_ID=custom` i `STUDIO_GITLAB_APPLICATION_ID=custom` w `.env` — wtedy handler nie rzuca i zwraca HTML; klient sprawdza sesję Studio (ustawioną przez nasz Custom Auth) i pokazuje edytor. Przyciski OAuth na stronie logowania nie działają (to placeholder), użytkownicy i tak wchodzą przez dashboard → /api/studio/login.
+
 ## 5) Formularze (standard)
 
 - Wszystkie formularze używają `useForm()`:
@@ -102,6 +115,13 @@ Ma zapobiegać chaosowi i przypadkowemu łamaniu konwencji.
   - handleSubmit (validate → pending → call → map errors)
 - Integracja z Nuxt UI `UForm` / `UAuthForm`
 - Dokumentacja: `content/docs/useForm.md`
+
+## 5D) Lokalne szkice (blog create)
+
+- Drafty posta na `/dashboard/blog/create` trzymamy w localStorage per user.
+- Klucz: `blog:draft:v1:{userId}` (jedna struktura z lista szkicow).
+- Logika tylko w `useBlogDraft()`; komponenty tylko korzystaja.
+- Czyscimy szkic tylko po udanym zapisie na backendzie albo po wyborze "Nowy post".
 
 ## 4A) UI System (ContactForm-style)
 
@@ -353,3 +373,17 @@ Każdy TODO ma sekcje:
 - ✅ Używaj auto-importów dla: Vue/Nuxt composables, oczywistych utilities
 - ⚠️ Rozważ jawne importy dla: funkcji biznesowych, mniej oczywistych composables
 - ⚠️ Duża liczba auto-importów utrudnia refaktoryzację w IDE (zmiana nazwy pliku nie aktualizuje "ukrytych" użyć)
+
+## 13) Chat i realtime (MUST)
+
+- Chat stack: UI -> app/composables/resources -> server/api (parse -> validate -> use-case -> DTO) -> domain -> server/repositories -> Prisma.
+- No fetch in components. Chat UI uses Nuxt UI chat components and composables only.
+- Realtime: Nitro WebSocket endpoint handles auth + permissions, emits events to user rooms (user:{userId}) and optionally thread rooms (thread:{threadId}).
+- AI chat uses existing AI provider layer from server/services/ai and server/api/ai/completion.post.ts; stream over WS with HTTP fallback.
+- Permissions source of truth: shared/permissions.ts, enforced server-side for HTTP and WS; UI only mirrors access.
+- DM rule: threads are created only after invite acceptance; DM does not grant access to other resources.
+- Read state MVP: per-thread lastReadAt on participant; v2 can add per-message receipts.
+- Links to other modules use ChatMessageLink (entityType + entityId); no hard-coded UI coupling.
+- Frontend: Chat UI shell lives in app/pages/dashboard/chat.vue and ChatDrawer is mounted in layouts (default + dashboard).
+- WebSocket events handled in UI: chat.message.new, chat.message.delta, chat.read.updated, chat.typing, chat.error; outbound: chat.message.send, chat.thread.join/leave, chat.read.update, chat.typing.
+- UI never calls fetch directly; chat data flows through useChatResource and useChatSocket.

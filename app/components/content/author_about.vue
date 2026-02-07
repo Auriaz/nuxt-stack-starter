@@ -16,6 +16,8 @@ const props = withDefaults(defineProps<Props>(), {
   to: appMeta.author.to,
   target: appMeta.author.target
 })
+
+const avatarSrc = useAvatarSrc(() => props.src)
 </script>
 
 <template>
@@ -28,7 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
       <!-- Avatar -->
       <div class="shrink-0">
         <UAvatar
-          :src="props.src"
+          :src="avatarSrc"
           :alt="props.name"
           size="xl"
           class="w-20 h-20"

@@ -8,7 +8,28 @@
 * 🟢 You can import this file directly.
 */
 
+export const ChatThreadType = {
+  ai: 'ai',
+  dm: 'dm',
+  room: 'room'
+} as const
+
+export type ChatThreadType = (typeof ChatThreadType)[keyof typeof ChatThreadType]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const ChatMessageType = {
+  user: 'user',
+  assistant: 'assistant',
+  system: 'system'
+} as const
+
+export type ChatMessageType = (typeof ChatMessageType)[keyof typeof ChatMessageType]
+
+
+export const ChatInviteStatus = {
+  pending: 'pending',
+  accepted: 'accepted',
+  rejected: 'rejected'
+} as const
+
+export type ChatInviteStatus = (typeof ChatInviteStatus)[keyof typeof ChatInviteStatus]

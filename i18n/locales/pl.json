@@ -1,6 +1,6 @@
 {
   "nav": {
-    "home": "Strona główna",
+    "home": "Strona g\u0142\u00F3wna",
     "offer": "Oferta",
     "portfolio": "Portfolio",
     "about": "O nas",
@@ -8,9 +8,9 @@
     "blog": "Blog"
   },
   "common": {
-    "readMore": "Czytaj więcej",
-    "learnMore": "Dowiedz się więcej",
+    "readMore": "Czytaj wi\u0119cej",
+    "learnMore": "Dowiedz si\u0119 wi\u0119cej",
     "getStarted": "Zacznij",
-    "contactUs": "Skontaktuj się z nami"
+    "contactUs": "Skontaktuj si\u0119 z nami"
   }
 }

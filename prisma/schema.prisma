@@ -34,18 +34,146 @@ model User {
   deactivatedAt     DateTime? // tymczasowa dezaktywacja; logowanie reaktywuje konto
   showEmail         Boolean   @default(true) // czy pokazywać email w profilu publicznym
 
-  emailVerificationTokens EmailVerificationToken[]
-  passwordResetTokens     PasswordResetToken[]
-  oauthAccounts           OAuthAccount[]
-  notifications           Notification[]
-  mediaAssets             MediaAsset[]
-  userSessions            UserSession[]
-  loginEvents             LoginEvent[]
-  activityLogs            ActivityLog[]
-  userSettings            UserSettings?
+  emailVerificationTokens   EmailVerificationToken[]
+  passwordResetTokens       PasswordResetToken[]
+  oauthAccounts             OAuthAccount[]
+  notifications             Notification[]
+  mediaAssets               MediaAsset[]
+  userSessions              UserSession[]
+  loginEvents               LoginEvent[]
+  activityLogs              ActivityLog[]
+  userSettings              UserSettings?
+  blogPosts                 BlogPost[]
+  chatThreadsCreated        ChatThread[]             @relation("ChatThreadCreated")
+  chatMessages              ChatMessage[]
+  chatParticipants          ChatParticipant[]
+  chatThreadInvitesSent     ChatThreadInvite[]       @relation("ChatThreadInviteSent")
+  chatThreadInvitesReceived ChatThreadInvite[]       @relation("ChatThreadInviteReceived")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum ChatThreadType {
+  ai
+  dm
+  room
+}
+
+enum ChatMessageType {
+  user
+  assistant
+  system
+}
+
+enum ChatInviteStatus {
+  pending
+  accepted
+  rejected
+}
+
+model ChatThread {
+  id            Int            @id @default(autoincrement())
+  type          ChatThreadType
+  title         String?
+  createdById   Int?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  lastMessageAt DateTime?
+
+  createdBy    User?              @relation("ChatThreadCreated", fields: [createdById], references: [id], onDelete: SetNull)
+  participants ChatParticipant[]
+  messages     ChatMessage[]
+  invites      ChatThreadInvite[]
+  topics       ChatThreadTopic[]
+
+  @@index([type])
+  @@index([lastMessageAt])
+}
+
+model ChatThreadTopic {
+  id        Int      @id @default(autoincrement())
+  threadId  Int
+  slug      String
+  label     String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  thread ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@unique([threadId, slug])
+  @@index([threadId])
+  @@index([threadId, order])
+}
+
+model ChatParticipant {
+  id         Int       @id @default(autoincrement())
+  threadId   Int
+  userId     Int
+  role       String    @default("member")
+  joinedAt   DateTime  @default(now())
+  leftAt     DateTime?
+  lastReadAt DateTime?
+  mutedUntil DateTime?
+
+  thread ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([threadId, userId])
+  @@index([userId])
+  @@index([threadId])
+  @@index([userId, lastReadAt])
+}
+
+model ChatMessage {
+  id        Int             @id @default(autoincrement())
+  threadId  Int
+  senderId  Int?
+  type      ChatMessageType
+  content   String
+  metadata  Json?
+  createdAt DateTime        @default(now())
+
+  thread ChatThread        @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender User?             @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  links  ChatMessageLink[]
+
+  @@index([threadId, createdAt])
+  @@index([senderId])
+}
+
+model ChatMessageLink {
+  id         Int      @id @default(autoincrement())
+  messageId  Int
+  entityType String
+  entityId   String
+  meta       Json?
+  createdAt  DateTime @default(now())
+
+  message ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@index([entityType, entityId])
+}
+
+model ChatThreadInvite {
+  id            Int              @id @default(autoincrement())
+  threadId      Int
+  invitedUserId Int
+  invitedById   Int
+  status        ChatInviteStatus @default(pending)
+  createdAt     DateTime         @default(now())
+  respondedAt   DateTime?
+
+  thread      ChatThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  invitedUser User       @relation("ChatThreadInviteReceived", fields: [invitedUserId], references: [id], onDelete: Cascade)
+  invitedBy   User       @relation("ChatThreadInviteSent", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@unique([threadId, invitedUserId])
+  @@index([threadId])
+  @@index([invitedUserId])
+  @@index([invitedById])
+  @@index([status])
 }
 
 /// Ustawienia użytkownika (1:1 z User): język, motyw, powiadomienia e-mail itd.
@@ -55,8 +183,11 @@ model UserSettings {
   locale             String?  @default("pl") // pl | en
   timezone           String?  @default("Europe/Warsaw")
   appearanceTheme    String?  @default("system") // system | light | dark
-  emailNotifications Boolean @default(true)
+  emailNotifications Boolean  @default(true)
   marketingEmails    Boolean  @default(false)
+  llmApiKey          String? // legacy: pojedynczy klucz (fallback dla openai)
+  llmProviders       Json? // [{ provider: string, apiKey: string }] — nigdy nie zwracamy apiKey do klienta
+  llmSystemPrompt    String? // własny prompt systemowy dla asystenta AI (np. ton, kontekst bloga)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -245,4 +376,53 @@ model MediaAsset {
   @@index([ownerId, createdAt])
   @@index([ownerId, type])
   @@index([deletedAt])
+}
+
+/// Tag blogowy (słownik tagów do wyboru przy tworzeniu/edycji posta).
+model BlogTag {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  @@index([name])
+}
+
+/// Post blogowy (Prisma) — tytuł, slug, treść MD, autor, tagi, SEO, data publikacji.
+model BlogPost {
+  id          Int       @id @default(autoincrement())
+  slug        String    @unique
+  title       String
+  description String?
+  bodyMd      String // treść w Markdown
+  imageUrl    String?
+  publishedAt DateTime? // null = szkic
+  authorId    Int
+  tags        String[]
+  seoTitle    String?
+  seoDesc     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  author  User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  anchors BlogAnchor[]
+
+  @@index([authorId])
+  @@index([slug])
+  @@index([publishedAt])
+}
+
+/// Kotwica posta (link w aside: e.g. "Spis treści" → #toc, zewnętrzny link itd.).
+model BlogAnchor {
+  id         Int      @id @default(autoincrement())
+  blogPostId Int
+  label      String
+  to         String // href: "#section" lub pełna ścieżka
+  order      Int      @default(0)
+  icon       String?
+  target     String? // np. "_blank"
+  createdAt  DateTime @default(now())
+
+  blogPost BlogPost @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+
+  @@index([blogPostId])
 }
