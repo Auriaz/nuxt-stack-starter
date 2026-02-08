@@ -9,10 +9,17 @@ useSeoMeta({
   description: 'Lista powiadomień'
 })
 
-const { notifications, fetchNotifications, isLoading, markAsRead, formatTime } = useNotifications()
+const { notifications, fetchNotifications, isLoading, markAsRead, formatTime, setupWebSocket } = useNotifications()
+let stopSocket: (() => void) | null = null
 
 onMounted(() => {
+  stopSocket = setupWebSocket()
   fetchNotifications()
+})
+
+onBeforeUnmount(() => {
+  stopSocket?.()
+  stopSocket = null
 })
 </script>
 

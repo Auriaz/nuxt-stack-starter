@@ -32,6 +32,18 @@ export const getDashboardMenuItems = (options: boolean | DashboardMenuOptions = 
       active: false
     },
     {
+      label: 'Znajomi',
+      icon: 'i-lucide-user-plus',
+      to: '/dashboard/friends',
+      active: false
+    },
+    {
+      label: 'Zespoly',
+      icon: 'i-lucide-users-2',
+      to: '/dashboard/teams',
+      active: false
+    },
+    {
       label: 'Media',
       icon: 'i-lucide-image',
       to: '/dashboard/media',

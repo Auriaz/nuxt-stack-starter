@@ -32,6 +32,7 @@ export default defineEventHandler(async (event) => {
   const normalizedPath = rawPath.split('?')[0]
 
   // WebSocket endpoints have their own auth checks in the WS handler
+  // @ts-expect-error normalizedPath jest zawsze zdefiniowane po ustawieniu rawPath
   if (normalizedPath.startsWith('/api/ws/')) {
     return
   }

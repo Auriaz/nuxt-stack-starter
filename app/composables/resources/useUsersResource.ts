@@ -1,4 +1,5 @@
 import type { UserOutput, CreateUserInput } from '#shared/types/api'
+import type { FriendUserSummaryDTO } from '#shared/types/friends'
 import { useApiClient } from './useApiClient'
 
 /**
@@ -15,6 +16,19 @@ import { useApiClient } from './useApiClient'
  */
 export function useUsersResource() {
   const apiClient = useApiClient()
+
+  async function searchUsers(query: string): Promise<FriendUserSummaryDTO[]> {
+    const q = query.trim()
+    if (q.length < 2) return []
+    const response = await apiClient.request<{ data: FriendUserSummaryDTO[] }>(`/api/users/search?q=${encodeURIComponent(q)}`, {
+      method: 'GET',
+      unwrap: false
+    })
+    if (response && typeof response === 'object' && 'data' in response) {
+      return response.data ?? []
+    }
+    return []
+  }
 
   async function getUsers(): Promise<UserOutput[]> {
     const response = await apiClient.request<{ data: UserOutput[] } | UserOutput[]>('/api/users')
@@ -42,6 +56,7 @@ export function useUsersResource() {
 
   return {
     getUsers,
-    createUser
+    createUser,
+    searchUsers
   }
 }

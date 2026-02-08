@@ -47,6 +47,7 @@ export interface UserRepository {
   setDeactivatedAt(id: number, deactivatedAt: Date | null): Promise<User>
   delete(id: number): Promise<User>
   count(): Promise<number>
+  searchPublicUsers(query: string, limit: number, excludeUserId?: number): Promise<Array<{ id: number, username: string, email: string, name: string | null, avatarUrl: string | null }>>
 }
 
 export const userRepository: UserRepository = {
@@ -248,5 +249,39 @@ export const userRepository: UserRepository = {
 
   async count() {
     return await prisma.user.count()
+  },
+
+  async searchPublicUsers(query, limit, excludeUserId) {
+    const trimmed = query.trim()
+    if (!trimmed) return []
+    const blockedFilter = excludeUserId
+      ? {
+          NOT: [
+            { friendRequestsSent: { some: { receiverId: excludeUserId, status: 'blocked' } } },
+            { friendRequestsReceived: { some: { senderId: excludeUserId, status: 'blocked' } } }
+          ]
+        }
+      : {}
+
+    const where = {
+      OR: [
+        { email: { contains: trimmed, mode: 'insensitive' as const } },
+        { username: { contains: trimmed, mode: 'insensitive' as const } }
+      ],
+      ...(excludeUserId ? { id: { not: excludeUserId } } : {}),
+      ...blockedFilter
+    }
+    return await prisma.user.findMany({
+      where,
+      take: limit,
+      orderBy: { username: 'asc' },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        name: true,
+        avatarUrl: true
+      }
+    })
   }
 }

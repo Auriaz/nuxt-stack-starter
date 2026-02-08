@@ -1,14 +1,17 @@
-import { ref, computed, readonly } from 'vue'
-import type { Notification, NotificationStats } from '#shared/types'
+import { computed, readonly } from 'vue'
+import { safeParse } from 'valibot'
+import type { Notification, NotificationStats, NotificationsReadPayload } from '#shared/types'
+import { MarkNotificationsReadInputSchema, NotificationSchema } from '#shared/schemas/notification'
 import { useNotificationsResource } from '~/composables/resources/useNotificationsResource'
+import { useNotificationsSocket } from '~/composables/useNotificationsSocket'
 
 export function useNotifications() {
   const auth = useAuth()
   const resource = useNotificationsResource()
 
-  const notifications = ref<Notification[]>([])
-  const isLoading = ref(false)
-  const error = ref<string | null>(null)
+  const notifications = useState<Notification[]>('notifications', () => [])
+  const isLoading = useState<boolean>('notificationsLoading', () => false)
+  const error = useState<string | null>('notificationsError', () => null)
 
   const stats = computed<NotificationStats>(() => {
     const total = notifications.value.length
@@ -39,6 +42,23 @@ export function useNotifications() {
     return `${diffInYears} ${diffInYears === 1 ? 'rok' : diffInYears < 5 ? 'lata' : 'lat'} temu`
   }
 
+  const normalizeNotification = (raw: unknown): Notification | null => {
+    if (!raw || typeof raw !== 'object') return null
+    const obj = raw as Record<string, unknown>
+    const mapped = {
+      id: obj.id,
+      type: obj.type,
+      title: typeof obj.title === 'string' && obj.title.trim() ? obj.title : 'Powiadomienie',
+      message: typeof obj.message === 'string' ? obj.message : '',
+      read: typeof obj.read === 'boolean' ? obj.read : false,
+      created_at: obj.created_at ?? obj.createdAt,
+      action_url: obj.action_url ?? obj.actionUrl
+    }
+    const parsed = safeParse(NotificationSchema, mapped)
+    if (!parsed.success) return null
+    return parsed.output
+  }
+
   const fetchNotifications = async (): Promise<Notification[]> => {
     if (!auth.isLoggedIn.value) {
       notifications.value = []
@@ -48,12 +68,14 @@ export function useNotifications() {
     error.value = null
     try {
       const data = await resource.fetchNotifications()
-      notifications.value = data.items
-      return data.items
+      const normalized = Array.isArray(data.items)
+        ? data.items.map(item => normalizeNotification(item)).filter((item): item is Notification => !!item)
+        : []
+      notifications.value = normalized
+      return normalized
     } catch (err: unknown) {
       error.value = err instanceof Error ? err.message : 'Nie udało się pobrać powiadomień'
-      notifications.value = []
-      return []
+      return notifications.value
     } finally {
       isLoading.value = false
     }
@@ -93,8 +115,52 @@ export function useNotifications() {
     notifications.value.splice(index, 1)
   }
 
-  const setupWebSocket = (): void => {
-    // TODO: v2 WebSocket — useNotificationsSocket()
+  const applyReadPayload = (payload: NotificationsReadPayload) => {
+    if (payload.all) {
+      notifications.value.forEach((notification) => {
+        notification.read = true
+      })
+      return
+    }
+    if (!payload.ids || payload.ids.length === 0) return
+    const ids = new Set(payload.ids)
+    notifications.value.forEach((notification) => {
+      if (ids.has(notification.id)) {
+        notification.read = true
+      }
+    })
+  }
+
+  const setupWebSocket = (): (() => void) => {
+    if (!auth.isLoggedIn.value) {
+      return () => { }
+    }
+    const socket = useNotificationsSocket()
+    socket.connect()
+
+    const stop = socket.onEvent((event) => {
+      if (event.type === 'notification.new') {
+        const incoming = normalizeNotification(event.payload)
+        if (!incoming) return
+        const existingIndex = notifications.value.findIndex(item => item.id === incoming.id)
+        if (existingIndex >= 0) {
+          notifications.value[existingIndex] = incoming
+        } else {
+          notifications.value.unshift(incoming)
+        }
+        return
+      }
+
+      if (event.type === 'notifications.read') {
+        const parsed = safeParse(MarkNotificationsReadInputSchema, event.payload ?? {})
+        if (!parsed.success) return
+        applyReadPayload({ ids: parsed.output.ids, all: parsed.output.all })
+      }
+    })
+
+    return () => {
+      stop()
+    }
   }
 
   return {

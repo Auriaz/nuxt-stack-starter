@@ -52,6 +52,7 @@ export interface ChatMessageSearchRecord {
 export interface ChatRepository {
   findThreadById(threadId: number): Promise<ChatThreadRecord | null>
   findAiThreadByUserId(userId: number): Promise<ChatThreadRecord | null>
+  findDmThreadByUsers(userA: number, userB: number): Promise<ChatThreadRecord | null>
   findParticipant(threadId: number, userId: number): Promise<ChatParticipantRecord | null>
   listParticipantUserIds(threadId: number): Promise<number[]>
   listRecentMessages(threadId: number, limit?: number): Promise<ChatMessageRecord[]>
@@ -101,6 +102,23 @@ export const chatRepository: ChatRepository = {
         type: 'ai',
         participants: {
           some: { userId }
+        }
+      }
+    })
+    return thread as ChatThreadRecord | null
+  },
+
+  async findDmThreadByUsers(userA, userB) {
+    const thread = await prisma.chatThread.findFirst({
+      where: {
+        type: 'dm',
+        participants: {
+          some: { userId: userA }
+        },
+        AND: {
+          participants: {
+            some: { userId: userB }
+          }
         }
       }
     })

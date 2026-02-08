@@ -8,6 +8,7 @@ import { safeParse } from 'valibot'
 import { MarkNotificationsReadInputSchema } from '#shared/schemas/notification'
 import { markNotificationsReadUseCase } from '~~/domain/notifications/markNotificationsRead.usecase'
 import { notificationRepository } from '~~/server/repositories/notification.repo'
+import { publishNotificationsRead } from '~~/server/utils/notifications'
 
 export default defineEventHandler(async (event) => {
   const session = await requireUserSession(event)
@@ -46,5 +47,6 @@ export default defineEventHandler(async (event) => {
     { ids: parsed.output.ids, all: parsed.output.all },
     notificationRepository
   )
+  publishNotificationsRead(userId, { ids: parsed.output.ids, all: parsed.output.all })
   return { data: result }
 })

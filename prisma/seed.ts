@@ -28,6 +28,13 @@ const permissionsSeed: Array<{ key: PermissionKey, label: string, group: string 
   { key: PERMISSIONS.CHAT_DM_CREATE, label: 'Tworzenie DM', group: 'Chat' },
   { key: PERMISSIONS.CHAT_AI_USE, label: 'Korzystanie z AI chat', group: 'Chat' },
   { key: PERMISSIONS.CHAT_MODERATE, label: 'Moderacja czatu', group: 'Chat' },
+  { key: PERMISSIONS.FRIENDS_READ, label: 'Podgląd znajomych', group: 'Friends' },
+  { key: PERMISSIONS.FRIENDS_INVITE, label: 'Wysyłanie zaproszeń do znajomych', group: 'Friends' },
+  { key: PERMISSIONS.FRIENDS_MANAGE, label: 'Zarządzanie znajomymi', group: 'Friends' },
+  { key: PERMISSIONS.TEAMS_READ, label: 'Podgląd zespołów', group: 'Teams' },
+  { key: PERMISSIONS.TEAMS_CREATE, label: 'Tworzenie zespołów', group: 'Teams' },
+  { key: PERMISSIONS.TEAMS_MANAGE, label: 'Zarządzanie zespołami', group: 'Teams' },
+  { key: PERMISSIONS.TEAMS_MEMBERS_MANAGE, label: 'Zarządzanie członkami zespołu', group: 'Teams' },
   { key: PERMISSIONS.NOTIFICATIONS_READ, label: 'Odczyt powiadomień', group: 'Notifications' },
   { key: PERMISSIONS.NOTIFICATIONS_MANAGE, label: 'Zarządzanie powiadomieniami', group: 'Notifications' }
 ]
@@ -55,6 +62,13 @@ const rolePermissionsSeed: Record<string, PermissionKey[]> = {
     PERMISSIONS.CHAT_DM_CREATE,
     PERMISSIONS.CHAT_AI_USE,
     PERMISSIONS.CHAT_MODERATE,
+    PERMISSIONS.FRIENDS_READ,
+    PERMISSIONS.FRIENDS_INVITE,
+    PERMISSIONS.FRIENDS_MANAGE,
+    PERMISSIONS.TEAMS_READ,
+    PERMISSIONS.TEAMS_CREATE,
+    PERMISSIONS.TEAMS_MANAGE,
+    PERMISSIONS.TEAMS_MEMBERS_MANAGE,
     PERMISSIONS.NOTIFICATIONS_READ,
     PERMISSIONS.NOTIFICATIONS_MANAGE
   ],
@@ -68,6 +82,11 @@ const rolePermissionsSeed: Record<string, PermissionKey[]> = {
     PERMISSIONS.MEDIA_UPDATE,
     PERMISSIONS.MEDIA_DELETE,
     PERMISSIONS.CHAT_USE,
+    PERMISSIONS.FRIENDS_READ,
+    PERMISSIONS.FRIENDS_INVITE,
+    PERMISSIONS.FRIENDS_MANAGE,
+    PERMISSIONS.TEAMS_READ,
+    PERMISSIONS.TEAMS_CREATE,
     PERMISSIONS.NOTIFICATIONS_READ
   ]
 }

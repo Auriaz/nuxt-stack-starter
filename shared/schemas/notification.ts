@@ -1,4 +1,4 @@
-import { object, string, number, optional, boolean, picklist, array } from 'valibot'
+import { object, string, number, optional, boolean, picklist, array, unknown } from 'valibot'
 
 export const NotificationSchema = object({
   id: number(),
@@ -22,4 +22,9 @@ export const NotificationStatsSchema = object({
 export const MarkNotificationsReadInputSchema = object({
   ids: optional(array(number())),
   all: optional(boolean())
+})
+
+export const NotificationSocketEnvelopeSchema = object({
+  type: picklist(['notification.new', 'notifications.read']),
+  payload: optional(unknown())
 })

@@ -49,6 +49,12 @@ model User {
   chatParticipants          ChatParticipant[]
   chatThreadInvitesSent     ChatThreadInvite[]       @relation("ChatThreadInviteSent")
   chatThreadInvitesReceived ChatThreadInvite[]       @relation("ChatThreadInviteReceived")
+  friendRequestsSent        FriendRequest[]          @relation("FriendRequestSent")
+  friendRequestsReceived    FriendRequest[]          @relation("FriendRequestReceived")
+  teamsOwned                Team[]                   @relation("TeamOwner")
+  teamMembers               TeamMember[]
+  teamInvitesSent           TeamInvite[]             @relation("TeamInviteSent")
+  teamInvitesReceived       TeamInvite[]             @relation("TeamInviteReceived")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -70,6 +76,27 @@ enum ChatInviteStatus {
   pending
   accepted
   rejected
+}
+
+enum FriendRequestStatus {
+  pending
+  accepted
+  declined
+  canceled
+  blocked
+}
+
+enum TeamRole {
+  owner
+  admin
+  member
+}
+
+enum TeamInviteStatus {
+  pending
+  accepted
+  declined
+  canceled
 }
 
 model ChatThread {
@@ -257,6 +284,77 @@ model Notification {
 
   @@index([userId])
   @@index([userId, read])
+}
+
+model FriendRequest {
+  id             Int                  @id @default(autoincrement())
+  senderId       Int
+  receiverId     Int
+  status         FriendRequestStatus  @default(pending)
+  previousStatus FriendRequestStatus?
+  message        String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  sender   User @relation("FriendRequestSent", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("FriendRequestReceived", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+  @@index([receiverId, status])
+  @@index([senderId, status])
+}
+
+model Team {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String?
+  ownerId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner   User         @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members TeamMember[]
+  invites TeamInvite[]
+
+  @@unique([slug])
+  @@index([ownerId])
+}
+
+model TeamMember {
+  id       Int      @id @default(autoincrement())
+  teamId   Int
+  userId   Int
+  role     TeamRole @default(member)
+  joinedAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([userId])
+  @@index([teamId])
+}
+
+model TeamInvite {
+  id             Int                  @id @default(autoincrement())
+  teamId         Int
+  inviterId      Int
+  inviteeId      Int
+  previousStatus FriendRequestStatus?
+  status         TeamInviteStatus     @default(pending)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  respondedAt    DateTime?
+
+  team    Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  inviter User @relation("TeamInviteSent", fields: [inviterId], references: [id], onDelete: Cascade)
+  invitee User @relation("TeamInviteReceived", fields: [inviteeId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, inviteeId, status])
+  @@index([teamId])
+  @@index([inviteeId])
+  @@index([inviterId])
+  @@index([status])
 }
 
 model Role {

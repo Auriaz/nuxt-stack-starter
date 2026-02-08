@@ -20,6 +20,13 @@ export const PERMISSIONS = {
   CHAT_DM_CREATE: 'chat.dm.create',
   CHAT_AI_USE: 'chat.ai.use',
   CHAT_MODERATE: 'chat.moderate',
+  FRIENDS_READ: 'friends.read',
+  FRIENDS_INVITE: 'friends.invite',
+  FRIENDS_MANAGE: 'friends.manage',
+  TEAMS_READ: 'teams.read',
+  TEAMS_CREATE: 'teams.create',
+  TEAMS_MANAGE: 'teams.manage',
+  TEAMS_MEMBERS_MANAGE: 'teams.members.manage',
   NOTIFICATIONS_READ: 'notifications.read',
   NOTIFICATIONS_MANAGE: 'notifications.manage'
 } as const
@@ -48,6 +55,13 @@ export const PERMISSION_META: Record<PermissionKey, { label: string, group: stri
   'chat.dm.create': { label: 'Tworzenie DM', group: 'Chat' },
   'chat.ai.use': { label: 'Korzystanie z AI chat', group: 'Chat' },
   'chat.moderate': { label: 'Moderacja czatu', group: 'Chat' },
+  'friends.read': { label: 'Podgląd znajomych', group: 'Friends' },
+  'friends.invite': { label: 'Wysyłanie zaproszeń do znajomych', group: 'Friends' },
+  'friends.manage': { label: 'Zarządzanie znajomymi', group: 'Friends' },
+  'teams.read': { label: 'Podgląd zespołów', group: 'Teams' },
+  'teams.create': { label: 'Tworzenie zespołów', group: 'Teams' },
+  'teams.manage': { label: 'Zarządzanie zespołami', group: 'Teams' },
+  'teams.members.manage': { label: 'Zarządzanie członkami zespołu', group: 'Teams' },
   'notifications.read': { label: 'Odczyt powiadomień', group: 'Notifications' },
   'notifications.manage': { label: 'Zarządzanie powiadomieniami', group: 'Notifications' }
 }

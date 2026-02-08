@@ -77,6 +77,26 @@ export type ActivityLog = Prisma.ActivityLogModel
  */
 export type Notification = Prisma.NotificationModel
 /**
+ * Model FriendRequest
+ * 
+ */
+export type FriendRequest = Prisma.FriendRequestModel
+/**
+ * Model Team
+ * 
+ */
+export type Team = Prisma.TeamModel
+/**
+ * Model TeamMember
+ * 
+ */
+export type TeamMember = Prisma.TeamMemberModel
+/**
+ * Model TeamInvite
+ * 
+ */
+export type TeamInvite = Prisma.TeamInviteModel
+/**
  * Model Role
  * 
  */

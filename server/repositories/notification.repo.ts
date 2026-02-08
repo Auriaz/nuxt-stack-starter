@@ -15,15 +15,31 @@ export interface NotificationRecord {
   createdAt: Date
 }
 
+export interface NotificationCreateInput {
+  userId: number
+  type: string
+  title: string
+  message: string
+  actionUrl?: string | null
+}
+
 export interface NotificationRepository {
   findManyByUserId(userId: number, limit?: number): Promise<NotificationRecord[]>
   countUnreadByUserId(userId: number): Promise<number>
+  create(input: NotificationCreateInput): Promise<NotificationRecord>
   markAsReadByIds(userId: number, ids: number[]): Promise<number>
   markAllAsReadByUserId(userId: number): Promise<number>
 }
 
 const getNotificationModel = () => {
-  const client = prisma as unknown as { notification: { findMany: (args: unknown) => Promise<NotificationRecord[]>, count: (args: unknown) => Promise<number>, updateMany: (args: unknown) => Promise<{ count: number }> } }
+  const client = prisma as unknown as {
+    notification: {
+      findMany: (args: unknown) => Promise<NotificationRecord[]>
+      count: (args: unknown) => Promise<number>
+      create: (args: unknown) => Promise<NotificationRecord>
+      updateMany: (args: unknown) => Promise<{ count: number }>
+    }
+  }
   return client.notification
 }
 
@@ -41,6 +57,19 @@ export const notificationRepository: NotificationRepository = {
     const model = getNotificationModel()
     return await model.count({
       where: { userId, read: false }
+    })
+  },
+
+  async create(input) {
+    const model = getNotificationModel()
+    return await model.create({
+      data: {
+        userId: input.userId,
+        type: input.type,
+        title: input.title,
+        message: input.message,
+        actionUrl: input.actionUrl ?? undefined
+      }
     })
   },
 

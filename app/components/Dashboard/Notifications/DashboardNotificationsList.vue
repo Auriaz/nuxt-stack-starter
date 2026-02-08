@@ -1,12 +1,13 @@
 <script lang="ts" setup>
+import { computed } from 'vue'
 import type { Notification } from '#shared/types'
 import { useNotifications } from '~/composables/useNotifications'
 
 interface Props {
-  notifications: Notification[]
+  notifications?: Notification[]
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
   'mark-as-read': [id: number]
@@ -14,7 +15,8 @@ const emit = defineEmits<{
   'click': [notification: Notification]
 }>()
 
-const { markAllAsRead, unreadCount } = useNotifications()
+const { notifications: stateNotifications, markAllAsRead, unreadCount } = useNotifications()
+const displayNotifications = computed(() => (props.notifications?.length ? props.notifications : stateNotifications.value))
 const isMarkingAll = ref(false)
 
 const handleMarkAllAsRead = async () => {
@@ -66,12 +68,12 @@ const handleClick = (notification: Notification) => {
 
     <!-- Lista powiadomień -->
     <div
-      v-if="notifications.length > 0"
+      v-if="displayNotifications.length > 0"
       class="max-h-96 overflow-y-auto"
     >
       <div class="p-2 space-y-2">
-        <DashboardNotificationItem
-          v-for="notification in notifications"
+        <DashboardNotificationsItem
+          v-for="notification in displayNotifications"
           :key="notification.id"
           :notification="notification"
           @click="handleClick"

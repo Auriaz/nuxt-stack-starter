@@ -1,31 +1,46 @@
 <script lang="ts" setup>
-import { onMounted, computed } from 'vue'
+import { onMounted, onBeforeUnmount, computed } from 'vue'
 import type { Notification } from '#shared/types'
 import { useNotifications } from '~/composables/useNotifications'
 
-const { notifications, unreadCount, fetchNotifications, isLoading } = useNotifications()
+const { notifications, unreadCount, fetchNotifications, isLoading, setupWebSocket } = useNotifications()
+let stopSocket: (() => void) | null = null
 
 // Konwertuj readonly array na mutable array dla komponentu
 const mutableNotifications = computed(() => [...notifications.value])
 
 // Pobierz powiadomienia przy pierwszym otwarciu (lazy loading)
 const handleOpen = async () => {
-  if (notifications.value.length === 0 && !isLoading.value) {
+  if (!isLoading.value) {
     await fetchNotifications()
   }
 }
 
 // Pobierz powiadomienia przy montowaniu komponentu (opcjonalnie - można zmienić na lazy)
 onMounted(async () => {
+  stopSocket = setupWebSocket()
   // Lazy loading - pobierz tylko gdy użytkownik otworzy dropdown
   // Jeśli chcesz pobierać od razu, odkomentuj poniższą linię:
   // await fetchNotifications()
+})
+
+onBeforeUnmount(() => {
+  stopSocket?.()
+  stopSocket = null
 })
 
 const handleNotificationClick = (notification: Notification) => {
   // Opcjonalnie: przekieruj do szczegółów powiadomienia
   if (notification.action_url) {
     navigateTo(notification.action_url)
+    return
+  }
+  if (notification.title.toLowerCase().includes('zespol')) {
+    navigateTo('/dashboard/teams')
+    return
+  }
+  if (notification.title.toLowerCase().includes('zaproszenie')) {
+    navigateTo('/dashboard/friends')
   }
 }
 </script>

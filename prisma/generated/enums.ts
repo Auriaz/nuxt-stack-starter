@@ -33,3 +33,33 @@ export const ChatInviteStatus = {
 } as const
 
 export type ChatInviteStatus = (typeof ChatInviteStatus)[keyof typeof ChatInviteStatus]
+
+
+export const FriendRequestStatus = {
+  pending: 'pending',
+  accepted: 'accepted',
+  declined: 'declined',
+  canceled: 'canceled',
+  blocked: 'blocked'
+} as const
+
+export type FriendRequestStatus = (typeof FriendRequestStatus)[keyof typeof FriendRequestStatus]
+
+
+export const TeamRole = {
+  owner: 'owner',
+  admin: 'admin',
+  member: 'member'
+} as const
+
+export type TeamRole = (typeof TeamRole)[keyof typeof TeamRole]
+
+
+export const TeamInviteStatus = {
+  pending: 'pending',
+  accepted: 'accepted',
+  declined: 'declined',
+  canceled: 'canceled'
+} as const
+
+export type TeamInviteStatus = (typeof TeamInviteStatus)[keyof typeof TeamInviteStatus]
