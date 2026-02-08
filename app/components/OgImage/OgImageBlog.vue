@@ -48,6 +48,7 @@ const formattedDate = computed(() => {
     <!-- Obraz tła (jeśli dostępny) -->
 
     <img
+      v-if="image"
       :src="image"
       :alt="title"
       class="absolute top-0 left-0 w-full h-full object-cover"

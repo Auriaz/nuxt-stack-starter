@@ -530,6 +530,7 @@ export const useChatStore = defineStore('chat', () => {
     updateRead,
     openDrawer,
     closeDrawer,
-    toggleDrawer
+    toggleDrawer,
+    ensureAiThread
   }
 })

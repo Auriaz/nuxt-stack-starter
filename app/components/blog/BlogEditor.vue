@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Editor } from '@tiptap/core'
 import type { MediaAssetDTO } from '#shared/types'
 import type { ArrayOrNested, EditorCustomHandlers, EditorToolbarItem } from '#ui/types'
 import { useMediaResource } from '~/composables/resources/useMediaResource'
@@ -10,7 +11,7 @@ interface Props {
   placeholder?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   placeholder: 'Treść posta (Markdown). Użyj / dla poleceń.'
 })
 
@@ -31,7 +32,8 @@ const editorRef = ref<{ editor?: unknown } | null>(null)
 const {
   extension: completionExtension,
   handlers: aiHandlers,
-  isLoading: aiLoading
+  isLoading: aiLoading,
+  runCustomPrompt
 } = useEditorCompletion(editorRef, {
   onError: (err) => {
     let code: string | undefined
@@ -68,6 +70,80 @@ const {
 })
 
 const customHandlers = { ...aiHandlers }
+
+const fullPromptOpen = ref(false)
+const selectionPromptOpen = ref(false)
+const fullPrompt = ref('')
+const selectionPrompt = ref('')
+
+function getEditor(): Editor | undefined {
+  return editorRef.value?.editor as Editor | undefined
+}
+
+function buildFullArticlePrompt(instruction: string) {
+  const article = (props.modelValue ?? '').trim()
+  return [
+    `Instrukcja: ${instruction}`,
+    'Zadanie: edytuj caly artykul zgodnie z instrukcja.',
+    'Zwracaj tylko poprawiony Markdown (bez komentarzy ani dodatkowego tekstu).',
+    'Artykul (Markdown):',
+    article || 'Brak tresci.'
+  ].join('\n\n')
+}
+
+function buildSelectionPrompt(instruction: string, selectionText: string) {
+  return [
+    `Instrukcja: ${instruction}`,
+    'Zadanie: edytuj zaznaczony fragment zgodnie z instrukcja.',
+    'Zwracaj tylko poprawiony fragment w Markdown (bez komentarzy ani dodatkowego tekstu).',
+    'Zaznaczony fragment:',
+    selectionText
+  ].join('\n\n')
+}
+
+function runFullArticleAction(instruction: string) {
+  const editor = getEditor()
+  if (!editor) return
+  const article = (props.modelValue ?? '').trim()
+  if (!article) {
+    toast.add({
+      title: 'Brak tresci',
+      description: 'Najpierw wpisz tresc artykulu, a potem uruchom akcje AI.',
+      color: 'warning'
+    })
+    return
+  }
+  editor.chain().focus().selectAll().run()
+  runCustomPrompt(editor, buildFullArticlePrompt(instruction))
+}
+
+function runFullArticlePrompt() {
+  const prompt = fullPrompt.value.trim()
+  if (!prompt) return
+  runFullArticleAction(prompt)
+  fullPrompt.value = ''
+  fullPromptOpen.value = false
+}
+
+function runSelectionPrompt() {
+  const editor = getEditor()
+  if (!editor) return
+  const prompt = selectionPrompt.value.trim()
+  if (!prompt) return
+  const { from, to } = editor.state.selection
+  if (from === to) {
+    toast.add({
+      title: 'Brak zaznaczenia',
+      description: 'Zaznacz fragment tekstu, aby uruchomic akcje AI.',
+      color: 'warning'
+    })
+    return
+  }
+  const selectedText = editor.state.doc.textBetween(from, to, '\n')
+  runCustomPrompt(editor, buildSelectionPrompt(prompt, selectedText))
+  selectionPrompt.value = ''
+  selectionPromptOpen.value = false
+}
 
 /** Lepsze wklejanie: zawsze używamy text/plain i wstawiamy jako markdown (bez śmieciowego HTML z Worda/Docs). */
 function handlePaste(_view: unknown, event: ClipboardEvent, _slice: unknown): boolean {
@@ -133,16 +209,6 @@ const suggestionItems = [
     { kind: 'codeBlock', label: 'Blok kodu', icon: 'i-lucide-square-code' },
     { kind: 'horizontalRule', label: 'Separator', icon: 'i-lucide-separator-horizontal' },
     { kind: 'image', label: 'Obraz', icon: 'i-lucide-image' }
-  ],
-  [
-    { type: 'label', label: 'AI' },
-    { kind: 'aiContinue', label: 'Kontynuuj z AI', icon: 'i-lucide-sparkles' },
-    { kind: 'aiFix', label: 'Popraw gramatykę', icon: 'i-lucide-spell-check' },
-    { kind: 'aiExtend', label: 'Rozwiń fragment', icon: 'i-lucide-unfold-vertical' },
-    { kind: 'aiReduce', label: 'Skróć fragment', icon: 'i-lucide-fold-vertical' },
-    { kind: 'aiSimplify', label: 'Uprość tekst', icon: 'i-lucide-lightbulb' },
-    { kind: 'aiSummarize', label: 'Podsumuj', icon: 'i-lucide-list' },
-    { kind: 'aiTranslate', label: 'Tłumacz', icon: 'i-lucide-languages', language: 'angielski' }
   ]
 ]
 
@@ -150,27 +216,18 @@ const fixedToolbarItems = computed<ArrayOrNested<EditorToolbarItem<EditorCustomH
   [
     {
       icon: 'i-lucide-sparkles',
-      label: 'AI',
+      label: 'AI (caly artykul)',
       variant: 'soft',
       loading: aiLoading.value,
-      tooltip: { text: 'Asystent AI' },
+      tooltip: { text: 'Asystent AI - caly artykul' },
       content: { align: 'start' },
       items: [
-        { kind: 'aiFix', icon: 'i-lucide-spell-check', label: 'Popraw gramatykę' },
-        { kind: 'aiExtend', icon: 'i-lucide-unfold-vertical', label: 'Rozwiń tekst' },
-        { kind: 'aiReduce', icon: 'i-lucide-fold-vertical', label: 'Skróć tekst' },
-        { kind: 'aiSimplify', icon: 'i-lucide-lightbulb', label: 'Uprość tekst' },
-        { kind: 'aiContinue', icon: 'i-lucide-text', label: 'Kontynuuj zdanie' },
-        { kind: 'aiSummarize', icon: 'i-lucide-list', label: 'Podsumuj' },
-        {
-          icon: 'i-lucide-languages',
-          label: 'Tłumacz',
-          children: [
-            { kind: 'aiTranslate', language: 'angielski', label: 'Angielski' },
-            { kind: 'aiTranslate', language: 'niemiecki', label: 'Niemiecki' },
-            { kind: 'aiTranslate', language: 'francuski', label: 'Francuski' }
-          ]
-        }
+        { icon: 'i-lucide-spell-check', label: 'Popraw caly artykul', onClick: () => runFullArticleAction('Popraw caly artykul, popraw bledy i styl.') },
+        { icon: 'i-lucide-unfold-vertical', label: 'Rozwin caly artykul', onClick: () => runFullArticleAction('Rozwin caly artykul, dodaj przyklady i detale.') },
+        { icon: 'i-lucide-fold-vertical', label: 'Skroc caly artykul', onClick: () => runFullArticleAction('Skroc caly artykul bez utraty kluczowych informacji.') },
+        { icon: 'i-lucide-lightbulb', label: 'Uprosc caly artykul', onClick: () => runFullArticleAction('Uprosc jezyk artykulu i popraw czytelnosc.') },
+        { icon: 'i-lucide-list', label: 'Podsumuj caly artykul', onClick: () => runFullArticleAction('Dodaj podsumowanie i wyciagnij najwazniejsze wnioski.') },
+        { icon: 'i-lucide-pen-line', label: 'Wlasny prompt...', onClick: () => { fullPromptOpen.value = true } }
       ]
     }
   ],
@@ -214,6 +271,33 @@ const fixedToolbarItems = computed<ArrayOrNested<EditorToolbarItem<EditorCustomH
 ])
 
 const bubbleToolbarItems: ArrayOrNested<EditorToolbarItem<EditorCustomHandlers>> = [
+  [
+    {
+      icon: 'i-lucide-sparkles',
+      label: 'AI (zaznaczenie)',
+      variant: 'soft',
+      loading: aiLoading.value,
+      tooltip: { text: 'Asystent AI - zaznaczenie' },
+      content: { align: 'start' },
+      items: [
+        { kind: 'aiFix', icon: 'i-lucide-spell-check', label: 'Popraw fragment' },
+        { kind: 'aiExtend', icon: 'i-lucide-unfold-vertical', label: 'Rozwin fragment' },
+        { kind: 'aiReduce', icon: 'i-lucide-fold-vertical', label: 'Skroc fragment' },
+        { kind: 'aiSimplify', icon: 'i-lucide-lightbulb', label: 'Uprosc fragment' },
+        { kind: 'aiSummarize', icon: 'i-lucide-list', label: 'Podsumuj fragment' },
+        {
+          icon: 'i-lucide-languages',
+          label: 'Tlumacz',
+          children: [
+            { kind: 'aiTranslate', language: 'angielski', label: 'Angielski' },
+            { kind: 'aiTranslate', language: 'niemiecki', label: 'Niemiecki' },
+            { kind: 'aiTranslate', language: 'francuski', label: 'Francuski' }
+          ]
+        },
+        { icon: 'i-lucide-pen-line', label: 'Wlasny prompt...', onClick: () => { selectionPromptOpen.value = true } }
+      ]
+    }
+  ],
   [
     { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold', tooltip: { text: 'Pogrubienie' } },
     { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic', tooltip: { text: 'Kursywa' } },
@@ -276,11 +360,95 @@ const bubbleToolbarItems: ArrayOrNested<EditorToolbarItem<EditorCustomHandlers>>
     </ClientOnly>
 
     <UModal
+      v-model:open="fullPromptOpen"
+      title="Asystent AI - caly artykul"
+      :ui="{ content: 'max-w-2xl' }"
+    >
+      <template #body>
+        <div class="space-y-4 w-full">
+          <UFormField
+            label="Instrukcja"
+            name="aiFullPrompt"
+            class="w-full"
+          >
+            <UTextarea
+              v-model="fullPrompt"
+              placeholder="Np. popraw styl, dodaj przyklady, zachowaj formalny ton..."
+              :rows="5"
+              class="w-full"
+            />
+          </UFormField>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="w-full flex items-center justify-end gap-2">
+          <UButton
+            variant="outline"
+            color="neutral"
+            @click="fullPromptOpen = false"
+          >
+            Anuluj
+          </UButton>
+          <UButton
+            color="primary"
+            :loading="aiLoading"
+            @click="runFullArticlePrompt"
+          >
+            Uruchom
+          </UButton>
+        </div>
+      </template>
+    </UModal>
+
+    <UModal
+      v-model:open="selectionPromptOpen"
+      title="Asystent AI - zaznaczony fragment"
+      :ui="{ content: 'max-w-2xl' }"
+    >
+      <template #body>
+        <div class="space-y-4 w-full flex flex-row">
+          <UFormField
+            label="Instrukcja"
+            name="aiSelectionPrompt"
+            class="w-full"
+          >
+            <UTextarea
+              v-model="selectionPrompt"
+              placeholder="Np. uprosc ten fragment, skroc o 30%, zmien ton na bardziej rzeczowy..."
+              :rows="4"
+              class="w-full"
+            />
+          </UFormField>
+        </div>
+      </template>
+
+      <template #footer>
+        <div class="w-full flex items-center justify-end gap-2">
+          <UButton
+            variant="outline"
+            color="neutral"
+            @click="selectionPromptOpen = false"
+          >
+            Anuluj
+          </UButton>
+          <UButton
+            color="primary"
+            :loading="aiLoading"
+            @click="runSelectionPrompt"
+          >
+            Uruchom
+          </UButton>
+        </div>
+      </template>
+    </UModal>
+
+    <UModal
       v-model:open="showMediaModal"
       title="Wybierz obraz z biblioteki"
       :ui="{ content: 'w-full max-w-4xl' }"
     >
-      <template #content>
+      <template #body>
         <div class="p-4">
           <MediaGrid
             :items="imageItems"

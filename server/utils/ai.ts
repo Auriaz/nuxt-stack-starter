@@ -16,9 +16,12 @@ export type CompletionMode
     | 'simplify'
     | 'summarize'
     | 'translate'
+    | 'edit'
 
 export function getSystemPrompt(mode: CompletionMode, language?: string): string {
   switch (mode) {
+    case 'edit':
+      return `You are a writing assistant. Follow the user's instruction and edit the provided text accordingly. ${preserveMarkdown} Only output the edited text, nothing else.`
     case 'fix':
       return `You are a writing assistant. Fix all spelling and grammar errors in the given text. ${preserveMarkdown} Only output the corrected text, nothing else.`
     case 'extend':
@@ -45,6 +48,8 @@ CRITICAL RULES:
 
 export function getMaxTokens(mode: CompletionMode): number {
   switch (mode) {
+    case 'edit':
+      return 900
     case 'fix':
     case 'extend':
     case 'translate':

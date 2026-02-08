@@ -1,4 +1,4 @@
-import { object, string, optional, array, number, picklist } from 'valibot'
+import { object, string, optional, array, number, picklist, nullable } from 'valibot'
 
 /** Query listy postów (GET /api/blog, GET /api/dashboard/blog) */
 export const BlogListQuerySchema = object({
@@ -39,7 +39,7 @@ export const BlogPostUpdateSchema = object({
   description: optional(string()),
   bodyMd: optional(string()),
   imageUrl: optional(string()),
-  publishedAt: optional(string() | null),
+  publishedAt: optional(nullable(string())),
   tags: optional(array(string())),
   anchors: optional(array(BlogAnchorItemSchema)),
   seoTitle: optional(string()),

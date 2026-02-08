@@ -1,7 +1,7 @@
 import { object, string, optional, picklist } from 'valibot'
 
 const completionModePicklist = picklist(
-  ['continue', 'fix', 'extend', 'reduce', 'simplify', 'summarize', 'translate'],
+  ['continue', 'fix', 'extend', 'reduce', 'simplify', 'summarize', 'translate', 'edit'],
   'Nieprawidłowy tryb completion'
 )
 

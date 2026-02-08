@@ -22,11 +22,19 @@ export interface BlogFormState {
 interface Props {
   form: BlogFormState
   loading?: boolean
+  errors?: Record<string, string | undefined>
+  aiLoading?: 'title' | 'description' | 'seoTitle' | 'seoDesc' | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  loading: false
+  loading: false,
+  errors: undefined,
+  aiLoading: null
 })
+
+const emit = defineEmits<{
+  (event: 'generateTitle' | 'generateDescription' | 'generateSeoTitle' | 'generateSeoDesc'): void
+}>()
 
 const tagInput = ref('')
 const availableTags = ref<BlogTagDTO[]>([])
@@ -154,6 +162,17 @@ function addAnchor() {
 function removeAnchor(index: number) {
   props.form.anchors?.splice(index, 1)
 }
+
+function updateAnchor(
+  index: number,
+  key: 'label' | 'to' | 'icon' | 'target',
+  value: string
+) {
+  if (!props.form.anchors) return
+  const anchor = props.form.anchors[index]
+  if (!anchor) return
+  anchor[key] = value
+}
 </script>
 
 <template>
@@ -178,19 +197,34 @@ function removeAnchor(index: number) {
         label="Tytuł"
         name="title"
         required
+        :error="props.errors?.title"
       >
-        <UInput
-          v-model="form.title"
-          placeholder="Tytuł posta"
-          size="sm"
-          class="w-full"
-        />
+        <div class="flex gap-2">
+          <UInput
+            v-model="form.title"
+            placeholder="Tytuł posta"
+            size="sm"
+            class="w-full"
+          />
+          <UButton
+            type="button"
+            variant="soft"
+            size="sm"
+            icon="i-lucide-sparkles"
+            title="Wygeneruj tytuł z AI"
+            :loading="props.aiLoading === 'title'"
+            @click="emit('generateTitle')"
+          >
+            AI
+          </UButton>
+        </div>
       </UFormField>
 
       <UFormField
         label="Slug (URL)"
         name="slug"
         required
+        :error="props.errors?.slug"
       >
         <div class="flex gap-2">
           <UInput
@@ -216,14 +250,30 @@ function removeAnchor(index: number) {
         label="Opis (krótki)"
         name="description"
         required
+        :error="props.errors?.description"
       >
-        <UTextarea
-          v-model="form.description"
-          placeholder="Krótki opis posta"
-          :rows="3"
-          size="sm"
-          class="w-full"
-        />
+        <div class="space-y-2">
+          <UTextarea
+            v-model="form.description"
+            placeholder="Krótki opis posta"
+            :rows="3"
+            size="sm"
+            class="w-full"
+          />
+          <div class="flex items-center justify-end">
+            <UButton
+              type="button"
+              variant="soft"
+              size="sm"
+              icon="i-lucide-sparkles"
+              title="Wygeneruj opis z AI"
+              :loading="props.aiLoading === 'description'"
+              @click="emit('generateDescription')"
+            >
+              AI
+            </UButton>
+          </div>
+        </div>
       </UFormField>
     </UCard>
 
@@ -246,6 +296,7 @@ function removeAnchor(index: number) {
       <UFormField
         label="Data publikacji (pusta = szkic)"
         name="publishedAt"
+        :error="props.errors?.publishedAt"
       >
         <UInput
           v-model="form.publishedAt"
@@ -298,6 +349,7 @@ function removeAnchor(index: number) {
       <UFormField
         label="Meta tytuł"
         name="seoTitle"
+        :error="props.errors?.seoTitle"
       >
         <div class="space-y-2">
           <UInput
@@ -308,13 +360,24 @@ function removeAnchor(index: number) {
           />
           <div class="flex items-center justify-between text-xs">
             <span :class="metaTitleColor">{{ metaTitleLength }}/60</span>
-            <UButton
-              variant="soft"
-              size="xs"
-              @click="autoGenerateMetaTitle"
-            >
-              Odśwież z tytułu
-            </UButton>
+            <div class="flex items-center gap-2">
+              <UButton
+                variant="soft"
+                size="xs"
+                @click="autoGenerateMetaTitle"
+              >
+                Odśwież z tytułu
+              </UButton>
+              <UButton
+                variant="soft"
+                size="xs"
+                icon="i-lucide-sparkles"
+                :loading="props.aiLoading === 'seoTitle'"
+                @click="emit('generateSeoTitle')"
+              >
+                AI
+              </UButton>
+            </div>
           </div>
         </div>
       </UFormField>
@@ -322,6 +385,7 @@ function removeAnchor(index: number) {
       <UFormField
         label="Meta opis"
         name="seoDesc"
+        :error="props.errors?.seoDesc"
       >
         <div class="space-y-2">
           <UTextarea
@@ -333,13 +397,24 @@ function removeAnchor(index: number) {
           />
           <div class="flex items-center justify-between text-xs">
             <span :class="metaDescriptionColor">{{ metaDescriptionLength }}/160</span>
-            <UButton
-              variant="soft"
-              size="xs"
-              @click="autoGenerateMetaDescription"
-            >
-              Auto z opisu
-            </UButton>
+            <div class="flex items-center gap-2">
+              <UButton
+                variant="soft"
+                size="xs"
+                @click="autoGenerateMetaDescription"
+              >
+                Auto z opisu
+              </UButton>
+              <UButton
+                variant="soft"
+                size="xs"
+                icon="i-lucide-sparkles"
+                :loading="props.aiLoading === 'seoDesc'"
+                @click="emit('generateSeoDesc')"
+              >
+                AI
+              </UButton>
+            </div>
           </div>
         </div>
       </UFormField>

@@ -15,6 +15,7 @@ export type CompletionMode
     | 'simplify'
     | 'summarize'
     | 'translate'
+    | 'edit'
 
 export interface UseEditorCompletionOptions {
   api?: string
@@ -60,7 +61,8 @@ export function useEditorCompletion(
         'reduce',
         'simplify',
         'summarize',
-        'translate'
+        'translate',
+        'edit'
       ]
       if (
         transformModes.includes(mode.value)
@@ -118,7 +120,8 @@ export function useEditorCompletion(
         'reduce',
         'simplify',
         'summarize',
-        'translate'
+        'translate',
+        'edit'
       ]
       if (transformModes.includes(mode.value)) {
         return
@@ -175,6 +178,29 @@ export function useEditorCompletion(
       }
     }
     complete(selectedText)
+  }
+
+  function runCustomPrompt(
+    editor: Editor,
+    prompt: string,
+    options?: { mode?: CompletionMode, replaceRange?: { from: number, to: number } }
+  ) {
+    if (isLoading.value) return
+    getCompletionStorage()?.clearSuggestion()
+    mode.value = options?.mode ?? 'edit'
+    language.value = undefined
+    const range = options?.replaceRange ?? {
+      from: editor.state.selection.from,
+      to: editor.state.selection.to
+    }
+    insertState.value = {
+      pos: range.from,
+      deleteRange: {
+        from: range.from,
+        to: range.to
+      }
+    }
+    complete(prompt)
   }
 
   function getMarkdownBefore(editor: Editor, pos: number): string {
@@ -307,6 +333,7 @@ export function useEditorCompletion(
     extension,
     handlers,
     isLoading,
-    mode
+    mode,
+    runCustomPrompt
   }
 }

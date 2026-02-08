@@ -17,7 +17,7 @@ const postsForGrid = computed(() =>
     path: blogResource.postPath(post),
     title: post.title,
     description: post.description ?? '',
-    image: post.imageUrl ? { src: post.imageUrl, alt: post.title } : { src: '', alt: post.title },
+    image: post.imageUrl ? { src: post.imageUrl, alt: post.title } : undefined,
     date: post.publishedAt ?? '',
     authors: post.authorName
       ? [{ name: post.authorName, avatar: { src: post.authorAvatar ?? '', alt: post.authorName } }]

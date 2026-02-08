@@ -22,6 +22,7 @@ module.exports = {
     ],
     'type-case': [2, 'always', 'lower-case'],
     'type-empty': [2, 'never'],
-    'header-max-length': [2, 'always', 256]
+    'header-max-length': [2, 'always', 256],
+    'body-max-line-length': [2, 'always', 256]
   }
 }

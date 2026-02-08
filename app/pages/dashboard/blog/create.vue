@@ -6,6 +6,7 @@ import { slugify } from '#shared/utils/content'
 import { useBlogResource } from '~/composables/resources/useBlogResource'
 import { useMarkdownRender } from '~/composables/useMarkdownRender'
 import { useBlogDraft, type BlogDraftMeta, type BlogDraftPayload, type BlogDraftRecord } from '~/composables/useBlogDraft'
+import { useAiTextCompletion } from '~/composables/useAiTextCompletion'
 import AppBlogSidebar, { type BlogFormState } from '~/components/blog/BlogSidebar.vue'
 import ModalConfirmation from '~/components/Modal/Confirmation/ModalConfirmation.vue'
 import ContentProseHtml from '~/components/content/ContentProseHtml.vue'
@@ -13,6 +14,7 @@ import AuthorAbout from '~/components/content/author_about.vue'
 
 const { locale } = useI18n()
 const { user } = useAuth()
+const toast = useToast()
 
 const authorAvatarSrc = useAvatarSrc(() => user.value?.avatarUrl ?? undefined)
 
@@ -51,6 +53,9 @@ const showMissingDraftNotice = ref(false)
 const deleteDraftModalRef = ref<InstanceType<typeof ModalConfirmation> | null>(null)
 const clearDraftsModalRef = ref<InstanceType<typeof ModalConfirmation> | null>(null)
 
+const aiMetaLoading = ref<'title' | 'description' | 'seoTitle' | 'seoDesc' | null>(null)
+const { complete: aiComplete } = useAiTextCompletion()
+
 function setFieldError(field: string, message: string): void {
   form.errors.value = { ...form.errors.value, [field]: message }
 }
@@ -59,6 +64,73 @@ function clearFieldError(field: string): void {
   if (!form.errors.value?.[field]) return
   const { [field]: _ignored, ...rest } = form.errors.value
   form.errors.value = rest
+}
+
+function normalizeAiLine(text: string): string {
+  return text
+    .replace(/^["'“”„]+|["'“”„]+$/g, '')
+    .replace(/\r\n/g, '\n')
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean)
+    .join(' ')
+    .trim()
+}
+
+function buildAiMetaContext() {
+  const title = (form.values.value?.title ?? '').trim()
+  const description = (form.values.value?.description ?? '').trim()
+  const body = (form.values.value?.bodyMd ?? '').trim()
+  const trimmedBody = body.length > 3000 ? `${body.slice(0, 3000)}...` : body
+  const parts = [
+    title ? `Tytul: ${title}` : null,
+    description ? `Opis: ${description}` : null,
+    trimmedBody ? `Tresc (Markdown):\n${trimmedBody}` : null
+  ].filter(Boolean)
+  return parts.length ? parts.join('\n\n') : 'Brak tresci.'
+}
+
+async function runAiMeta(kind: 'title' | 'description' | 'seoTitle' | 'seoDesc') {
+  if (aiMetaLoading.value) return
+  aiMetaLoading.value = kind
+  try {
+    const context = buildAiMetaContext()
+    let instruction = ''
+    if (kind === 'title') {
+      instruction = 'Wygeneruj chwytliwy tytul posta (max 70 znakow).'
+    } else if (kind === 'description') {
+      instruction = 'Wygeneruj krotki opis posta (1-2 zdania, max 200 znakow).'
+    } else if (kind === 'seoTitle') {
+      instruction = 'Wygeneruj meta tytul SEO (max 60 znakow).'
+    } else {
+      instruction = 'Wygeneruj meta opis SEO (140-160 znakow).'
+    }
+    const prompt = [
+      `Instrukcja: ${instruction}`,
+      'Zadanie: zwroc tylko wynik, bez komentarzy ani cudzyslowow.',
+      'Kontekst:',
+      context
+    ].join('\n\n')
+    const result = await aiComplete(prompt, 'edit')
+    const value = normalizeAiLine(result || '')
+    if (!value) {
+      setFieldError(kind === 'seoTitle' ? 'seoTitle' : kind === 'seoDesc' ? 'seoDesc' : kind, 'Brak wyniku z AI.')
+      return
+    }
+    if (kind === 'title') form.setField('title', value)
+    if (kind === 'description') form.setField('description', value)
+    if (kind === 'seoTitle') form.setField('seoTitle', value)
+    if (kind === 'seoDesc') form.setField('seoDesc', value)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Nie udalo sie wygenerowac tresci AI.'
+    toast.add({
+      title: 'Asystent AI',
+      description: message,
+      color: 'warning'
+    })
+  } finally {
+    aiMetaLoading.value = null
+  }
 }
 
 function buildDraftPayload(): BlogDraftPayload {
@@ -83,7 +155,7 @@ function refreshDrafts(): void {
 
 function applyDraft(draft: BlogDraftRecord): void {
   form.reset()
-  form.setValues(draft.payload)
+  form.setValues(draft.payload as unknown as BlogFormState)
   activeDraftId.value = draft.draftId
 }
 
@@ -620,6 +692,12 @@ function onPreviewScroll() {
           <AppBlogSidebar
             :form="(form.values.value as unknown as BlogFormState)"
             :loading="form.pending.value"
+            :errors="form.errors.value"
+            :ai-loading="aiMetaLoading"
+            @generate-title="() => runAiMeta('title')"
+            @generate-description="() => runAiMeta('description')"
+            @generate-seo-title="() => runAiMeta('seoTitle')"
+            @generate-seo-desc="() => runAiMeta('seoDesc')"
           />
         </div>
       </template>
@@ -630,7 +708,7 @@ function onPreviewScroll() {
       title="Kontynuować poprzedni szkic?"
       :ui="{ content: 'max-w-2xl' }"
     >
-      <template #content>
+      <template #body>
         <div class="space-y-4">
           <UAlert
             color="primary"
@@ -683,24 +761,26 @@ function onPreviewScroll() {
               </div>
             </UCard>
           </div>
+        </div>
+      </template>
 
-          <div class="flex flex-wrap items-center justify-end gap-3">
-            <UButton
-              v-if="draftItems.length > 1"
-              variant="outline"
-              color="error"
-              @click="requestClearDrafts"
-            >
-              Wyczysc wszystkie szkice
-            </UButton>
-            <UButton
-              variant="outline"
-              color="neutral"
-              @click="startNewPost"
-            >
-              Rozpocznij nowy post
-            </UButton>
-          </div>
+      <template #footer>
+        <div class="flex flex-wrap items-center justify-end gap-3">
+          <UButton
+            v-if="draftItems.length > 1"
+            variant="outline"
+            color="error"
+            @click="requestClearDrafts"
+          >
+            Wyczysc wszystkie szkice
+          </UButton>
+          <UButton
+            variant="outline"
+            color="neutral"
+            @click="startNewPost"
+          >
+            Rozpocznij nowy post
+          </UButton>
         </div>
       </template>
     </UModal>
@@ -712,7 +792,7 @@ function onPreviewScroll() {
       confirm-label="Usun"
       cancel-label="Anuluj"
       variant="danger"
-      @confirm="confirmDeleteDraft"
+      @confirm="(arg: unknown) => confirmDeleteDraft(arg as string)"
     />
 
     <ModalConfirmation
