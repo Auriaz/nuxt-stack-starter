@@ -14,10 +14,47 @@ const emit = defineEmits<{
 
 const search = ref('')
 
+const typeLabels: Record<string, string> = {
+  ai: 'AI',
+  dm: 'DM',
+  team: 'Zespoly',
+  room: 'Pokoje'
+}
+
+function getSearchText(thread: ChatThreadDTO) {
+  const label = typeLabels[thread.type] || 'Inne'
+  return `${thread.title || ''} ${label}`.toLowerCase()
+}
+
 const filtered = computed(() => {
   if (!search.value.trim()) return props.threads
   const query = search.value.toLowerCase()
-  return props.threads.filter(thread => (thread.title || '').toLowerCase().includes(query))
+  return props.threads.filter(thread => getSearchText(thread).includes(query))
+})
+
+const grouped = computed(() => {
+  const ai: ChatThreadDTO[] = []
+  const dm: ChatThreadDTO[] = []
+  const team: ChatThreadDTO[] = []
+  const room: ChatThreadDTO[] = []
+  const other: ChatThreadDTO[] = []
+
+  for (const thread of filtered.value) {
+    if (thread.type === 'ai') ai.push(thread)
+    else if (thread.type === 'dm') dm.push(thread)
+    else if (thread.type === 'team') team.push(thread)
+    else if (thread.type === 'room') room.push(thread)
+    else other.push(thread)
+  }
+
+  const groups: Array<{ key: string, label: string, items: ChatThreadDTO[] }> = [
+    { key: 'ai', label: 'Asystent AI', items: ai },
+    { key: 'dm', label: 'Wiadomosci', items: dm },
+    { key: 'team', label: 'Zespoly', items: team },
+    { key: 'room', label: 'Pokoje', items: room.concat(other) }
+  ]
+
+  return groups.filter(group => group.items.length > 0)
 })
 </script>
 
@@ -51,7 +88,7 @@ const filtered = computed(() => {
     </div>
 
     <div
-      v-else-if="filtered.length === 0"
+      v-else-if="grouped.length === 0"
       class="text-sm text-basic-500 dark:text-basic-400 py-6 text-center"
     >
       Brak watkow
@@ -59,16 +96,25 @@ const filtered = computed(() => {
 
     <div
       v-else
-      class="space-y-1"
+      class="space-y-4"
     >
-      <ChatThreadItem
-        v-for="thread in filtered"
-        :key="thread.id"
-        :thread="thread"
-        :active="thread.id === activeThreadId"
-        :unread-count="unreadByThread?.[thread.id]"
-        @click="emit('select', thread.id)"
-      />
+      <div
+        v-for="group in grouped"
+        :key="group.key"
+        class="space-y-1"
+      >
+        <p class="text-xs font-semibold uppercase text-basic-500 dark:text-basic-400">
+          {{ group.label }}
+        </p>
+        <ChatThreadItem
+          v-for="thread in group.items"
+          :key="thread.id"
+          :thread="thread"
+          :active="thread.id === activeThreadId"
+          :unread-count="unreadByThread?.[thread.id]"
+          @click="emit('select', thread.id)"
+        />
+      </div>
     </div>
   </UCard>
 </template>

@@ -121,6 +121,8 @@ export const ChatThreadScalarFieldEnum = {
   type: 'type',
   title: 'title',
   createdById: 'createdById',
+  teamId: 'teamId',
+  dmKey: 'dmKey',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   lastMessageAt: 'lastMessageAt'

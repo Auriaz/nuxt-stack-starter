@@ -1,4 +1,4 @@
-import type { ChatThreadDTO, ChatMessageDTO } from '#shared/types/chat'
+import type { ChatThreadDTO, ChatMessageDTO, ChatParticipantWithUserDTO } from '#shared/types/chat'
 import { useApiClient } from './useApiClient'
 
 export function useChatResource() {
@@ -17,9 +17,32 @@ export function useChatResource() {
     return await apiClient.request<ChatMessageDTO[]>(`/api/chat/threads/${threadId}/messages${query}`)
   }
 
+  const listParticipants = async (threadId: number): Promise<ChatParticipantWithUserDTO[]> => {
+    return await apiClient.request<ChatParticipantWithUserDTO[]>(`/api/chat/threads/${threadId}/participants`)
+  }
+
+  const openDm = async (userId: number): Promise<ChatThreadDTO> => {
+    return await apiClient.request<ChatThreadDTO>(`/api/chat/dm/${userId}`, { method: 'POST' })
+  }
+
+  const listTeamThreads = async (teamId: number): Promise<ChatThreadDTO[]> => {
+    return await apiClient.request<ChatThreadDTO[]>(`/api/chat/teams/${teamId}/threads`)
+  }
+
+  const createTeamThread = async (teamId: number, title?: string): Promise<ChatThreadDTO> => {
+    return await apiClient.request<ChatThreadDTO>(`/api/chat/teams/${teamId}/threads`, {
+      method: 'POST',
+      body: { title }
+    })
+  }
+
   return {
     ensureAiThread,
     listThreads,
-    listMessages
+    listMessages,
+    listParticipants,
+    openDm,
+    listTeamThreads,
+    createTeamThread
   }
 }

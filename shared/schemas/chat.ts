@@ -1,6 +1,7 @@
 import { object, string, number, optional, picklist, boolean, unknown, array } from 'valibot'
+import { FriendUserSummarySchema } from './friends'
 
-export const ChatThreadTypeSchema = picklist(['ai', 'dm', 'room'])
+export const ChatThreadTypeSchema = picklist(['ai', 'dm', 'room', 'team'])
 export const ChatMessageTypeSchema = picklist(['user', 'assistant', 'system'])
 
 export const ChatThreadTopicSchema = object({
@@ -16,6 +17,7 @@ export const ChatThreadSchema = object({
   id: number(),
   type: ChatThreadTypeSchema,
   title: optional(string()),
+  team_id: optional(number()),
   created_at: string(),
   last_message_at: optional(string()),
   topics: optional(array(ChatThreadTopicSchema))
@@ -26,6 +28,14 @@ export const ChatParticipantSchema = object({
   role: string(),
   joined_at: string(),
   last_read_at: optional(string())
+})
+
+export const ChatParticipantWithUserSchema = object({
+  user_id: number(),
+  role: string(),
+  joined_at: string(),
+  last_read_at: optional(string()),
+  user: optional(FriendUserSummarySchema)
 })
 
 export const ChatMessageSchema = object({
@@ -43,6 +53,14 @@ export const ChatMessageSendInputSchema = object({
   content: string(),
   temp_id: optional(string()),
   metadata: optional(unknown())
+})
+
+export const ChatDmOpenInputSchema = object({
+  user_id: number()
+})
+
+export const ChatTeamThreadCreateInputSchema = object({
+  title: optional(string())
 })
 
 export const ChatThreadJoinInputSchema = object({

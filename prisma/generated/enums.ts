@@ -11,7 +11,8 @@
 export const ChatThreadType = {
   ai: 'ai',
   dm: 'dm',
-  room: 'room'
+  room: 'room',
+  team: 'team'
 } as const
 
 export type ChatThreadType = (typeof ChatThreadType)[keyof typeof ChatThreadType]

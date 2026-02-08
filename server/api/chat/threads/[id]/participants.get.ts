@@ -1,7 +1,7 @@
 /**
- * GET /api/chat/threads/:id/messages - list messages for a thread.
+ * GET /api/chat/threads/:id/participants - list participants for a thread.
  */
-import { getRouterParam, getQuery } from 'h3'
+import { getRouterParam } from 'h3'
 import { PERMISSIONS } from '#shared/permissions'
 import { assertCanAccessThreadUseCase } from '~~/domain/chat/assertCanAccessThread.usecase'
 import { ChatAccessDeniedError, ChatThreadNotFoundError } from '~~/domain/chat/errors'
@@ -35,8 +35,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const idParam = getRouterParam(event, 'id')
-  const threadId = parseId(idParam)
+  const threadId = parseId(getRouterParam(event, 'id'))
   if (!threadId) {
     throw createError({
       statusCode: 400,
@@ -50,6 +49,25 @@ export default defineEventHandler(async (event) => {
       { userId, threadId, permissions, action: 'read' },
       { chatRepository, friendsRepository, teamsRepository }
     )
+
+    const participants = await chatRepository.listParticipantsWithUsers(threadId)
+    return {
+      data: participants.map(participant => ({
+        user_id: participant.userId,
+        role: participant.role,
+        joined_at: participant.joinedAt.toISOString(),
+        last_read_at: participant.lastReadAt ? participant.lastReadAt.toISOString() : undefined,
+        user: participant.user
+          ? {
+              id: participant.user.id,
+              username: participant.user.username,
+              name: participant.user.name ?? undefined,
+              email: participant.user.email ?? undefined,
+              avatar_url: participant.user.avatarUrl ?? undefined
+            }
+          : undefined
+      }))
+    }
   } catch (err) {
     if (err instanceof ChatThreadNotFoundError) {
       throw createError({
@@ -66,23 +84,5 @@ export default defineEventHandler(async (event) => {
       })
     }
     throw err
-  }
-
-  const query = getQuery(event)
-  const cursorRaw = typeof query.cursor === 'string' ? query.cursor : undefined
-  const cursorDate = cursorRaw ? new Date(cursorRaw) : undefined
-  const cursor = cursorDate && !Number.isNaN(cursorDate.valueOf()) ? cursorDate : undefined
-
-  const messages = await chatRepository.listMessagesByThread(threadId, { cursor })
-  return {
-    data: messages.map(message => ({
-      id: message.id,
-      thread_id: message.threadId,
-      sender_id: message.senderId ?? undefined,
-      type: message.type,
-      content: message.content,
-      metadata: message.metadata ?? undefined,
-      created_at: message.createdAt.toISOString()
-    }))
   }
 })

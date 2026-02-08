@@ -1,7 +1,16 @@
 <script lang="ts" setup>
 import { useDashboardSearch } from '~/composables/useDashboardSearch'
+import { useChatStore } from '~/stores/chat'
 
 const { groups, searchTerm, chatLoading } = useDashboardSearch()
+const chatStore = useChatStore()
+const { isLoggedIn } = useAuth()
+
+onMounted(() => {
+  if (isLoggedIn.value) {
+    chatStore.ensureRealtime()
+  }
+})
 </script>
 
 <template>

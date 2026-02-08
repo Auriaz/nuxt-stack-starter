@@ -7,12 +7,15 @@ import type {
   ChatMessageNewPayload,
   ChatMessageDeltaPayload,
   ChatReadUpdatedPayload,
-  ChatSocketEnvelope
+  ChatSocketEnvelope,
+  ChatParticipantWithUserDTO
 } from '#shared/types/chat'
 import { CHAT_EVENTS } from '~/composables/chatEvents'
 import { useChatSocket } from '~/composables/useChatSocket'
 import { useChatResource } from '~/composables/resources/useChatResource'
 import { useAuth } from '~/composables/useAuth'
+import { useNotifications } from '~/composables/useNotifications'
+import { PERMISSIONS } from '#shared/permissions'
 
 const createTempId = () => {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -27,6 +30,7 @@ export const useChatStore = defineStore('chat', () => {
   const socket = useChatSocket()
   const resource = useChatResource()
   const { user, isLoggedIn } = useAuth()
+  const notifications = useNotifications()
 
   const threads = ref<ChatThreadDTO[]>([])
   const activeThreadId = ref<number | null>(null)
@@ -34,6 +38,8 @@ export const useChatStore = defineStore('chat', () => {
   const typingByThread = ref<Record<number, number[]>>({})
   const readStateByThread = ref<Record<number, { lastReadAt?: string }>>({})
   const draftByThread = ref<Record<number, string>>({})
+  const participantsByThread = ref<Record<number, ChatParticipantWithUserDTO[]>>({})
+  const unreadByThread = ref<Record<number, number>>({})
   const pendingByThread = ref<Record<number, { streamId: string, messageId: number } | undefined>>({})
   const messageStatusByThread = ref<Record<number, ChatStatus>>({})
   const isLoadingThreads = ref(false)
@@ -42,14 +48,47 @@ export const useChatStore = defineStore('chat', () => {
   const drawerOpen = ref(false)
   const initialized = ref(false)
   const socketBound = ref(false)
+  let refreshTimer: ReturnType<typeof setTimeout> | null = null
 
   function sortThreads(items: ChatThreadDTO[]) {
     return [...items].sort((a, b) => {
       const aWeight = a.type === 'ai' ? 0 : 1
       const bWeight = b.type === 'ai' ? 0 : 1
       if (aWeight !== bWeight) return aWeight - bWeight
-      return 0
+      const aTime = new Date(a.last_message_at || a.created_at).getTime()
+      const bTime = new Date(b.last_message_at || b.created_at).getTime()
+      return bTime - aTime
     })
+  }
+
+  function upsertThread(thread: ChatThreadDTO) {
+    const index = threads.value.findIndex(item => item.id === thread.id)
+    if (index >= 0) {
+      threads.value[index] = { ...threads.value[index], ...thread }
+      threads.value = sortThreads(threads.value)
+      return
+    }
+    threads.value = sortThreads([...threads.value, thread])
+  }
+
+  function scheduleThreadsRefresh() {
+    if (refreshTimer) return
+    refreshTimer = setTimeout(async () => {
+      refreshTimer = null
+      await loadThreads()
+    }, 250)
+  }
+
+  function updateThreadLastMessage(threadId: number, lastMessageAt: string) {
+    const index = threads.value.findIndex(item => item.id === threadId)
+    if (index === -1) {
+      scheduleThreadsRefresh()
+      return
+    }
+    const item = threads.value[index]
+    if (!item) return
+    item.last_message_at = lastMessageAt
+    threads.value = sortThreads(threads.value)
   }
 
   const unreadCount = computed(() => {
@@ -83,7 +122,8 @@ export const useChatStore = defineStore('chat', () => {
       role: message.type === 'assistant' ? 'assistant' : message.type === 'system' ? 'system' : 'user',
       parts: [{ type: 'text', text: message.content }],
       content: message.content,
-      createdAt: new Date(message.created_at)
+      createdAt: new Date(message.created_at),
+      senderId: message.sender_id
     }) as UIMessage)
   })
 
@@ -116,14 +156,15 @@ export const useChatStore = defineStore('chat', () => {
     if (index !== -1) items.splice(index, 1)
   }
 
-  async function loadThreads() {
+  async function loadThreads(options?: { activateFirst?: boolean }) {
     if (!isLoggedIn.value) return
     isLoadingThreads.value = true
     error.value = null
     try {
       const data = await resource.listThreads()
       threads.value = sortThreads(data)
-      if (!activeThreadId.value && data.length > 0) {
+      const activateFirst = options?.activateFirst !== false
+      if (activateFirst && !activeThreadId.value && data.length > 0) {
         const first = threads.value[0]
         if (first) setActiveThread(first.id)
       }
@@ -136,11 +177,30 @@ export const useChatStore = defineStore('chat', () => {
 
   async function ensureAiThread() {
     if (!isLoggedIn.value) return null
+    if (Array.isArray(user.value?.permissions) && !user.value?.permissions?.includes(PERMISSIONS.CHAT_AI_USE)) {
+      return null
+    }
     try {
       const result = await resource.ensureAiThread()
       return result.threadId
     } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'statusCode' in err && (err as { statusCode?: number }).statusCode === 403) {
+        return null
+      }
       error.value = err instanceof Error ? err.message : 'Nie udalo sie przygotowac watku AI'
+      return null
+    }
+  }
+
+  async function openDmThread(otherUserId: number) {
+    if (!isLoggedIn.value) return null
+    try {
+      const thread = await resource.openDm(otherUserId)
+      upsertThread(thread)
+      setActiveThread(thread.id)
+      return thread
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Nie udalo sie otworzyc DM'
       return null
     }
   }
@@ -155,6 +215,16 @@ export const useChatStore = defineStore('chat', () => {
       error.value = err instanceof Error ? err.message : 'Nie udalo sie pobrac wiadomosci'
     } finally {
       isLoadingMessages.value[threadId] = false
+    }
+  }
+
+  async function loadParticipants(threadId: number) {
+    if (!isLoggedIn.value) return
+    try {
+      const data = await resource.listParticipants(threadId)
+      participantsByThread.value[threadId] = data
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Nie udalo sie pobrac uczestnikow'
     }
   }
 
@@ -177,6 +247,8 @@ export const useChatStore = defineStore('chat', () => {
     const previous = activeThreadId.value
     activeThreadId.value = threadId
 
+    notifications.clearLocalByAction(`/dashboard/chat?thread=${threadId}`)
+
     if (previous && previous !== threadId) {
       socket.send({ type: CHAT_EVENTS.THREAD_LEAVE, payload: { thread_id: previous } })
     }
@@ -187,7 +259,12 @@ export const useChatStore = defineStore('chat', () => {
       void loadMessages(threadId)
     }
 
+    if (!participantsByThread.value[threadId]) {
+      void loadParticipants(threadId)
+    }
+
     updateRead(threadId)
+    unreadByThread.value[threadId] = 0
   }
 
   function setDraft(threadId: number, value: string) {
@@ -247,6 +324,34 @@ export const useChatStore = defineStore('chat', () => {
       messageStatusByThread.value[threadId] = 'ready'
     } else {
       messageStatusByThread.value[threadId] = 'ready'
+    }
+
+    updateThreadLastMessage(threadId, message.created_at)
+
+    const currentUserId = user.value?.id
+    const isOwn = currentUserId && message.sender_id === currentUserId
+    const isActive = activeThreadId.value === threadId
+    if (!isOwn && !isActive) {
+      unreadByThread.value[threadId] = (unreadByThread.value[threadId] || 0) + 1
+      const thread = threads.value.find(item => item.id === threadId)
+      if (thread?.type === 'ai' || message.type === 'assistant') {
+        return
+      }
+      const title = thread?.type === 'team'
+        ? `Nowa wiadomosc w zespole: ${thread.title || 'Kanal zespolu'}`
+        : thread?.type === 'dm'
+          ? 'Nowa wiadomosc w DM'
+          : 'Nowa wiadomosc'
+      const rawPreview = typeof message.content === 'string' ? message.content : ''
+      const preview = rawPreview.trim().slice(0, 140)
+      const channelLabel = thread?.title || (thread?.type === 'team' ? 'Kanal zespolu' : thread?.type === 'dm' ? 'Nowy DM' : 'Czat')
+      const notificationMessage = preview ? `${channelLabel} • ${preview}` : `${channelLabel} • Brak tresci`
+      notifications.addLocalNotification({
+        title,
+        message: notificationMessage,
+        actionUrl: `/dashboard/chat?thread=${threadId}`,
+        type: 'info'
+      })
     }
 
     if (activeThreadId.value === threadId) {
@@ -317,6 +422,7 @@ export const useChatStore = defineStore('chat', () => {
       }
     })
     readStateByThread.value[threadId] = { lastReadAt }
+    unreadByThread.value[threadId] = 0
   }
 
   function handleSocketEvent(event: ChatSocketEnvelope) {
@@ -375,6 +481,15 @@ export const useChatStore = defineStore('chat', () => {
     })()
   }
 
+  function ensureRealtime() {
+    if (!isLoggedIn.value) return
+    if (!socketBound.value) {
+      bindSocket()
+    }
+    connect()
+    void loadThreads({ activateFirst: false })
+  }
+
   watch(
     () => socket.status.value,
     (next) => {
@@ -396,14 +511,18 @@ export const useChatStore = defineStore('chat', () => {
     typingByThread,
     readStateByThread,
     draftByThread,
+    participantsByThread,
+    unreadByThread,
     unreadCount,
     isLoadingThreads,
     isLoadingMessages,
     error,
     drawerOpen,
     ensureInitialized,
+    ensureRealtime,
     loadThreads,
     loadMessages,
+    openDmThread,
     setActiveThread,
     setDraft,
     sendMessage,

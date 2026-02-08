@@ -38,6 +38,7 @@ export default defineEventHandler(async (event) => {
       id: thread.id,
       type: thread.type,
       title: thread.title ?? undefined,
+      team_id: thread.teamId ?? undefined,
       created_at: thread.createdAt.toISOString(),
       last_message_at: thread.lastMessageAt ? thread.lastMessageAt.toISOString() : undefined,
       topics: topicsByThread[index]?.map(topic => ({

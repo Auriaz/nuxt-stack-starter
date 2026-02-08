@@ -13,24 +13,7 @@ const canUseChat = computed(() => {
   return can(PERMISSIONS.CHAT_USE)
 })
 
-const unreadByThread = computed(() => {
-  const map: Record<number, number> = {}
-  const currentUserId = user.value?.id
-  if (!currentUserId) return map
-
-  for (const thread of chatStore.threads) {
-    const items = chatStore.messagesByThread?.[thread.id] || []
-    const lastRead = chatStore.readStateByThread?.[thread.id]?.lastReadAt
-    if (!lastRead) {
-      map[thread.id] = items.filter(message => message.sender_id !== currentUserId).length
-      continue
-    }
-    const lastReadDate = new Date(lastRead)
-    map[thread.id] = items.filter(message => message.sender_id !== currentUserId && new Date(message.created_at) > lastReadDate).length
-  }
-
-  return map
-})
+const unreadByThread = computed(() => chatStore.unreadByThread)
 
 watch(
   () => chatStore.drawerOpen,
@@ -61,6 +44,12 @@ watch(
             <template #conversation>
               <ChatThreadView
                 :thread-title="chatStore.activeThread?.title"
+                :thread-type="chatStore.activeThread?.type"
+                :current-user-id="user?.id"
+                :current-user-name="user?.name || user?.username"
+                :current-user-avatar-url="user?.avatarUrl"
+                :participants="activeId ? chatStore.participantsByThread[activeId] : undefined"
+                :raw-messages="chatStore.activeMessages"
                 :messages="chatStore.activeUiMessages"
                 :status="chatStore.activeStatus"
                 :typing-users="chatStore.activeTypingUsers"

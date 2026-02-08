@@ -8,6 +8,9 @@ import type {
   ChatThreadLeaveInputSchema,
   ChatReadUpdateInputSchema,
   ChatTypingInputSchema,
+  ChatDmOpenInputSchema,
+  ChatTeamThreadCreateInputSchema,
+  ChatParticipantWithUserSchema,
   ChatMessageDeltaPayloadSchema,
   ChatMessageNewPayloadSchema,
   ChatReadUpdatedPayloadSchema,
@@ -23,6 +26,7 @@ export type ChatMessageType = InferOutput<typeof ChatMessageTypeSchema>
 export type ChatThreadDTO = InferOutput<typeof ChatThreadSchema>
 export type ChatThreadTopicDTO = InferOutput<typeof ChatThreadTopicSchema>
 export type ChatParticipantDTO = InferOutput<typeof ChatParticipantSchema>
+export type ChatParticipantWithUserDTO = InferOutput<typeof ChatParticipantWithUserSchema>
 export type ChatMessageDTO = InferOutput<typeof ChatMessageSchema>
 
 export type ChatMessageSendInput = InferOutput<typeof ChatMessageSendInputSchema>
@@ -30,6 +34,8 @@ export type ChatThreadJoinInput = InferOutput<typeof ChatThreadJoinInputSchema>
 export type ChatThreadLeaveInput = InferOutput<typeof ChatThreadLeaveInputSchema>
 export type ChatReadUpdateInput = InferOutput<typeof ChatReadUpdateInputSchema>
 export type ChatTypingInput = InferOutput<typeof ChatTypingInputSchema>
+export type ChatDmOpenInput = InferOutput<typeof ChatDmOpenInputSchema>
+export type ChatTeamThreadCreateInput = InferOutput<typeof ChatTeamThreadCreateInputSchema>
 
 export type ChatMessageDeltaPayload = InferOutput<typeof ChatMessageDeltaPayloadSchema>
 export type ChatMessageNewPayload = InferOutput<typeof ChatMessageNewPayloadSchema>

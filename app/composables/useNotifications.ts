@@ -82,6 +82,11 @@ export function useNotifications() {
   }
 
   const markAsRead = async (id: number): Promise<void> => {
+    if (id < 0) {
+      const local = notifications.value.find(n => n.id === id)
+      if (local) local.read = true
+      return
+    }
     const notification = notifications.value.find(n => n.id === id)
     if (!notification || notification.read) return
     try {
@@ -97,7 +102,10 @@ export function useNotifications() {
     const unread = notifications.value.filter(n => !n.read)
     if (unread.length === 0) return
     try {
-      await resource.markAllAsRead()
+      const localOnly = unread.every(n => n.id < 0)
+      if (!localOnly) {
+        await resource.markAllAsRead()
+      }
       unread.forEach((n) => {
         n.read = true
       })
@@ -113,6 +121,32 @@ export function useNotifications() {
     const index = notifications.value.findIndex(n => n.id === id)
     if (index === -1) return
     notifications.value.splice(index, 1)
+  }
+
+  const addLocalNotification = (input: { title: string, message: string, actionUrl?: string, type?: Notification['type'] }) => {
+    const localId = -1 * Date.now()
+    const newNotification: Notification = {
+      id: localId,
+      type: input.type ?? 'info',
+      title: input.title,
+      message: input.message,
+      read: false,
+      created_at: new Date().toISOString(),
+      action_url: input.actionUrl
+    }
+    notifications.value.unshift(newNotification)
+    const localIds = notifications.value.filter(item => item.id < 0).map(item => item.id)
+    if (localIds.length > 50) {
+      const toRemove = localIds.slice(50)
+      notifications.value = notifications.value.filter(item => !toRemove.includes(item.id))
+    }
+  }
+
+  const clearLocalByAction = (actionPrefix: string) => {
+    notifications.value = notifications.value.filter((item) => {
+      if (item.id >= 0) return true
+      return !item.action_url?.startsWith(actionPrefix)
+    })
   }
 
   const applyReadPayload = (payload: NotificationsReadPayload) => {
@@ -173,6 +207,8 @@ export function useNotifications() {
     markAsRead,
     markAllAsRead,
     deleteNotification,
+    addLocalNotification,
+    clearLocalByAction,
     formatTime,
     setupWebSocket
   }

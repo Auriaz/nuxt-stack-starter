@@ -5,6 +5,8 @@ export interface ChatThreadRecord {
   type: string
   title: string | null
   createdById: number | null
+  teamId: number | null
+  dmKey: string | null
   createdAt: Date
   updatedAt: Date
   lastMessageAt: Date | null
@@ -19,6 +21,22 @@ export interface ChatParticipantRecord {
   leftAt: Date | null
   lastReadAt: Date | null
   mutedUntil: Date | null
+}
+
+export interface ChatParticipantWithUserRecord {
+  id: number
+  threadId: number
+  userId: number
+  role: string
+  joinedAt: Date
+  lastReadAt: Date | null
+  user?: {
+    id: number
+    username: string
+    email: string
+    name: string | null
+    avatarUrl: string | null
+  }
 }
 
 export interface ChatMessageRecord {
@@ -53,14 +71,17 @@ export interface ChatRepository {
   findThreadById(threadId: number): Promise<ChatThreadRecord | null>
   findAiThreadByUserId(userId: number): Promise<ChatThreadRecord | null>
   findDmThreadByUsers(userA: number, userB: number): Promise<ChatThreadRecord | null>
+  findDmThreadByKey(dmKey: string): Promise<ChatThreadRecord | null>
   findParticipant(threadId: number, userId: number): Promise<ChatParticipantRecord | null>
+  listParticipantsWithUsers(threadId: number): Promise<ChatParticipantWithUserRecord[]>
   listParticipantUserIds(threadId: number): Promise<number[]>
   listRecentMessages(threadId: number, limit?: number): Promise<ChatMessageRecord[]>
   listThreadsForUser(userId: number): Promise<ChatThreadRecord[]>
+  listThreadsByTeam(teamId: number): Promise<ChatThreadRecord[]>
   listMessagesByThread(threadId: number, options?: { cursor?: Date, limit?: number }): Promise<ChatMessageRecord[]>
   listTopicsByThread(threadId: number): Promise<ChatThreadTopicRecord[]>
   searchMessagesForUser(userId: number, query: string, limit?: number): Promise<ChatMessageSearchRecord[]>
-  createThread(input: { type: string, title?: string | null, createdById?: number | null }): Promise<ChatThreadRecord>
+  createThread(input: { type: string, title?: string | null, createdById?: number | null, teamId?: number | null, dmKey?: string | null }): Promise<ChatThreadRecord>
   createParticipant(input: { threadId: number, userId: number, role?: string }): Promise<ChatParticipantRecord>
   createTopics(threadId: number, topics: Array<{ slug: string, label: string, order: number }>): Promise<ChatThreadTopicRecord[]>
   createMessage(input: { threadId: number, senderId: number | null, type: string, content: string, metadata?: unknown | null }): Promise<ChatMessageRecord>
@@ -76,6 +97,14 @@ const getChatThreadModel = () => {
 const getChatParticipantModel = () => {
   const client = prisma as unknown as { chatParticipant: { findUnique: (args: unknown) => Promise<ChatParticipantRecord | null>, findMany: (args: unknown) => Promise<Array<{ userId: number }>>, update: (args: unknown) => Promise<ChatParticipantRecord> } }
   return client.chatParticipant
+}
+
+const selectParticipantUser = {
+  id: true,
+  username: true,
+  email: true,
+  name: true,
+  avatarUrl: true
 }
 
 const getChatMessageModel = () => {
@@ -125,6 +154,16 @@ export const chatRepository: ChatRepository = {
     return thread as ChatThreadRecord | null
   },
 
+  async findDmThreadByKey(dmKey) {
+    const thread = await prisma.chatThread.findFirst({
+      where: {
+        type: 'dm',
+        dmKey
+      }
+    })
+    return thread as ChatThreadRecord | null
+  },
+
   async findParticipant(threadId, userId) {
     const model = getChatParticipantModel()
     return await model.findUnique({
@@ -132,6 +171,15 @@ export const chatRepository: ChatRepository = {
         threadId_userId: { threadId, userId }
       }
     })
+  },
+
+  async listParticipantsWithUsers(threadId) {
+    const participants = await prisma.chatParticipant.findMany({
+      where: { threadId },
+      orderBy: { joinedAt: 'asc' },
+      include: { user: { select: selectParticipantUser } }
+    })
+    return participants as ChatParticipantWithUserRecord[]
   },
 
   async listParticipantUserIds(threadId) {
@@ -156,9 +204,35 @@ export const chatRepository: ChatRepository = {
   async listThreadsForUser(userId) {
     const items = await prisma.chatThread.findMany({
       where: {
-        participants: {
-          some: { userId }
-        }
+        OR: [
+          {
+            participants: {
+              some: { userId }
+            }
+          },
+          {
+            type: 'team',
+            team: {
+              members: {
+                some: { userId }
+              }
+            }
+          }
+        ]
+      },
+      orderBy: [
+        { lastMessageAt: 'desc' },
+        { updatedAt: 'desc' }
+      ]
+    })
+    return items as ChatThreadRecord[]
+  },
+
+  async listThreadsByTeam(teamId) {
+    const items = await prisma.chatThread.findMany({
+      where: {
+        type: 'team',
+        teamId
       },
       orderBy: [
         { lastMessageAt: 'desc' },
@@ -230,9 +304,11 @@ export const chatRepository: ChatRepository = {
   async createThread(input) {
     const thread = await prisma.chatThread.create({
       data: {
-        type: input.type as 'ai' | 'dm' | 'room',
+        type: input.type as 'ai' | 'dm' | 'room' | 'team',
         title: input.title ?? undefined,
-        createdById: input.createdById ?? undefined
+        createdById: input.createdById ?? undefined,
+        teamId: input.teamId ?? undefined,
+        dmKey: input.dmKey ?? undefined
       }
     })
     return thread as ChatThreadRecord

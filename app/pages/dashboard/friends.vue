@@ -7,6 +7,7 @@ import type { FriendRequestDTO, FriendUserSummaryDTO } from '#shared/types/frien
 import { useFriendsResource } from '~/composables/resources/useFriendsResource'
 import { useNotificationsSocket } from '~/composables/useNotificationsSocket'
 import { useUsersResource } from '~/composables/resources/useUsersResource'
+import { useChatStore } from '~/stores/chat'
 
 definePageMeta({
   layout: 'dashboard',
@@ -22,6 +23,8 @@ useSeoMeta({
 const friendsResource = useFriendsResource()
 const notificationsSocket = useNotificationsSocket()
 const usersResource = useUsersResource()
+const chatStore = useChatStore()
+const router = useRouter()
 
 const isLoading = ref(false)
 const error = ref<string | null>(null)
@@ -98,6 +101,12 @@ async function unblockUser(userId: number) {
 async function removeFriend(userId: number) {
   await friendsResource.removeFriend(userId)
   await loadFriends()
+}
+
+async function openDm(userId: number) {
+  const thread = await chatStore.openDmThread(userId)
+  if (!thread) return
+  await router.push({ path: '/dashboard/chat', query: { thread: String(thread.id) } })
 }
 
 watch(debouncedTerm, async (term) => {
@@ -240,6 +249,12 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
                 <div class="flex gap-2">
+                  <UButton
+                    size="sm"
+                    @click="openDm(friend.id)"
+                  >
+                    Napisz
+                  </UButton>
                   <UButton
                     size="sm"
                     variant="outline"

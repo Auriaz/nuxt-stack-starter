@@ -4,9 +4,12 @@ import { safeParse } from 'valibot'
 import { PERMISSIONS } from '#shared/permissions'
 import { NotificationSchema } from '#shared/schemas/notification'
 import type { TeamDTO, TeamMemberDTO, TeamInviteDTO, TeamRole } from '#shared/types/teams'
+import type { ChatThreadDTO } from '#shared/types/chat'
 import type { FriendUserSummaryDTO } from '#shared/types/friends'
 import ModalConfirmation from '~/components/Modal/Confirmation/ModalConfirmation.vue'
 import { useTeamsResource } from '~/composables/resources/useTeamsResource'
+import { useChatResource } from '~/composables/resources/useChatResource'
+import { useChatStore } from '~/stores/chat'
 import { useNotificationsSocket } from '~/composables/useNotificationsSocket'
 import { useUsersResource } from '~/composables/resources/useUsersResource'
 
@@ -17,7 +20,10 @@ definePageMeta({
 })
 
 const route = useRoute()
+const router = useRouter()
 const teamsResource = useTeamsResource()
+const chatResource = useChatResource()
+const chatStore = useChatStore()
 const notificationsSocket = useNotificationsSocket()
 const usersResource = useUsersResource()
 const { user } = useAuth()
@@ -28,6 +34,10 @@ const members = ref<TeamMemberDTO[]>([])
 const invites = ref<TeamInviteDTO[]>([])
 const isLoading = ref(false)
 const error = ref<string | null>(null)
+const teamThreads = ref<ChatThreadDTO[]>([])
+const threadsLoading = ref(false)
+const threadsError = ref<string | null>(null)
+const newThreadTitle = ref('')
 
 const searchTerm = ref('')
 const debouncedTerm = useDebounce(searchTerm, 250)
@@ -75,6 +85,7 @@ async function loadTeam() {
     } else {
       invites.value = []
     }
+    await loadTeamThreads()
   } catch (err: unknown) {
     error.value = err instanceof Error ? err.message : 'Nie udalo sie pobrac zespolu'
   } finally {
@@ -83,6 +94,18 @@ async function loadTeam() {
       pendingRefresh.value = false
       void loadTeam()
     }
+  }
+}
+
+async function loadTeamThreads() {
+  threadsLoading.value = true
+  threadsError.value = null
+  try {
+    teamThreads.value = await chatResource.listTeamThreads(teamId.value)
+  } catch (err: unknown) {
+    threadsError.value = err instanceof Error ? err.message : 'Nie udalo sie pobrac watkow zespolu'
+  } finally {
+    threadsLoading.value = false
   }
 }
 
@@ -125,6 +148,23 @@ async function cancelInvite(inviteId: number) {
 async function deleteInvite(inviteId: number) {
   await teamsResource.deleteInvite(teamId.value, inviteId)
   await loadTeam()
+}
+
+async function openTeamThread(threadId: number) {
+  await router.push({ path: '/dashboard/chat', query: { thread: String(threadId) } })
+}
+
+async function createTeamThread() {
+  if (!newThreadTitle.value.trim()) return
+  try {
+    const thread = await chatResource.createTeamThread(teamId.value, newThreadTitle.value.trim())
+    chatStore.setActiveThread(thread.id)
+    newThreadTitle.value = ''
+    await loadTeamThreads()
+    await openTeamThread(thread.id)
+  } catch (err: unknown) {
+    threadsError.value = err instanceof Error ? err.message : 'Nie udalo sie utworzyc watku'
+  }
 }
 
 async function confirmDeleteTeam() {
@@ -235,6 +275,81 @@ onBeforeUnmount(() => {
                   </UButton>
                 </div>
               </div>
+            </div>
+          </UCard>
+
+          <UCard>
+            <template #header>
+              <div class="flex items-center justify-between">
+                <p class="font-semibold">
+                  Czat zespolu
+                </p>
+                <span class="text-xs text-muted">{{ teamThreads.length }}</span>
+              </div>
+            </template>
+
+            <div class="space-y-3">
+              <div class="flex flex-wrap items-center gap-2">
+                <UInput
+                  v-model="newThreadTitle"
+                  placeholder="Nazwa kanalu"
+                  :disabled="!canManage"
+                  class="min-w-55"
+                />
+                <UButton
+                  size="sm"
+                  :disabled="!canManage || !newThreadTitle.trim()"
+                  @click="createTeamThread"
+                >
+                  Nowy kanal
+                </UButton>
+              </div>
+
+              <div
+                v-if="threadsLoading"
+                class="text-sm text-muted"
+              >
+                Ladowanie watkow...
+              </div>
+              <div
+                v-else-if="teamThreads.length === 0"
+                class="text-sm text-muted"
+              >
+                Brak kanalow czatu
+              </div>
+              <div
+                v-else
+                class="space-y-2"
+              >
+                <div
+                  v-for="thread in teamThreads"
+                  :key="thread.id"
+                  class="flex items-center justify-between rounded border border-default px-3 py-2"
+                >
+                  <div class="min-w-0">
+                    <div class="font-medium truncate">
+                      {{ thread.title || 'Kanal zespolu' }}
+                    </div>
+                    <div class="text-xs text-muted">
+                      #{{ thread.id }}
+                    </div>
+                  </div>
+                  <UButton
+                    size="sm"
+                    variant="outline"
+                    @click="openTeamThread(thread.id)"
+                  >
+                    Otworz
+                  </UButton>
+                </div>
+              </div>
+
+              <UAlert
+                v-if="threadsError"
+                color="error"
+                variant="soft"
+                :title="threadsError"
+              />
             </div>
           </UCard>
 

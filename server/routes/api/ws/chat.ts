@@ -18,8 +18,12 @@ import type {
   ChatErrorPayload
 } from '#shared/types/chat'
 import { chatRepository } from '~~/server/repositories/chat.repo'
+import { friendsRepository } from '~~/server/repositories/friends.repo'
+import { teamsRepository } from '~~/server/repositories/teams.repo'
 import { settingsRepository, parseLlmProviders } from '~~/server/repositories/settings.repo'
 import { createChatMessageUseCase } from '~~/domain/chat/createMessage.usecase'
+import { assertCanAccessThreadUseCase } from '~~/domain/chat/assertCanAccessThread.usecase'
+import { listThreadAudienceUserIdsUseCase } from '~~/domain/chat/listThreadAudience.usecase'
 import { markThreadReadUseCase } from '~~/domain/chat/markThreadRead.usecase'
 import { ChatAccessDeniedError, ChatThreadNotFoundError } from '~~/domain/chat/errors'
 import { createChatCompletionStream } from '~~/server/utils/chat-ai'
@@ -171,14 +175,25 @@ export default defineWebSocketHandler({
         return
       }
 
-      const participant = await chatRepository.findParticipant(parsed.output.thread_id, userId)
-      if (!participant) {
-        sendError(peer, { code: 'FORBIDDEN', message: 'Not a participant' })
-        return
-      }
+      try {
+        await assertCanAccessThreadUseCase(
+          { userId, threadId: parsed.output.thread_id, permissions, action: 'join' },
+          { chatRepository, friendsRepository, teamsRepository }
+        )
 
-      peer.subscribe(`${ROOM_THREAD_PREFIX}${parsed.output.thread_id}`)
-      peer.send(toJson({ type: 'chat.thread.joined', payload: { thread_id: parsed.output.thread_id } }))
+        peer.subscribe(`${ROOM_THREAD_PREFIX}${parsed.output.thread_id}`)
+        peer.send(toJson({ type: 'chat.thread.joined', payload: { thread_id: parsed.output.thread_id } }))
+      } catch (err) {
+        if (err instanceof ChatThreadNotFoundError) {
+          sendError(peer, { code: 'THREAD_NOT_FOUND', message: err.message })
+          return
+        }
+        if (err instanceof ChatAccessDeniedError) {
+          sendError(peer, { code: 'FORBIDDEN', message: err.message })
+          return
+        }
+        sendError(peer, { code: 'SERVER_ERROR', message: 'Failed to join thread' })
+      }
       return
     }
 
@@ -202,8 +217,12 @@ export default defineWebSocketHandler({
       }
 
       try {
+        const { thread } = await assertCanAccessThreadUseCase(
+          { userId, threadId: parsed.output.thread_id, permissions, action: 'read' },
+          { chatRepository, friendsRepository, teamsRepository }
+        )
         const result = await markThreadReadUseCase(userId, parsed.output.thread_id, chatRepository)
-        const userIds = await chatRepository.listParticipantUserIds(parsed.output.thread_id)
+        const userIds = await listThreadAudienceUserIdsUseCase(thread, { chatRepository, teamsRepository })
         const readPayload: ChatReadUpdatedPayload = {
           thread_id: result.threadId,
           user_id: result.userId,
@@ -231,11 +250,27 @@ export default defineWebSocketHandler({
         return
       }
 
-      const userIds = await chatRepository.listParticipantUserIds(parsed.output.thread_id)
-      publishToUsers(peer, userIds, {
-        type: 'chat.typing',
-        payload: { thread_id: parsed.output.thread_id, user_id: userId, typing: parsed.output.typing }
-      })
+      try {
+        const { thread } = await assertCanAccessThreadUseCase(
+          { userId, threadId: parsed.output.thread_id, permissions, action: 'read' },
+          { chatRepository, friendsRepository, teamsRepository }
+        )
+        const userIds = await listThreadAudienceUserIdsUseCase(thread, { chatRepository, teamsRepository })
+        publishToUsers(peer, userIds, {
+          type: 'chat.typing',
+          payload: { thread_id: parsed.output.thread_id, user_id: userId, typing: parsed.output.typing }
+        })
+      } catch (err) {
+        if (err instanceof ChatThreadNotFoundError) {
+          sendError(peer, { code: 'THREAD_NOT_FOUND', message: err.message })
+          return
+        }
+        if (err instanceof ChatAccessDeniedError) {
+          sendError(peer, { code: 'FORBIDDEN', message: err.message })
+          return
+        }
+        sendError(peer, { code: 'SERVER_ERROR', message: 'Failed to broadcast typing' })
+      }
       return
     }
 
@@ -251,6 +286,10 @@ export default defineWebSocketHandler({
     }
 
     try {
+      const access = await assertCanAccessThreadUseCase(
+        { userId, threadId: parsed.output.thread_id, permissions, action: 'write' },
+        { chatRepository, friendsRepository, teamsRepository }
+      )
       const { thread, message: messageDto, createdAt } = await createChatMessageUseCase(
         {
           threadId: parsed.output.thread_id,
@@ -263,7 +302,7 @@ export default defineWebSocketHandler({
       )
 
       await chatRepository.updateParticipantLastReadAt(parsed.output.thread_id, userId, createdAt)
-      const userIds = await chatRepository.listParticipantUserIds(parsed.output.thread_id)
+      const userIds = await listThreadAudienceUserIdsUseCase(access.thread, { chatRepository, teamsRepository })
       const newPayload: ChatMessageNewPayload = {
         thread_id: parsed.output.thread_id,
         message: messageDto,

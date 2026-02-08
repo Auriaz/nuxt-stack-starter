@@ -15,7 +15,10 @@ const emit = defineEmits<{
 
 const { formatTime, markAsRead } = useNotifications()
 
+const isChatNotification = computed(() => props.notification.action_url?.startsWith('/dashboard/chat') || props.notification.title.toLowerCase().includes('wiadomosc'))
+
 const getTypeColor = (type: Notification['type']): string => {
+  if (isChatNotification.value) return 'text-primary-500'
   const colors: Record<Notification['type'], string> = {
     info: 'text-info-500',
     success: 'text-success-500',
@@ -26,6 +29,7 @@ const getTypeColor = (type: Notification['type']): string => {
 }
 
 const getTypeBgColor = (type: Notification['type']): string => {
+  if (isChatNotification.value) return 'bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-800'
   const colors: Record<Notification['type'], string> = {
     info: 'bg-info-50 dark:bg-info-900/20 border-info-200 dark:border-info-800',
     success: 'bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-800',
@@ -36,6 +40,7 @@ const getTypeBgColor = (type: Notification['type']): string => {
 }
 
 const getTypeIcon = (type: Notification['type']): string => {
+  if (isChatNotification.value) return 'i-lucide-message-square'
   const icons: Record<Notification['type'], string> = {
     info: 'i-heroicons-information-circle',
     success: 'i-heroicons-check-circle',
@@ -78,10 +83,11 @@ const handleMarkAsRead = async (e: Event) => {
       v-if="!notification.read"
       :class="[
         'absolute left-0 top-0 h-full w-1 rounded-l-lg',
-        notification.type === 'info' ? 'bg-info-500'
-        : notification.type === 'success' ? 'bg-success-500'
-          : notification.type === 'warning' ? 'bg-warning-500'
-            : 'bg-error-500'
+        isChatNotification ? 'bg-primary-500'
+        : notification.type === 'info' ? 'bg-info-500'
+          : notification.type === 'success' ? 'bg-success-500'
+            : notification.type === 'warning' ? 'bg-warning-500'
+              : 'bg-error-500'
       ]"
     />
 
@@ -89,10 +95,11 @@ const handleMarkAsRead = async (e: Event) => {
     <div
       :class="[
         'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
-        notification.type === 'info' ? 'bg-info-100 dark:bg-info-900/30'
-        : notification.type === 'success' ? 'bg-success-100 dark:bg-success-900/30'
-          : notification.type === 'warning' ? 'bg-warning-100 dark:bg-warning-900/30'
-            : 'bg-error-100 dark:bg-error-900/30'
+        isChatNotification ? 'bg-primary-100 dark:bg-primary-900/30'
+        : notification.type === 'info' ? 'bg-info-100 dark:bg-info-900/30'
+          : notification.type === 'success' ? 'bg-success-100 dark:bg-success-900/30'
+            : notification.type === 'warning' ? 'bg-warning-100 dark:bg-warning-900/30'
+              : 'bg-error-100 dark:bg-error-900/30'
       ]"
     >
       <UIcon

@@ -64,6 +64,7 @@ enum ChatThreadType {
   ai
   dm
   room
+  team
 }
 
 enum ChatMessageType {
@@ -104,18 +105,23 @@ model ChatThread {
   type          ChatThreadType
   title         String?
   createdById   Int?
+  teamId        Int?
+  dmKey         String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   lastMessageAt DateTime?
 
   createdBy    User?              @relation("ChatThreadCreated", fields: [createdById], references: [id], onDelete: SetNull)
+  team         Team?              @relation(fields: [teamId], references: [id], onDelete: SetNull)
   participants ChatParticipant[]
   messages     ChatMessage[]
   invites      ChatThreadInvite[]
   topics       ChatThreadTopic[]
 
+  @@unique([dmKey])
   @@index([type])
   @@index([lastMessageAt])
+  @@index([teamId])
 }
 
 model ChatThreadTopic {
@@ -312,9 +318,10 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  owner   User         @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  members TeamMember[]
-  invites TeamInvite[]
+  owner       User         @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  invites     TeamInvite[]
+  chatThreads ChatThread[]
 
   @@unique([slug])
   @@index([ownerId])
