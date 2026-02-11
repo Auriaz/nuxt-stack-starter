@@ -66,6 +66,9 @@ export const ModelName = {
   Team: 'Team',
   TeamMember: 'TeamMember',
   TeamInvite: 'TeamInvite',
+  CalendarEvent: 'CalendarEvent',
+  CalendarEventParticipant: 'CalendarEventParticipant',
+  CalendarEventReminder: 'CalendarEventReminder',
   Role: 'Role',
   Permission: 'Permission',
   RolePermission: 'RolePermission',
@@ -206,6 +209,7 @@ export const UserSettingsScalarFieldEnum = {
   llmApiKey: 'llmApiKey',
   llmProviders: 'llmProviders',
   llmSystemPrompt: 'llmSystemPrompt',
+  calendarPrefs: 'calendarPrefs',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -314,6 +318,52 @@ export const TeamInviteScalarFieldEnum = {
 } as const
 
 export type TeamInviteScalarFieldEnum = (typeof TeamInviteScalarFieldEnum)[keyof typeof TeamInviteScalarFieldEnum]
+
+
+export const CalendarEventScalarFieldEnum = {
+  id: 'id',
+  ownerId: 'ownerId',
+  teamId: 'teamId',
+  title: 'title',
+  description: 'description',
+  startAt: 'startAt',
+  endAt: 'endAt',
+  timezone: 'timezone',
+  location: 'location',
+  url: 'url',
+  status: 'status',
+  visibility: 'visibility',
+  cancelledAt: 'cancelledAt',
+  chatThreadId: 'chatThreadId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CalendarEventScalarFieldEnum = (typeof CalendarEventScalarFieldEnum)[keyof typeof CalendarEventScalarFieldEnum]
+
+
+export const CalendarEventParticipantScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  userId: 'userId',
+  role: 'role',
+  rsvpStatus: 'rsvpStatus',
+  invitedById: 'invitedById',
+  createdAt: 'createdAt'
+} as const
+
+export type CalendarEventParticipantScalarFieldEnum = (typeof CalendarEventParticipantScalarFieldEnum)[keyof typeof CalendarEventParticipantScalarFieldEnum]
+
+
+export const CalendarEventReminderScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  minutesBefore: 'minutesBefore',
+  channel: 'channel',
+  firedAt: 'firedAt'
+} as const
+
+export type CalendarEventReminderScalarFieldEnum = (typeof CalendarEventReminderScalarFieldEnum)[keyof typeof CalendarEventReminderScalarFieldEnum]
 
 
 export const RoleScalarFieldEnum = {

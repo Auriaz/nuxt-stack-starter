@@ -64,3 +64,43 @@ export const TeamInviteStatus = {
 } as const
 
 export type TeamInviteStatus = (typeof TeamInviteStatus)[keyof typeof TeamInviteStatus]
+
+
+export const CalendarEventStatus = {
+  scheduled: 'scheduled',
+  cancelled: 'cancelled'
+} as const
+
+export type CalendarEventStatus = (typeof CalendarEventStatus)[keyof typeof CalendarEventStatus]
+
+
+export const CalendarEventVisibility = {
+  private: 'private',
+  team: 'team'
+} as const
+
+export type CalendarEventVisibility = (typeof CalendarEventVisibility)[keyof typeof CalendarEventVisibility]
+
+
+export const CalendarEventParticipantRole = {
+  owner: 'owner',
+  attendee: 'attendee'
+} as const
+
+export type CalendarEventParticipantRole = (typeof CalendarEventParticipantRole)[keyof typeof CalendarEventParticipantRole]
+
+
+export const CalendarEventRsvpStatus = {
+  invited: 'invited',
+  accepted: 'accepted',
+  declined: 'declined'
+} as const
+
+export type CalendarEventRsvpStatus = (typeof CalendarEventRsvpStatus)[keyof typeof CalendarEventRsvpStatus]
+
+
+export const CalendarEventReminderChannel = {
+  in_app: 'in_app'
+} as const
+
+export type CalendarEventReminderChannel = (typeof CalendarEventReminderChannel)[keyof typeof CalendarEventReminderChannel]

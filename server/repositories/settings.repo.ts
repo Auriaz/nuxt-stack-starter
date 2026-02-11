@@ -38,6 +38,7 @@ export const settingsRepository: SettingsRepository = {
     if (data.marketingEmails !== undefined) updateData.marketingEmails = data.marketingEmails
     if (data.llmApiKey !== undefined) updateData.llmApiKey = data.llmApiKey
     if (data.llmSystemPrompt !== undefined) updateData.llmSystemPrompt = data.llmSystemPrompt
+    if (data.calendarPrefs !== undefined) updateData.calendarPrefs = data.calendarPrefs
 
     if (data.llmProviders !== undefined && data.llmProviders.length > 0) {
       const existing = await prisma.userSettings.findUnique({ where: { userId } })
@@ -66,6 +67,7 @@ export const settingsRepository: SettingsRepository = {
           llmApiKey?: string | null
           llmProviders?: LlmProviderEntry[]
           llmSystemPrompt?: string | null
+          calendarPrefs?: unknown
         })
       },
       update: updateData as {
@@ -77,6 +79,7 @@ export const settingsRepository: SettingsRepository = {
         llmApiKey?: string | null
         llmProviders?: LlmProviderEntry[]
         llmSystemPrompt?: string | null
+        calendarPrefs?: unknown
       }
     })
   }

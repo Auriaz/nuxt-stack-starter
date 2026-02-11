@@ -22,7 +22,8 @@ export async function updateUserSettingsUseCase(
     marketingEmails: payload.marketingEmails,
     llmApiKey: payload.llmApiKey,
     llmProviders: payload.llmProviders,
-    llmSystemPrompt: payload.llmSystemPrompt
+    llmSystemPrompt: payload.llmSystemPrompt,
+    calendarPrefs: payload.calendarPrefs
   })
 
   return await getUserSettingsUseCase(userId, settingsRepository, userRepository)

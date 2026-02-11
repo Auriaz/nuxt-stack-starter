@@ -97,6 +97,21 @@ export type TeamMember = Prisma.TeamMemberModel
  */
 export type TeamInvite = Prisma.TeamInviteModel
 /**
+ * Model CalendarEvent
+ * 
+ */
+export type CalendarEvent = Prisma.CalendarEventModel
+/**
+ * Model CalendarEventParticipant
+ * 
+ */
+export type CalendarEventParticipant = Prisma.CalendarEventParticipantModel
+/**
+ * Model CalendarEventReminder
+ * 
+ */
+export type CalendarEventReminder = Prisma.CalendarEventReminderModel
+/**
  * Model Role
  * 
  */

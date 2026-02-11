@@ -38,7 +38,13 @@ const permissionsSeed: Array<{ key: PermissionKey, label: string, group: string 
   { key: PERMISSIONS.TEAMS_MANAGE, label: 'Zarządzanie zespołami', group: 'Teams' },
   { key: PERMISSIONS.TEAMS_MEMBERS_MANAGE, label: 'Zarządzanie członkami zespołu', group: 'Teams' },
   { key: PERMISSIONS.NOTIFICATIONS_READ, label: 'Odczyt powiadomień', group: 'Notifications' },
-  { key: PERMISSIONS.NOTIFICATIONS_MANAGE, label: 'Zarządzanie powiadomieniami', group: 'Notifications' }
+  { key: PERMISSIONS.NOTIFICATIONS_MANAGE, label: 'Zarządzanie powiadomieniami', group: 'Notifications' },
+  { key: PERMISSIONS.CALENDAR_READ, label: 'Podgląd kalendarza', group: 'Calendar' },
+  { key: PERMISSIONS.CALENDAR_WRITE, label: 'Tworzenie i edycja wydarzeń', group: 'Calendar' },
+  { key: PERMISSIONS.CALENDAR_TEAM_READ, label: 'Podgląd kalendarza zespołu', group: 'Calendar' },
+  { key: PERMISSIONS.CALENDAR_TEAM_WRITE, label: 'Edycja wydarzeń zespołowych', group: 'Calendar' },
+  { key: PERMISSIONS.CALENDAR_INVITE, label: 'Zapraszanie do wydarzeń', group: 'Calendar' },
+  { key: PERMISSIONS.CALENDAR_ADMIN, label: 'Administracja kalendarzem', group: 'Calendar' }
 ]
 
 const rolePermissionsSeed: Record<string, PermissionKey[]> = {
@@ -74,7 +80,13 @@ const rolePermissionsSeed: Record<string, PermissionKey[]> = {
     PERMISSIONS.TEAMS_MANAGE,
     PERMISSIONS.TEAMS_MEMBERS_MANAGE,
     PERMISSIONS.NOTIFICATIONS_READ,
-    PERMISSIONS.NOTIFICATIONS_MANAGE
+    PERMISSIONS.NOTIFICATIONS_MANAGE,
+    PERMISSIONS.CALENDAR_READ,
+    PERMISSIONS.CALENDAR_WRITE,
+    PERMISSIONS.CALENDAR_TEAM_READ,
+    PERMISSIONS.CALENDAR_TEAM_WRITE,
+    PERMISSIONS.CALENDAR_INVITE,
+    PERMISSIONS.CALENDAR_ADMIN
   ],
   user: [
     PERMISSIONS.PORTFOLIO_READ,
@@ -94,7 +106,12 @@ const rolePermissionsSeed: Record<string, PermissionKey[]> = {
     PERMISSIONS.FRIENDS_MANAGE,
     PERMISSIONS.TEAMS_READ,
     PERMISSIONS.TEAMS_CREATE,
-    PERMISSIONS.NOTIFICATIONS_READ
+    PERMISSIONS.NOTIFICATIONS_READ,
+    PERMISSIONS.CALENDAR_READ,
+    PERMISSIONS.CALENDAR_WRITE,
+    PERMISSIONS.CALENDAR_TEAM_READ,
+    PERMISSIONS.CALENDAR_TEAM_WRITE,
+    PERMISSIONS.CALENDAR_INVITE
   ]
 }
 

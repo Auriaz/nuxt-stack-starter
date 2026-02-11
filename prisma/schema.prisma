@@ -44,17 +44,20 @@ model User {
   activityLogs              ActivityLog[]
   userSettings              UserSettings?
   blogPosts                 BlogPost[]
-  chatThreadsCreated        ChatThread[]             @relation("ChatThreadCreated")
+  chatThreadsCreated        ChatThread[]               @relation("ChatThreadCreated")
   chatMessages              ChatMessage[]
   chatParticipants          ChatParticipant[]
-  chatThreadInvitesSent     ChatThreadInvite[]       @relation("ChatThreadInviteSent")
-  chatThreadInvitesReceived ChatThreadInvite[]       @relation("ChatThreadInviteReceived")
-  friendRequestsSent        FriendRequest[]          @relation("FriendRequestSent")
-  friendRequestsReceived    FriendRequest[]          @relation("FriendRequestReceived")
-  teamsOwned                Team[]                   @relation("TeamOwner")
+  chatThreadInvitesSent     ChatThreadInvite[]         @relation("ChatThreadInviteSent")
+  chatThreadInvitesReceived ChatThreadInvite[]         @relation("ChatThreadInviteReceived")
+  friendRequestsSent        FriendRequest[]            @relation("FriendRequestSent")
+  friendRequestsReceived    FriendRequest[]            @relation("FriendRequestReceived")
+  teamsOwned                Team[]                     @relation("TeamOwner")
   teamMembers               TeamMember[]
-  teamInvitesSent           TeamInvite[]             @relation("TeamInviteSent")
-  teamInvitesReceived       TeamInvite[]             @relation("TeamInviteReceived")
+  teamInvitesSent           TeamInvite[]               @relation("TeamInviteSent")
+  teamInvitesReceived       TeamInvite[]               @relation("TeamInviteReceived")
+  calendarEventsOwned       CalendarEvent[]            @relation("CalendarEventOwner")
+  calendarEventParticipants CalendarEventParticipant[] @relation("CalendarEventParticipantUser")
+  calendarEventInvitesSent  CalendarEventParticipant[] @relation("CalendarEventParticipantInviter")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -98,6 +101,31 @@ enum TeamInviteStatus {
   accepted
   declined
   canceled
+}
+
+enum CalendarEventStatus {
+  scheduled
+  cancelled
+}
+
+enum CalendarEventVisibility {
+  private
+  team
+}
+
+enum CalendarEventParticipantRole {
+  owner
+  attendee
+}
+
+enum CalendarEventRsvpStatus {
+  invited
+  accepted
+  declined
+}
+
+enum CalendarEventReminderChannel {
+  in_app
 }
 
 model ChatThread {
@@ -221,6 +249,7 @@ model UserSettings {
   llmApiKey          String? // legacy: pojedynczy klucz (fallback dla openai)
   llmProviders       Json? // [{ provider: string, apiKey: string }] — nigdy nie zwracamy apiKey do klienta
   llmSystemPrompt    String? // własny prompt systemowy dla asystenta AI (np. ton, kontekst bloga)
+  calendarPrefs      Json? // ustawienia operacyjne kalendarza (quick settings)
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
@@ -318,10 +347,11 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  owner       User         @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  members     TeamMember[]
-  invites     TeamInvite[]
-  chatThreads ChatThread[]
+  owner          User            @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members        TeamMember[]
+  invites        TeamInvite[]
+  chatThreads    ChatThread[]
+  calendarEvents CalendarEvent[] @relation("CalendarEventTeam")
 
   @@unique([slug])
   @@index([ownerId])
@@ -362,6 +392,66 @@ model TeamInvite {
   @@index([inviteeId])
   @@index([inviterId])
   @@index([status])
+}
+
+model CalendarEvent {
+  id           Int                     @id @default(autoincrement())
+  ownerId      Int
+  teamId       Int?
+  title        String
+  description  String?
+  startAt      DateTime
+  endAt        DateTime
+  timezone     String
+  location     String?
+  url          String?
+  status       CalendarEventStatus     @default(scheduled)
+  visibility   CalendarEventVisibility @default(private)
+  cancelledAt  DateTime?
+  chatThreadId Int?
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
+
+  owner User  @relation("CalendarEventOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  team  Team? @relation("CalendarEventTeam", fields: [teamId], references: [id], onDelete: SetNull)
+
+  participants CalendarEventParticipant[]
+  reminders    CalendarEventReminder[]
+
+  @@index([ownerId, startAt])
+  @@index([teamId, startAt])
+  @@index([status, startAt])
+}
+
+model CalendarEventParticipant {
+  id          Int                          @id @default(autoincrement())
+  eventId     Int
+  userId      Int
+  role        CalendarEventParticipantRole @default(attendee)
+  rsvpStatus  CalendarEventRsvpStatus      @default(invited)
+  invitedById Int?
+  createdAt   DateTime                     @default(now())
+
+  event     CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User          @relation("CalendarEventParticipantUser", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy User?         @relation("CalendarEventParticipantInviter", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  @@unique([eventId, userId])
+  @@index([userId])
+  @@index([eventId])
+}
+
+model CalendarEventReminder {
+  id            Int                          @id @default(autoincrement())
+  eventId       Int
+  minutesBefore Int
+  channel       CalendarEventReminderChannel @default(in_app)
+  firedAt       DateTime?
+
+  event CalendarEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+  @@index([firedAt])
 }
 
 model Role {

@@ -26,6 +26,12 @@ export const getDashboardMenuItems = (options: boolean | DashboardMenuOptions = 
       active: false
     },
     {
+      label: 'Kalendarz',
+      icon: 'i-lucide-calendar-days',
+      to: '/dashboard/calendar',
+      active: false
+    },
+    {
       label: 'Czat',
       icon: 'i-lucide-message-square',
       to: '/dashboard/chat',

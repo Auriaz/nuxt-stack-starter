@@ -399,6 +399,9 @@ export const ModelName = {
   Team: 'Team',
   TeamMember: 'TeamMember',
   TeamInvite: 'TeamInvite',
+  CalendarEvent: 'CalendarEvent',
+  CalendarEventParticipant: 'CalendarEventParticipant',
+  CalendarEventReminder: 'CalendarEventReminder',
   Role: 'Role',
   Permission: 'Permission',
   RolePermission: 'RolePermission',
@@ -425,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "chatThread" | "chatThreadTopic" | "chatParticipant" | "chatMessage" | "chatMessageLink" | "chatThreadInvite" | "userSettings" | "userSession" | "loginEvent" | "activityLog" | "notification" | "friendRequest" | "team" | "teamMember" | "teamInvite" | "role" | "permission" | "rolePermission" | "contactMessage" | "emailVerificationToken" | "passwordResetToken" | "oAuthAccount" | "mediaAsset" | "blogTag" | "blogPost" | "blogAnchor"
+    modelProps: "user" | "chatThread" | "chatThreadTopic" | "chatParticipant" | "chatMessage" | "chatMessageLink" | "chatThreadInvite" | "userSettings" | "userSession" | "loginEvent" | "activityLog" | "notification" | "friendRequest" | "team" | "teamMember" | "teamInvite" | "calendarEvent" | "calendarEventParticipant" | "calendarEventReminder" | "role" | "permission" | "rolePermission" | "contactMessage" | "emailVerificationToken" | "passwordResetToken" | "oAuthAccount" | "mediaAsset" | "blogTag" | "blogPost" | "blogAnchor"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1613,6 +1616,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CalendarEvent: {
+      payload: Prisma.$CalendarEventPayload<ExtArgs>
+      fields: Prisma.CalendarEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CalendarEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CalendarEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventPayload>
+        }
+        findFirst: {
+          args: Prisma.CalendarEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CalendarEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventPayload>
+        }
+        findMany: {
+          args: Prisma.CalendarEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventPayload>[]
+        }
+        create: {
+          args: Prisma.CalendarEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventPayload>
+        }
+        createMany: {
+          args: Prisma.CalendarEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CalendarEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventPayload>[]
+        }
+        delete: {
+          args: Prisma.CalendarEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventPayload>
+        }
+        update: {
+          args: Prisma.CalendarEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.CalendarEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CalendarEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CalendarEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.CalendarEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventPayload>
+        }
+        aggregate: {
+          args: Prisma.CalendarEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCalendarEvent>
+        }
+        groupBy: {
+          args: Prisma.CalendarEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CalendarEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CalendarEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CalendarEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    CalendarEventParticipant: {
+      payload: Prisma.$CalendarEventParticipantPayload<ExtArgs>
+      fields: Prisma.CalendarEventParticipantFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CalendarEventParticipantFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventParticipantPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CalendarEventParticipantFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventParticipantPayload>
+        }
+        findFirst: {
+          args: Prisma.CalendarEventParticipantFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventParticipantPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CalendarEventParticipantFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventParticipantPayload>
+        }
+        findMany: {
+          args: Prisma.CalendarEventParticipantFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventParticipantPayload>[]
+        }
+        create: {
+          args: Prisma.CalendarEventParticipantCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventParticipantPayload>
+        }
+        createMany: {
+          args: Prisma.CalendarEventParticipantCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CalendarEventParticipantCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventParticipantPayload>[]
+        }
+        delete: {
+          args: Prisma.CalendarEventParticipantDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventParticipantPayload>
+        }
+        update: {
+          args: Prisma.CalendarEventParticipantUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventParticipantPayload>
+        }
+        deleteMany: {
+          args: Prisma.CalendarEventParticipantDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CalendarEventParticipantUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CalendarEventParticipantUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventParticipantPayload>[]
+        }
+        upsert: {
+          args: Prisma.CalendarEventParticipantUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventParticipantPayload>
+        }
+        aggregate: {
+          args: Prisma.CalendarEventParticipantAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCalendarEventParticipant>
+        }
+        groupBy: {
+          args: Prisma.CalendarEventParticipantGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CalendarEventParticipantGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CalendarEventParticipantCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CalendarEventParticipantCountAggregateOutputType> | number
+        }
+      }
+    }
+    CalendarEventReminder: {
+      payload: Prisma.$CalendarEventReminderPayload<ExtArgs>
+      fields: Prisma.CalendarEventReminderFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CalendarEventReminderFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventReminderPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CalendarEventReminderFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventReminderPayload>
+        }
+        findFirst: {
+          args: Prisma.CalendarEventReminderFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventReminderPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CalendarEventReminderFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventReminderPayload>
+        }
+        findMany: {
+          args: Prisma.CalendarEventReminderFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventReminderPayload>[]
+        }
+        create: {
+          args: Prisma.CalendarEventReminderCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventReminderPayload>
+        }
+        createMany: {
+          args: Prisma.CalendarEventReminderCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CalendarEventReminderCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventReminderPayload>[]
+        }
+        delete: {
+          args: Prisma.CalendarEventReminderDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventReminderPayload>
+        }
+        update: {
+          args: Prisma.CalendarEventReminderUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventReminderPayload>
+        }
+        deleteMany: {
+          args: Prisma.CalendarEventReminderDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CalendarEventReminderUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CalendarEventReminderUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventReminderPayload>[]
+        }
+        upsert: {
+          args: Prisma.CalendarEventReminderUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CalendarEventReminderPayload>
+        }
+        aggregate: {
+          args: Prisma.CalendarEventReminderAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCalendarEventReminder>
+        }
+        groupBy: {
+          args: Prisma.CalendarEventReminderGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CalendarEventReminderGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CalendarEventReminderCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CalendarEventReminderCountAggregateOutputType> | number
+        }
+      }
+    }
     Role: {
       payload: Prisma.$RolePayload<ExtArgs>
       fields: Prisma.RoleFieldRefs
@@ -2577,6 +2802,7 @@ export const UserSettingsScalarFieldEnum = {
   llmApiKey: 'llmApiKey',
   llmProviders: 'llmProviders',
   llmSystemPrompt: 'llmSystemPrompt',
+  calendarPrefs: 'calendarPrefs',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2685,6 +2911,52 @@ export const TeamInviteScalarFieldEnum = {
 } as const
 
 export type TeamInviteScalarFieldEnum = (typeof TeamInviteScalarFieldEnum)[keyof typeof TeamInviteScalarFieldEnum]
+
+
+export const CalendarEventScalarFieldEnum = {
+  id: 'id',
+  ownerId: 'ownerId',
+  teamId: 'teamId',
+  title: 'title',
+  description: 'description',
+  startAt: 'startAt',
+  endAt: 'endAt',
+  timezone: 'timezone',
+  location: 'location',
+  url: 'url',
+  status: 'status',
+  visibility: 'visibility',
+  cancelledAt: 'cancelledAt',
+  chatThreadId: 'chatThreadId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CalendarEventScalarFieldEnum = (typeof CalendarEventScalarFieldEnum)[keyof typeof CalendarEventScalarFieldEnum]
+
+
+export const CalendarEventParticipantScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  userId: 'userId',
+  role: 'role',
+  rsvpStatus: 'rsvpStatus',
+  invitedById: 'invitedById',
+  createdAt: 'createdAt'
+} as const
+
+export type CalendarEventParticipantScalarFieldEnum = (typeof CalendarEventParticipantScalarFieldEnum)[keyof typeof CalendarEventParticipantScalarFieldEnum]
+
+
+export const CalendarEventReminderScalarFieldEnum = {
+  id: 'id',
+  eventId: 'eventId',
+  minutesBefore: 'minutesBefore',
+  channel: 'channel',
+  firedAt: 'firedAt'
+} as const
+
+export type CalendarEventReminderScalarFieldEnum = (typeof CalendarEventReminderScalarFieldEnum)[keyof typeof CalendarEventReminderScalarFieldEnum]
 
 
 export const RoleScalarFieldEnum = {
@@ -3032,6 +3304,76 @@ export type ListEnumTeamInviteStatusFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'CalendarEventStatus'
+ */
+export type EnumCalendarEventStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarEventStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CalendarEventStatus[]'
+ */
+export type ListEnumCalendarEventStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarEventStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CalendarEventVisibility'
+ */
+export type EnumCalendarEventVisibilityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarEventVisibility'>
+    
+
+
+/**
+ * Reference to a field of type 'CalendarEventVisibility[]'
+ */
+export type ListEnumCalendarEventVisibilityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarEventVisibility[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CalendarEventParticipantRole'
+ */
+export type EnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarEventParticipantRole'>
+    
+
+
+/**
+ * Reference to a field of type 'CalendarEventParticipantRole[]'
+ */
+export type ListEnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarEventParticipantRole[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CalendarEventRsvpStatus'
+ */
+export type EnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarEventRsvpStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CalendarEventRsvpStatus[]'
+ */
+export type ListEnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarEventRsvpStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CalendarEventReminderChannel'
+ */
+export type EnumCalendarEventReminderChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarEventReminderChannel'>
+    
+
+
+/**
+ * Reference to a field of type 'CalendarEventReminderChannel[]'
+ */
+export type ListEnumCalendarEventReminderChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CalendarEventReminderChannel[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -3155,6 +3497,9 @@ export type GlobalOmitConfig = {
   team?: Prisma.TeamOmit
   teamMember?: Prisma.TeamMemberOmit
   teamInvite?: Prisma.TeamInviteOmit
+  calendarEvent?: Prisma.CalendarEventOmit
+  calendarEventParticipant?: Prisma.CalendarEventParticipantOmit
+  calendarEventReminder?: Prisma.CalendarEventReminderOmit
   role?: Prisma.RoleOmit
   permission?: Prisma.PermissionOmit
   rolePermission?: Prisma.RolePermissionOmit

@@ -30,7 +30,13 @@ export const PERMISSIONS = {
   TEAMS_MANAGE: 'teams.manage',
   TEAMS_MEMBERS_MANAGE: 'teams.members.manage',
   NOTIFICATIONS_READ: 'notifications.read',
-  NOTIFICATIONS_MANAGE: 'notifications.manage'
+  NOTIFICATIONS_MANAGE: 'notifications.manage',
+  CALENDAR_READ: 'calendar.read',
+  CALENDAR_WRITE: 'calendar.write',
+  CALENDAR_TEAM_READ: 'calendar.team.read',
+  CALENDAR_TEAM_WRITE: 'calendar.team.write',
+  CALENDAR_INVITE: 'calendar.invite',
+  CALENDAR_ADMIN: 'calendar.admin'
 } as const
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]
@@ -67,5 +73,11 @@ export const PERMISSION_META: Record<PermissionKey, { label: string, group: stri
   'teams.manage': { label: 'Zarządzanie zespołami', group: 'Teams' },
   'teams.members.manage': { label: 'Zarządzanie członkami zespołu', group: 'Teams' },
   'notifications.read': { label: 'Odczyt powiadomień', group: 'Notifications' },
-  'notifications.manage': { label: 'Zarządzanie powiadomieniami', group: 'Notifications' }
+  'notifications.manage': { label: 'Zarządzanie powiadomieniami', group: 'Notifications' },
+  'calendar.read': { label: 'Podgląd kalendarza', group: 'Calendar' },
+  'calendar.write': { label: 'Tworzenie i edycja wydarzeń', group: 'Calendar' },
+  'calendar.team.read': { label: 'Podgląd kalendarza zespołu', group: 'Calendar' },
+  'calendar.team.write': { label: 'Edycja wydarzeń zespołowych', group: 'Calendar' },
+  'calendar.invite': { label: 'Zapraszanie do wydarzeń', group: 'Calendar' },
+  'calendar.admin': { label: 'Administracja kalendarzem', group: 'Calendar' }
 }

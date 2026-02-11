@@ -86,14 +86,33 @@ export async function assertCanAccessThreadUseCase(
       throw new ChatAccessDeniedError('Not a team member')
     }
 
-    const permissionKey = params.action === 'write'
-      ? PERMISSIONS.CHAT_TEAM_WRITE
-      : PERMISSIONS.CHAT_TEAM_READ
-
-    if (!hasPermission(params.permissions, permissionKey, PERMISSIONS.CHAT_USE)) {
-      throw new ChatAccessDeniedError('Insufficient permissions')
+    // Dla odczytu sprawdzamy CHAT_TEAM_READ
+    if (params.action === 'read') {
+      if (!hasPermission(params.permissions, PERMISSIONS.CHAT_TEAM_READ, PERMISSIONS.CHAT_USE)) {
+        throw new ChatAccessDeniedError('Insufficient permissions')
+      }
+      const participant = await ensureTeamParticipant(thread, params.userId, deps.chatRepository)
+      return { thread, participant }
     }
 
+    // Dla zapisu sprawdzamy CHAT_TEAM_WRITE lub czy użytkownik jest członkiem wątku
+    if (params.action === 'write') {
+      // Jeśli użytkownik jest już uczestnikiem wątku (np. dodany do wydarzenia), może pisać
+      const participant = await deps.chatRepository.findParticipant(thread.id, params.userId)
+      if (participant) {
+        return { thread, participant }
+      }
+
+      // W przeciwnym razie wymaga uprawnienia CHAT_TEAM_WRITE
+      if (!hasPermission(params.permissions, PERMISSIONS.CHAT_TEAM_WRITE, PERMISSIONS.CHAT_USE)) {
+        throw new ChatAccessDeniedError('Insufficient permissions')
+      }
+
+      const newParticipant = await ensureTeamParticipant(thread, params.userId, deps.chatRepository)
+      return { thread, participant: newParticipant }
+    }
+
+    // Dla 'join' pozwalamy członkom zespołu dołączyć
     const participant = await ensureTeamParticipant(thread, params.userId, deps.chatRepository)
     return { thread, participant }
   }

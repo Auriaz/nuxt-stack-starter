@@ -371,6 +371,91 @@ export type EnumTeamInviteStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumTeamInviteStatusFilter<$PrismaModel>
 }
 
+export type EnumCalendarEventStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventStatus | Prisma.EnumCalendarEventStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventStatus[] | Prisma.ListEnumCalendarEventStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventStatus[] | Prisma.ListEnumCalendarEventStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventStatusFilter<$PrismaModel> | $Enums.CalendarEventStatus
+}
+
+export type EnumCalendarEventVisibilityFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventVisibility | Prisma.EnumCalendarEventVisibilityFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventVisibility[] | Prisma.ListEnumCalendarEventVisibilityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventVisibility[] | Prisma.ListEnumCalendarEventVisibilityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventVisibilityFilter<$PrismaModel> | $Enums.CalendarEventVisibility
+}
+
+export type EnumCalendarEventStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventStatus | Prisma.EnumCalendarEventStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventStatus[] | Prisma.ListEnumCalendarEventStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventStatus[] | Prisma.ListEnumCalendarEventStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventStatusWithAggregatesFilter<$PrismaModel> | $Enums.CalendarEventStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCalendarEventStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCalendarEventStatusFilter<$PrismaModel>
+}
+
+export type EnumCalendarEventVisibilityWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventVisibility | Prisma.EnumCalendarEventVisibilityFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventVisibility[] | Prisma.ListEnumCalendarEventVisibilityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventVisibility[] | Prisma.ListEnumCalendarEventVisibilityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventVisibilityWithAggregatesFilter<$PrismaModel> | $Enums.CalendarEventVisibility
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCalendarEventVisibilityFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCalendarEventVisibilityFilter<$PrismaModel>
+}
+
+export type EnumCalendarEventParticipantRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventParticipantRole | Prisma.EnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventParticipantRole[] | Prisma.ListEnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventParticipantRole[] | Prisma.ListEnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventParticipantRoleFilter<$PrismaModel> | $Enums.CalendarEventParticipantRole
+}
+
+export type EnumCalendarEventRsvpStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventRsvpStatus | Prisma.EnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventRsvpStatus[] | Prisma.ListEnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventRsvpStatus[] | Prisma.ListEnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventRsvpStatusFilter<$PrismaModel> | $Enums.CalendarEventRsvpStatus
+}
+
+export type EnumCalendarEventParticipantRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventParticipantRole | Prisma.EnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventParticipantRole[] | Prisma.ListEnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventParticipantRole[] | Prisma.ListEnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventParticipantRoleWithAggregatesFilter<$PrismaModel> | $Enums.CalendarEventParticipantRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCalendarEventParticipantRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCalendarEventParticipantRoleFilter<$PrismaModel>
+}
+
+export type EnumCalendarEventRsvpStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventRsvpStatus | Prisma.EnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventRsvpStatus[] | Prisma.ListEnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventRsvpStatus[] | Prisma.ListEnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventRsvpStatusWithAggregatesFilter<$PrismaModel> | $Enums.CalendarEventRsvpStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCalendarEventRsvpStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCalendarEventRsvpStatusFilter<$PrismaModel>
+}
+
+export type EnumCalendarEventReminderChannelFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventReminderChannel | Prisma.EnumCalendarEventReminderChannelFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventReminderChannel[] | Prisma.ListEnumCalendarEventReminderChannelFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventReminderChannel[] | Prisma.ListEnumCalendarEventReminderChannelFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventReminderChannelFilter<$PrismaModel> | $Enums.CalendarEventReminderChannel
+}
+
+export type EnumCalendarEventReminderChannelWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventReminderChannel | Prisma.EnumCalendarEventReminderChannelFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventReminderChannel[] | Prisma.ListEnumCalendarEventReminderChannelFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventReminderChannel[] | Prisma.ListEnumCalendarEventReminderChannelFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventReminderChannelWithAggregatesFilter<$PrismaModel> | $Enums.CalendarEventReminderChannel
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCalendarEventReminderChannelFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCalendarEventReminderChannelFilter<$PrismaModel>
+}
+
 export type NestedIntFilter<$PrismaModel = never> = {
   equals?: number | Prisma.IntFieldRefInput<$PrismaModel>
   in?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
@@ -713,6 +798,91 @@ export type NestedEnumTeamInviteStatusWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumTeamInviteStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumTeamInviteStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumCalendarEventStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventStatus | Prisma.EnumCalendarEventStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventStatus[] | Prisma.ListEnumCalendarEventStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventStatus[] | Prisma.ListEnumCalendarEventStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventStatusFilter<$PrismaModel> | $Enums.CalendarEventStatus
+}
+
+export type NestedEnumCalendarEventVisibilityFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventVisibility | Prisma.EnumCalendarEventVisibilityFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventVisibility[] | Prisma.ListEnumCalendarEventVisibilityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventVisibility[] | Prisma.ListEnumCalendarEventVisibilityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventVisibilityFilter<$PrismaModel> | $Enums.CalendarEventVisibility
+}
+
+export type NestedEnumCalendarEventStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventStatus | Prisma.EnumCalendarEventStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventStatus[] | Prisma.ListEnumCalendarEventStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventStatus[] | Prisma.ListEnumCalendarEventStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventStatusWithAggregatesFilter<$PrismaModel> | $Enums.CalendarEventStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCalendarEventStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCalendarEventStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumCalendarEventVisibilityWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventVisibility | Prisma.EnumCalendarEventVisibilityFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventVisibility[] | Prisma.ListEnumCalendarEventVisibilityFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventVisibility[] | Prisma.ListEnumCalendarEventVisibilityFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventVisibilityWithAggregatesFilter<$PrismaModel> | $Enums.CalendarEventVisibility
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCalendarEventVisibilityFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCalendarEventVisibilityFilter<$PrismaModel>
+}
+
+export type NestedEnumCalendarEventParticipantRoleFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventParticipantRole | Prisma.EnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventParticipantRole[] | Prisma.ListEnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventParticipantRole[] | Prisma.ListEnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventParticipantRoleFilter<$PrismaModel> | $Enums.CalendarEventParticipantRole
+}
+
+export type NestedEnumCalendarEventRsvpStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventRsvpStatus | Prisma.EnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventRsvpStatus[] | Prisma.ListEnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventRsvpStatus[] | Prisma.ListEnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventRsvpStatusFilter<$PrismaModel> | $Enums.CalendarEventRsvpStatus
+}
+
+export type NestedEnumCalendarEventParticipantRoleWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventParticipantRole | Prisma.EnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventParticipantRole[] | Prisma.ListEnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventParticipantRole[] | Prisma.ListEnumCalendarEventParticipantRoleFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventParticipantRoleWithAggregatesFilter<$PrismaModel> | $Enums.CalendarEventParticipantRole
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCalendarEventParticipantRoleFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCalendarEventParticipantRoleFilter<$PrismaModel>
+}
+
+export type NestedEnumCalendarEventRsvpStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventRsvpStatus | Prisma.EnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventRsvpStatus[] | Prisma.ListEnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventRsvpStatus[] | Prisma.ListEnumCalendarEventRsvpStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventRsvpStatusWithAggregatesFilter<$PrismaModel> | $Enums.CalendarEventRsvpStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCalendarEventRsvpStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCalendarEventRsvpStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumCalendarEventReminderChannelFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventReminderChannel | Prisma.EnumCalendarEventReminderChannelFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventReminderChannel[] | Prisma.ListEnumCalendarEventReminderChannelFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventReminderChannel[] | Prisma.ListEnumCalendarEventReminderChannelFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventReminderChannelFilter<$PrismaModel> | $Enums.CalendarEventReminderChannel
+}
+
+export type NestedEnumCalendarEventReminderChannelWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CalendarEventReminderChannel | Prisma.EnumCalendarEventReminderChannelFieldRefInput<$PrismaModel>
+  in?: $Enums.CalendarEventReminderChannel[] | Prisma.ListEnumCalendarEventReminderChannelFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CalendarEventReminderChannel[] | Prisma.ListEnumCalendarEventReminderChannelFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCalendarEventReminderChannelWithAggregatesFilter<$PrismaModel> | $Enums.CalendarEventReminderChannel
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCalendarEventReminderChannelFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCalendarEventReminderChannelFilter<$PrismaModel>
 }
 
 

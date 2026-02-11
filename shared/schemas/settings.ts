@@ -1,10 +1,32 @@
-import { object, string, optional, boolean, picklist, nullable, array } from 'valibot'
+import { object, string, optional, boolean, picklist, nullable, array, number } from 'valibot'
 
 const localePicklist = picklist(['pl', 'en'], 'Nieprawidłowa wartość języka')
 const appearanceThemePicklist = picklist(
   ['system', 'light', 'dark'],
   'Nieprawidłowa wartość motywu'
 )
+
+const calendarViewPicklist = picklist(
+  ['year', 'month', 'week', 'day', 'schedule', 'four-day'],
+  'Nieprawidłowy widok kalendarza'
+)
+
+const calendarScopePicklist = picklist(
+  ['personal', 'team', 'all'],
+  'Nieprawidłowy zakres kalendarza'
+)
+
+export const CalendarPrefsSchema = object({
+  defaultView: optional(calendarViewPicklist),
+  showWeekends: optional(boolean()),
+  showCancelled: optional(boolean()),
+  showWorkHoursOnly: optional(boolean()),
+  workdayStartHour: optional(number()),
+  workdayEndHour: optional(number()),
+  timezone: optional(string()),
+  scope: optional(calendarScopePicklist),
+  teamId: optional(number())
+})
 
 /** Jedna pozycja LLM w odpowiedzi (bez klucza — tylko provider i flaga hasKey). */
 export const LlmProviderOutputSchema = object({
@@ -31,7 +53,8 @@ export const SettingsOutputSchema = object({
   showEmail: optional(boolean()),
   hasLlmKey: optional(boolean()),
   llmProviders: optional(array(LlmProviderOutputSchema)),
-  llmSystemPrompt: optional(string())
+  llmSystemPrompt: optional(string()),
+  calendarPrefs: optional(CalendarPrefsSchema)
 })
 
 /**
@@ -46,5 +69,6 @@ export const SettingsUpdateSchema = object({
   marketingEmails: optional(boolean()),
   llmApiKey: optional(nullable(string())),
   llmProviders: optional(array(LlmProviderUpdateSchema)),
-  llmSystemPrompt: optional(nullable(string()))
+  llmSystemPrompt: optional(nullable(string())),
+  calendarPrefs: optional(CalendarPrefsSchema)
 })

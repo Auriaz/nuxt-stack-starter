@@ -27,6 +27,7 @@ import { listThreadAudienceUserIdsUseCase } from '~~/domain/chat/listThreadAudie
 import { markThreadReadUseCase } from '~~/domain/chat/markThreadRead.usecase'
 import { ChatAccessDeniedError, ChatThreadNotFoundError } from '~~/domain/chat/errors'
 import { createChatCompletionStream } from '~~/server/utils/chat-ai'
+import { registerChatPeer, unregisterChatPeer } from '~~/server/utils/chatHub'
 
 const ROOM_USER_PREFIX = 'user:'
 const ROOM_THREAD_PREFIX = 'thread:'
@@ -142,6 +143,7 @@ export default defineWebSocketHandler({
     }
 
     peer.subscribe(`${ROOM_USER_PREFIX}${userId}`)
+    registerChatPeer(userId, peer)
   },
 
   async message(peer, message) {
@@ -385,6 +387,13 @@ export default defineWebSocketHandler({
       }
       const messageText = err instanceof Error ? err.message : 'Message send failed'
       sendError(peer, { code: 'SERVER_ERROR', message: messageText })
+    }
+  },
+
+  close(peer) {
+    const userId = Number(peer.context.userId)
+    if (userId) {
+      unregisterChatPeer(userId, peer)
     }
   }
 })

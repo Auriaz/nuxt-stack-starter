@@ -74,6 +74,7 @@ export type UserSettingsCountAggregateOutputType = {
   llmApiKey: number
   llmProviders: number
   llmSystemPrompt: number
+  calendarPrefs: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -129,6 +130,7 @@ export type UserSettingsCountAggregateInputType = {
   llmApiKey?: true
   llmProviders?: true
   llmSystemPrompt?: true
+  calendarPrefs?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -231,6 +233,7 @@ export type UserSettingsGroupByOutputType = {
   llmApiKey: string | null
   llmProviders: runtime.JsonValue | null
   llmSystemPrompt: string | null
+  calendarPrefs: runtime.JsonValue | null
   createdAt: Date
   updatedAt: Date
   _count: UserSettingsCountAggregateOutputType | null
@@ -269,6 +272,7 @@ export type UserSettingsWhereInput = {
   llmApiKey?: Prisma.StringNullableFilter<"UserSettings"> | string | null
   llmProviders?: Prisma.JsonNullableFilter<"UserSettings">
   llmSystemPrompt?: Prisma.StringNullableFilter<"UserSettings"> | string | null
+  calendarPrefs?: Prisma.JsonNullableFilter<"UserSettings">
   createdAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -285,6 +289,7 @@ export type UserSettingsOrderByWithRelationInput = {
   llmApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   llmProviders?: Prisma.SortOrderInput | Prisma.SortOrder
   llmSystemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  calendarPrefs?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -304,6 +309,7 @@ export type UserSettingsWhereUniqueInput = Prisma.AtLeast<{
   llmApiKey?: Prisma.StringNullableFilter<"UserSettings"> | string | null
   llmProviders?: Prisma.JsonNullableFilter<"UserSettings">
   llmSystemPrompt?: Prisma.StringNullableFilter<"UserSettings"> | string | null
+  calendarPrefs?: Prisma.JsonNullableFilter<"UserSettings">
   createdAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserSettings"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -320,6 +326,7 @@ export type UserSettingsOrderByWithAggregationInput = {
   llmApiKey?: Prisma.SortOrderInput | Prisma.SortOrder
   llmProviders?: Prisma.SortOrderInput | Prisma.SortOrder
   llmSystemPrompt?: Prisma.SortOrderInput | Prisma.SortOrder
+  calendarPrefs?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserSettingsCountOrderByAggregateInput
@@ -343,6 +350,7 @@ export type UserSettingsScalarWhereWithAggregatesInput = {
   llmApiKey?: Prisma.StringNullableWithAggregatesFilter<"UserSettings"> | string | null
   llmProviders?: Prisma.JsonNullableWithAggregatesFilter<"UserSettings">
   llmSystemPrompt?: Prisma.StringNullableWithAggregatesFilter<"UserSettings"> | string | null
+  calendarPrefs?: Prisma.JsonNullableWithAggregatesFilter<"UserSettings">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserSettings"> | Date | string
 }
@@ -356,6 +364,7 @@ export type UserSettingsCreateInput = {
   llmApiKey?: string | null
   llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   llmSystemPrompt?: string | null
+  calendarPrefs?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutUserSettingsInput
@@ -372,6 +381,7 @@ export type UserSettingsUncheckedCreateInput = {
   llmApiKey?: string | null
   llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   llmSystemPrompt?: string | null
+  calendarPrefs?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -385,6 +395,7 @@ export type UserSettingsUpdateInput = {
   llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   llmSystemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calendarPrefs?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutUserSettingsNestedInput
@@ -401,6 +412,7 @@ export type UserSettingsUncheckedUpdateInput = {
   llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   llmSystemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calendarPrefs?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -416,6 +428,7 @@ export type UserSettingsCreateManyInput = {
   llmApiKey?: string | null
   llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   llmSystemPrompt?: string | null
+  calendarPrefs?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -429,6 +442,7 @@ export type UserSettingsUpdateManyMutationInput = {
   llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   llmSystemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calendarPrefs?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -444,6 +458,7 @@ export type UserSettingsUncheckedUpdateManyInput = {
   llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   llmSystemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calendarPrefs?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -464,6 +479,7 @@ export type UserSettingsCountOrderByAggregateInput = {
   llmApiKey?: Prisma.SortOrder
   llmProviders?: Prisma.SortOrder
   llmSystemPrompt?: Prisma.SortOrder
+  calendarPrefs?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -547,6 +563,7 @@ export type UserSettingsCreateWithoutUserInput = {
   llmApiKey?: string | null
   llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   llmSystemPrompt?: string | null
+  calendarPrefs?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -561,6 +578,7 @@ export type UserSettingsUncheckedCreateWithoutUserInput = {
   llmApiKey?: string | null
   llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   llmSystemPrompt?: string | null
+  calendarPrefs?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -590,6 +608,7 @@ export type UserSettingsUpdateWithoutUserInput = {
   llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   llmSystemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calendarPrefs?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -604,6 +623,7 @@ export type UserSettingsUncheckedUpdateWithoutUserInput = {
   llmApiKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   llmProviders?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   llmSystemPrompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  calendarPrefs?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -621,6 +641,7 @@ export type UserSettingsSelect<ExtArgs extends runtime.Types.Extensions.Internal
   llmApiKey?: boolean
   llmProviders?: boolean
   llmSystemPrompt?: boolean
+  calendarPrefs?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -637,6 +658,7 @@ export type UserSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   llmApiKey?: boolean
   llmProviders?: boolean
   llmSystemPrompt?: boolean
+  calendarPrefs?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -653,6 +675,7 @@ export type UserSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   llmApiKey?: boolean
   llmProviders?: boolean
   llmSystemPrompt?: boolean
+  calendarPrefs?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -669,11 +692,12 @@ export type UserSettingsSelectScalar = {
   llmApiKey?: boolean
   llmProviders?: boolean
   llmSystemPrompt?: boolean
+  calendarPrefs?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "locale" | "timezone" | "appearanceTheme" | "emailNotifications" | "marketingEmails" | "llmApiKey" | "llmProviders" | "llmSystemPrompt" | "createdAt" | "updatedAt", ExtArgs["result"]["userSettings"]>
+export type UserSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "locale" | "timezone" | "appearanceTheme" | "emailNotifications" | "marketingEmails" | "llmApiKey" | "llmProviders" | "llmSystemPrompt" | "calendarPrefs" | "createdAt" | "updatedAt", ExtArgs["result"]["userSettings"]>
 export type UserSettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -700,6 +724,7 @@ export type $UserSettingsPayload<ExtArgs extends runtime.Types.Extensions.Intern
     llmApiKey: string | null
     llmProviders: runtime.JsonValue | null
     llmSystemPrompt: string | null
+    calendarPrefs: runtime.JsonValue | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["userSettings"]>
@@ -1136,6 +1161,7 @@ export interface UserSettingsFieldRefs {
   readonly llmApiKey: Prisma.FieldRef<"UserSettings", 'String'>
   readonly llmProviders: Prisma.FieldRef<"UserSettings", 'Json'>
   readonly llmSystemPrompt: Prisma.FieldRef<"UserSettings", 'String'>
+  readonly calendarPrefs: Prisma.FieldRef<"UserSettings", 'Json'>
   readonly createdAt: Prisma.FieldRef<"UserSettings", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"UserSettings", 'DateTime'>
 }

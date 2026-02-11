@@ -176,6 +176,62 @@ async function saveSystemPrompt() {
       />
     </UCard>
 
+    <!-- Kalendarz (zaawansowane) -->
+    <UCard
+      variant="soft"
+      class="overflow-hidden"
+    >
+      <template #header>
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+            <UIcon
+              name="i-lucide-calendar-days"
+              class="h-5 w-5 text-primary"
+            />
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold">
+              Kalendarz (zaawansowane)
+            </h2>
+            <p class="mt-0.5 text-sm text-muted">
+              Integracje z zewnetrznymi kalendarzami i automatyczne synchronizacje.
+            </p>
+          </div>
+        </div>
+      </template>
+
+      <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <div>
+          <p class="text-sm text-muted">
+            Google Calendar bedzie dostepny jako pierwsza integracja.
+          </p>
+          <ul class="mt-3 space-y-1 text-sm text-muted">
+            <li>TODO: OAuth + uprawnienia do kalendarza</li>
+            <li>TODO: Automatyczna synchronizacja wydarzen</li>
+            <li>TODO: Mapowanie stref czasowych</li>
+          </ul>
+        </div>
+        <div class="flex justify-end">
+          <UButton
+            color="primary"
+            variant="soft"
+            disabled
+          >
+            Polacz Google Calendar (wkrotce)
+          </UButton>
+        </div>
+      </div>
+
+      <UAlert
+        color="primary"
+        variant="soft"
+        title="Placeholder"
+        description="Integracje kalendarza sa w przygotowaniu. Ten panel zostanie rozbudowany w kolejnym kroku."
+        icon="i-lucide-info"
+        class="mt-4 rounded-lg"
+      />
+    </UCard>
+
     <!-- Asystent AI (LLM) -->
     <UCard
       variant="soft"
