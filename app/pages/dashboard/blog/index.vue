@@ -5,7 +5,7 @@ import { useBlogDraft } from '~/composables/useBlogDraft'
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: 'auth'
+  middleware: ['auth', 'content-manage']
 })
 
 useSeoMeta({
@@ -24,8 +24,12 @@ const draftCount = ref(0)
 const hasDrafts = computed(() => draftCount.value > 0)
 const continueDraftUrl = computed(() => '/dashboard/blog/create?mode=continue')
 
-const { can } = useAccess()
-const hasContentManage = computed(() => can(PERMISSIONS.CONTENT_MANAGE))
+const { can, hasRole } = useAccess()
+const hasContentManage = computed(() =>
+  can(PERMISSIONS.CONTENT_MANAGE)
+  || can(PERMISSIONS.ADMIN_ACCESS)
+  || hasRole('admin')
+)
 
 onMounted(() => {
   const drafts = draftManager.listDrafts()
@@ -58,6 +62,19 @@ onMounted(() => {
           description="Dodaj pierwszy wpis przyciskiem «Dodaj post»."
           icon="i-lucide-book-open"
         />
+
+        <div
+          v-if="!posts?.length && hasContentManage"
+          class="mt-4"
+        >
+          <UButton
+            to="/dashboard/blog/create"
+            icon="i-lucide-plus"
+            color="primary"
+          >
+            Dodaj post
+          </UButton>
+        </div>
 
         <div
           v-else

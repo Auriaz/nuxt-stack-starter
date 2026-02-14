@@ -1,5 +1,5 @@
 import { prisma } from '../services/prisma'
-import type { Prisma, User } from '../../prisma/generated/client.js'
+import type { Prisma, User } from '@prisma/client'
 
 export type UserWithRolePermissions = Prisma.UserGetPayload<{
   include: {

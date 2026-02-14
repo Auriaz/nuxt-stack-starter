@@ -8,9 +8,13 @@ import { listBlogPostsUseCase } from '~~/domain/blog/listBlogPosts.usecase'
 import { blogPostRepository } from '~~/server/repositories/blogPost.repo'
 import { PERMISSIONS } from '~~/shared/permissions'
 import { requirePermission } from '~~/server/utils/access'
+import { hasPermission, hasRole } from '~~/domain/access/access.service'
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, PERMISSIONS.CONTENT_READ)
+  const user = await requirePermission(event, PERMISSIONS.CONTENT_READ)
+  const canViewAll = hasRole(user, 'admin')
+    || hasPermission(user, PERMISSIONS.ADMIN_ACCESS)
+    || hasPermission(user, PERMISSIONS.CONTENT_MANAGE)
 
   const query = getQuery(event)
   const parsed = safeParse(BlogListQuerySchema, {
@@ -36,7 +40,11 @@ export default defineEventHandler(async (event) => {
   }
 
   const result = await listBlogPostsUseCase(
-    { query: parsed.output, forDashboard: true },
+    {
+      query: parsed.output,
+      forDashboard: true,
+      authorId: canViewAll ? undefined : user.id
+    },
     blogPostRepository
   )
   return { data: result }

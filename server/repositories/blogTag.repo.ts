@@ -1,5 +1,5 @@
 import { prisma } from '../services/prisma'
-import type { BlogTag } from '../../prisma/generated/client.js'
+import type { BlogTag } from '@prisma/client'
 
 export interface BlogTagRepository {
   listAll(): Promise<BlogTag[]>

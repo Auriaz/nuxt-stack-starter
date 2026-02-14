@@ -4,12 +4,14 @@ type DashboardNavigationItem = NavigationMenuItem & {
   adminOnly?: boolean
   analyticsOnly?: boolean
   contentManageOnly?: boolean
+  categoryManageOnly?: boolean
 }
 
 export interface DashboardMenuOptions {
   hasAdminRole?: boolean
   showAnalytics?: boolean
   hasContentManage?: boolean
+  hasCategoryManage?: boolean
 }
 
 export const getDashboardMenuItems = (options: boolean | DashboardMenuOptions = false): NavigationMenuItem[][] => {
@@ -17,6 +19,7 @@ export const getDashboardMenuItems = (options: boolean | DashboardMenuOptions = 
   const hasAdminRole = opts.hasAdminRole ?? false
   const showAnalytics = opts.showAnalytics ?? false
   const hasContentManage = opts.hasContentManage ?? false
+  const hasCategoryManage = opts.hasCategoryManage ?? false
 
   const baseItems: DashboardNavigationItem[] = [
     {
@@ -56,9 +59,17 @@ export const getDashboardMenuItems = (options: boolean | DashboardMenuOptions = 
       active: false
     },
     {
+      label: 'Kategorie',
+      icon: 'i-lucide-tags',
+      to: '/dashboard/categories',
+      categoryManageOnly: true,
+      active: false
+    },
+    {
       label: 'Blog',
       icon: 'i-lucide-book-open',
       to: '/dashboard/blog',
+      contentManageOnly: true,
       active: false
     },
     {
@@ -121,6 +132,7 @@ export const getDashboardMenuItems = (options: boolean | DashboardMenuOptions = 
     if (item.adminOnly && !hasAdminRole) return false
     if (item.analyticsOnly && !showAnalytics) return false
     if (item.contentManageOnly && !hasContentManage) return false
+    if (item.categoryManageOnly && !hasCategoryManage) return false
     return true
   })
 

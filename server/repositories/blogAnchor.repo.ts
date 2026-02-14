@@ -1,5 +1,5 @@
 import { prisma } from '../services/prisma'
-import type { BlogAnchor } from '../../prisma/generated/client.js'
+import type { BlogAnchor } from '@prisma/client'
 
 export interface BlogAnchorCreateItem {
   label: string

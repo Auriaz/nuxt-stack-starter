@@ -1,5 +1,5 @@
 import { prisma } from '../services/prisma'
-import type { BlogPost } from '../../prisma/generated/client.js'
+import type { BlogPost } from '@prisma/client'
 
 export interface BlogPostCreateInput {
   slug: string
@@ -30,6 +30,7 @@ export interface BlogPostListFilters {
   search?: string
   tags?: string[]
   status?: 'published' | 'draft' | 'all'
+  authorId?: number
 }
 
 export interface BlogPostPagination {
@@ -136,6 +137,7 @@ export const blogPostRepository: BlogPostRepository = {
       publishedAt?: { not: null } | null
       title?: { contains: string, mode: 'insensitive' }
       tags?: { hasSome: string[] }
+      authorId?: number
     } = {}
     if (filters.status === 'published') {
       where.publishedAt = { not: null }
@@ -147,6 +149,9 @@ export const blogPostRepository: BlogPostRepository = {
     }
     if (filters.tags?.length) {
       where.tags = { hasSome: filters.tags }
+    }
+    if (filters.authorId != null) {
+      where.authorId = filters.authorId
     }
     const skip = (pagination.page - 1) * pagination.perPage
     const [items, total] = await Promise.all([

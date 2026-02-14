@@ -2,22 +2,30 @@
 import type { CalendarDate } from '@internationalized/date'
 import { useEventListener } from '@vueuse/core'
 import type { CalendarEventListItemDTO } from '#shared/types/calendar'
+import type { EventCategoryDTO } from '#shared/types/event-category'
+import { hexToRgba } from '~/utils/color'
 import type { TimeRange } from '~/composables/useCalendarSelection'
 
 const props = defineProps<{
   effectiveDate: CalendarDate
   events: CalendarEventListItemDTO[]
+  categoryColors: Record<number, string>
+  categories: EventCategoryDTO[]
+  teamMembers?: Array<{ id: number | string, name: string, role?: string, avatarUrl?: string }>
+  teamNames?: Record<number, string>
   isLoading: boolean
   showWorkHoursOnly: boolean
   workdayStartHour: number
   workdayEndHour: number
   timeRange: TimeRange | null
   isSelectingTime: boolean
+  canMoveTeamEvents: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'refresh' | 'timeEnd'): void
-  (e: 'edit' | 'cancel' | 'duplicate' | 'copyLink' | 'openChat' | 'moveScope', id: number): void
+  (e: 'edit' | 'cancel' | 'requestCancel' | 'duplicate' | 'copyLink' | 'copyTitle' | 'copyDate' | 'copyId' | 'copyDescription' | 'openChat' | 'shareChatLink' | 'moveScope', id: number): void
+  (e: 'changeCategoryFor', id: number, categoryId: number | null): void
   (e: 'moveEvent' | 'resizeEvent', value: { id: number, start: Date, end: Date }): void
   (e: 'timeStart', value: { date: Date, shiftKey: boolean }): void
   (e: 'timeHover', value: Date): void
@@ -64,6 +72,37 @@ function getEventStyle(event: CalendarEventListItemDTO) {
   }
 }
 
+function getCategoryColor(event: CalendarEventListItemDTO) {
+  if (!event.category_id) return null
+  return props.categoryColors[event.category_id] ?? null
+}
+
+function getCategoryStyle(event: CalendarEventListItemDTO) {
+  const color = getCategoryColor(event)
+  if (!color) return undefined
+  return {
+    backgroundColor: hexToRgba(color, 0.14) ?? undefined,
+    borderColor: color,
+    color
+  }
+}
+
+function getCategoryTextStyle(event: CalendarEventListItemDTO) {
+  const color = getCategoryColor(event)
+  return color ? { color } : undefined
+}
+
+function canMoveEvent(eventItem: CalendarEventListItemDTO) {
+  if (!eventItem.team_id) return true
+  return props.canMoveTeamEvents
+}
+
+function getMoveTooltip(eventItem: CalendarEventListItemDTO) {
+  return canMoveEvent(eventItem)
+    ? ''
+    : 'Wydarzenie zespolowe nie jest przesuwalne dla roli member.'
+}
+
 function getDurationMinutes(event: CalendarEventListItemDTO) {
   const start = new Date(event.start_at)
   const end = new Date(event.end_at)
@@ -79,6 +118,7 @@ function getMinutesFromPointer(clientY: number, columnEl: HTMLElement) {
 }
 
 function handleDragStart(eventItem: CalendarEventListItemDTO, event: DragEvent) {
+  if (!canMoveEvent(eventItem)) return
   const start = new Date(eventItem.start_at)
   const payload = {
     id: eventItem.id,
@@ -103,6 +143,8 @@ function handleDrop(hour: number, event: DragEvent) {
   if (!raw) return
   try {
     const payload = JSON.parse(raw) as { id: number, durationMinutes: number, startMinutes: number }
+    const eventItem = props.events.find(item => item.id === payload.id)
+    if (eventItem && !canMoveEvent(eventItem)) return
     const start = new Date(props.effectiveDate.year, props.effectiveDate.month - 1, props.effectiveDate.day)
     start.setHours(hour, Math.min(59, Math.max(0, payload.startMinutes ?? 0)), 0, 0)
     const end = new Date(start)
@@ -114,6 +156,7 @@ function handleDrop(hour: number, event: DragEvent) {
 }
 
 function startResize(eventItem: CalendarEventListItemDTO, event: MouseEvent) {
+  if (!canMoveEvent(eventItem)) return
   const columnEl = (event.currentTarget as HTMLElement | null)?.closest('[data-day-column]') as HTMLElement | null
   if (!columnEl) return
   resizingEvent.value = { id: eventItem.id, start: new Date(eventItem.start_at), columnEl }
@@ -152,6 +195,30 @@ function isHourSelected(hour: number) {
   cellEnd.setHours(hour + 1, 0, 0, 0)
   return cellStart.getTime() >= props.timeRange.start.getTime()
     && cellEnd.getTime() <= props.timeRange.end.getTime()
+}
+
+function createEventForTime(hour: number) {
+  emit('timeStart', { date: new Date(props.effectiveDate.year, props.effectiveDate.month - 1, props.effectiveDate.day, hour, 0, 0), shiftKey: false })
+  emit('timeEnd')
+}
+
+function getTimeMenuItems(hour: number) {
+  return [
+    [
+      {
+        label: 'Nowe wydarzenie',
+        icon: 'i-lucide-plus',
+        onClick: () => createEventForTime(hour)
+      }
+    ],
+    [
+      {
+        label: 'Odswiez',
+        icon: 'i-lucide-rotate-cw',
+        onClick: () => emit('refresh')
+      }
+    ]
+  ]
 }
 
 onMounted(async () => {
@@ -211,22 +278,29 @@ onMounted(async () => {
             data-day-column
             :style="{ height: `${gridHeight}px` }"
           >
-            <div
+            <UContextMenu
               v-for="hour in hours"
               :key="hour"
-              class="border-b border-neutral-200 dark:border-neutral-800"
-              :class="isHourSelected(hour) ? 'bg-primary-50/60 dark:bg-primary-500/10' : ''"
-              :style="{ height: `${hourHeight}px` }"
-              @mousedown.prevent="emit('timeStart', { date: new Date(effectiveDate.year, effectiveDate.month - 1, effectiveDate.day, hour, 0, 0), shiftKey: $event.shiftKey })"
-              @mouseenter="isSelectingTime ? emit('timeHover', new Date(effectiveDate.year, effectiveDate.month - 1, effectiveDate.day, hour, 0, 0)) : null"
-              @dragover.prevent
-              @drop="handleDrop(hour, $event)"
-            />
+              :items="getTimeMenuItems(hour)"
+            >
+              <div
+                class="border-b border-neutral-200 dark:border-neutral-800"
+                :class="isHourSelected(hour) ? 'bg-primary-50/60 dark:bg-primary-500/10' : ''"
+                :style="{ height: `${hourHeight}px` }"
+                @mousedown.prevent="emit('timeStart', { date: new Date(effectiveDate.year, effectiveDate.month - 1, effectiveDate.day, hour, 0, 0), shiftKey: $event.shiftKey })"
+                @mouseenter="isSelectingTime ? emit('timeHover', new Date(effectiveDate.year, effectiveDate.month - 1, effectiveDate.day, hour, 0, 0)) : null"
+                @dragover.prevent
+                @drop="handleDrop(hour, $event)"
+              />
+            </UContextMenu>
 
             <CalendarEventPopover
               v-for="event in events"
               :key="event.id"
               :event="event"
+              :categories="categories"
+              :team-members="teamMembers"
+              :team-name="event.team_id ? teamNames?.[event.team_id] : undefined"
               :open="openEventId === event.id"
               @update:open="setOpen(event.id, $event)"
               @edit="emit('edit', $event)"
@@ -236,26 +310,52 @@ onMounted(async () => {
               @open-chat="emit('openChat', $event)"
               @move-scope="emit('moveScope', $event)"
             >
-              <button
-                type="button"
-                class="absolute left-2 right-2 rounded-md bg-primary-500/10 px-2 py-1 text-left text-xs text-primary-800 hover:bg-primary-500/20 dark:text-primary-200"
-                :style="getEventStyle(event)"
-                draggable="true"
-                @dragstart="handleDragStart(event, $event)"
-                @dragend="handleDragEnd"
-                @click="setOpen(event.id, true)"
+              <UTooltip
+                :text="getMoveTooltip(event)"
+                :disabled="canMoveEvent(event)"
               >
-                <p class="truncate font-medium">
-                  {{ event.title }}
-                </p>
-                <p class="text-[10px] text-primary-600 dark:text-primary-300">
-                  {{ new Date(event.start_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}
-                </p>
-                <span
-                  class="absolute bottom-0 left-0 right-0 h-2 cursor-s-resize"
-                  @mousedown.prevent.stop="startResize(event, $event)"
-                />
-              </button>
+                <CalendarContextMenu
+                  :event="event"
+                  :categories="categories"
+                  @edit="emit('edit', event.id)"
+                  @request-cancel="emit('requestCancel', event.id)"
+                  @duplicate="emit('duplicate', event.id)"
+                  @change-category-for="emit('changeCategoryFor', $event[0], $event[1])"
+                  @copy-id="emit('copyId', event.id)"
+                  @copy-title="emit('copyTitle', event.id)"
+                  @copy-date="emit('copyDate', event.id)"
+                  @copy-description="emit('copyDescription', event.id)"
+                  @copy-link="emit('copyLink', event.id)"
+                  @share-chat-link="emit('shareChatLink', event.id)"
+                  @open-chat="emit('openChat', event.id)"
+                  @move-scope="emit('moveScope', event.id)"
+                >
+                  <button
+                    type="button"
+                    class="absolute left-2 right-2 rounded-md border border-transparent bg-primary-500/10 px-2 py-1 text-left text-xs text-primary-800 hover:bg-primary-500/20 dark:text-primary-200"
+                    :style="[getEventStyle(event), getCategoryStyle(event)]"
+                    :draggable="canMoveEvent(event)"
+                    @dragstart="handleDragStart(event, $event)"
+                    @dragend="handleDragEnd"
+                    @click="setOpen(event.id, true)"
+                  >
+                    <p class="truncate font-medium">
+                      {{ event.title }}
+                    </p>
+                    <p
+                      class="text-[10px] text-primary-600 dark:text-primary-300"
+                      :style="getCategoryTextStyle(event)"
+                    >
+                      {{ new Date(event.start_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}
+                    </p>
+                    <span
+                      v-if="canMoveEvent(event)"
+                      class="absolute bottom-0 left-0 right-0 h-2 cursor-s-resize"
+                      @mousedown.prevent.stop="startResize(event, $event)"
+                    />
+                  </button>
+                </CalendarContextMenu>
+              </UTooltip>
             </CalendarEventPopover>
           </div>
         </div>

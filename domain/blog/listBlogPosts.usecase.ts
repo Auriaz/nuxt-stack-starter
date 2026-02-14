@@ -6,6 +6,7 @@ import type { BlogPostRecordWithAuthor } from './blog.dto'
 export interface ListBlogPostsInput {
   query: BlogListQuery
   forDashboard: boolean
+  authorId?: number
 }
 
 export async function listBlogPostsUseCase(
@@ -18,7 +19,8 @@ export async function listBlogPostsUseCase(
   const filters = {
     search: input.query.search,
     tags: input.query.tags,
-    status: input.query.status ?? (input.forDashboard ? 'all' : 'published')
+    status: input.query.status ?? (input.forDashboard ? 'all' : 'published'),
+    ...(input.authorId != null && { authorId: input.authorId })
   }
 
   const { items, total } = input.forDashboard

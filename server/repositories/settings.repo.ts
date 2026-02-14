@@ -1,5 +1,5 @@
 import { prisma } from '../services/prisma'
-import type { UserSettings } from '../../prisma/generated/client.js'
+import type { UserSettings } from '@prisma/client'
 import type { SettingsUpdateInput } from '../../shared/types/settings.js'
 
 /** Typ jednego wpisu w llmProviders (w DB: JSON). */

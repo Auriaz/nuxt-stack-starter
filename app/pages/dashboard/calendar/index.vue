@@ -2,15 +2,19 @@
 import { CalendarDate, getLocalTimeZone } from '@internationalized/date'
 import { CreateCalendarEventInputSchema } from '#shared/schemas/calendar'
 import type { CalendarEventDTO, CalendarEventListItemDTO, CreateCalendarEventInput } from '#shared/types/calendar'
+import type { EventCategoryDTO } from '#shared/types/event-category'
+import type { TeamMemberDTO } from '#shared/types/teams'
 import type { FormSubmitEvent } from '@nuxt/ui'
 import { useCalendarResource } from '~/composables/resources/useCalendarResource'
 import { useTeamsResource } from '~/composables/resources/useTeamsResource'
+import { useEventCategoriesResource } from '~/composables/resources/useEventCategoriesResource'
 import { useCalendarSocket } from '~/composables/useCalendarSocket'
 import { useForm } from '~/composables/useForm'
 import { useCalendarPreferences } from '~/composables/useCalendarPreferences'
 import { useCalendarView, type CalendarViewMode } from '~/composables/useCalendarView'
 import { useCalendarSelection, type DayRange } from '~/composables/useCalendarSelection'
 import { PERMISSIONS } from '#shared/permissions'
+import { useChatStore } from '~/stores/chat'
 
 definePageMeta({
   layout: 'dashboard',
@@ -25,7 +29,9 @@ useSeoMeta({
 const { can, user } = useAccess()
 const calendarResource = useCalendarResource()
 const teamsResource = useTeamsResource()
+const categoriesResource = useEventCategoriesResource()
 const calendarSocket = useCalendarSocket()
+const chatStore = useChatStore()
 
 const defaultTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
 const today = new Date()
@@ -55,13 +61,18 @@ const teamId = computed({
 const events = ref<CalendarEventListItemDTO[]>([])
 const selectedEvent = ref<CalendarEventDTO | null>(null)
 const teams = ref<Array<{ id: number, name: string }>>([])
+const teamMembers = ref<TeamMemberDTO[]>([])
+const categories = ref<EventCategoryDTO[]>([])
 const isLoading = ref(false)
 const error = ref<string | null>(null)
+const teamRole = ref<'owner' | 'admin' | 'member' | null>(null)
 
 const isCreateOpen = ref(false)
 const isEditOpen = ref(false)
 const isMoveToTeamOpen = ref(false)
 const selectedEventForMove = ref<number | null>(null)
+const isCancelConfirmOpen = ref(false)
+const selectedEventForCancel = ref<number | null>(null)
 
 const form = useForm(CreateCalendarEventInputSchema, {
   initialValues: {
@@ -70,13 +81,32 @@ const form = useForm(CreateCalendarEventInputSchema, {
     start_at: '',
     end_at: '',
     timezone: defaultTimeZone,
-    visibility: 'private'
+    visibility: 'private',
+    category_id: undefined
   }
 })
 
 const hasCalendarRead = computed(() => can(PERMISSIONS.CALENDAR_READ) || can(PERMISSIONS.CALENDAR_TEAM_READ))
+const canMoveTeamEvents = computed(() =>
+  can(PERMISSIONS.CALENDAR_ADMIN)
+  || teamRole.value === 'owner'
+  || teamRole.value === 'admin'
+)
 const activeTimeZone = computed(() => prefs.value.timezone || defaultTimeZone)
 const toast = useToast()
+
+const categoryColors = computed<Record<number, string>>(() => {
+  return Object.fromEntries(categories.value.map(category => [category.id, category.color]))
+})
+const teamNameMap = computed<Record<number, string>>(() => {
+  return Object.fromEntries(teams.value.map(team => [team.id, team.name]))
+})
+const teamMemberPreview = computed(() => teamMembers.value.map(member => ({
+  id: member.user_id,
+  name: member.user?.name ?? member.user?.username ?? `Uzytkownik #${member.user_id}`,
+  role: member.role,
+  avatarUrl: member.user?.avatar_url ?? undefined
+})))
 
 function getEffectiveDate(): CalendarDate {
   return selectedDate.value ?? new CalendarDate(today.getFullYear(), today.getMonth() + 1, today.getDate())
@@ -263,6 +293,47 @@ async function loadTeams() {
   }
 }
 
+async function loadTeamRole() {
+  if (!teamId.value) {
+    teamRole.value = null
+    return
+  }
+
+  try {
+    const data = await teamsResource.listMembers(teamId.value)
+    const member = data.members.find(item => item.user_id === user.value?.id)
+    teamRole.value = member?.role ?? null
+  } catch {
+    teamRole.value = null
+  }
+}
+
+async function loadTeamMembers() {
+  if (!teamId.value) {
+    teamMembers.value = []
+    return
+  }
+
+  try {
+    const data = await teamsResource.listMembers(teamId.value)
+    teamMembers.value = data.members
+  } catch {
+    teamMembers.value = []
+  }
+}
+
+async function loadCategories() {
+  try {
+    const data = await categoriesResource.listCategories({
+      scope: 'all',
+      teamId: teamId.value
+    })
+    categories.value = Array.isArray(data) ? data : []
+  } catch {
+    categories.value = []
+  }
+}
+
 async function loadEvents() {
   if (!hasCalendarRead.value) {
     events.value = []
@@ -303,7 +374,8 @@ function openCreateModal() {
     end_at: defaults.end,
     timezone: activeTimeZone.value,
     visibility: scope.value === 'team' ? 'team' : 'private',
-    team_id: scope.value === 'team' ? teamId.value ?? undefined : undefined
+    team_id: scope.value === 'team' ? teamId.value ?? undefined : undefined,
+    category_id: undefined
   })
   isCreateOpen.value = true
 }
@@ -317,7 +389,8 @@ function openCreateModalWithRange(start: Date, end: Date) {
     end_at: toLocalInputValue(end.toISOString()),
     timezone: activeTimeZone.value,
     visibility: scope.value === 'team' ? 'team' : 'private',
-    team_id: scope.value === 'team' ? teamId.value ?? undefined : undefined
+    team_id: scope.value === 'team' ? teamId.value ?? undefined : undefined,
+    category_id: undefined
   })
   isCreateOpen.value = true
 }
@@ -380,6 +453,7 @@ async function openEditModal(eventId: number) {
       timezone: event.timezone,
       visibility: event.visibility,
       team_id: event.team_id ?? undefined,
+      category_id: event.category_id ?? undefined,
       location: event.location ?? undefined,
       url: event.url ?? undefined
     })
@@ -408,10 +482,14 @@ function normalizeInput(values: CreateCalendarEventInput): CreateCalendarEventIn
   const team = typeof values.team_id === 'number'
     ? values.team_id
     : values.team_id ? Number(values.team_id) : undefined
+  const category = typeof values.category_id === 'number'
+    ? values.category_id
+    : values.category_id ? Number(values.category_id) : undefined
   return {
     ...values,
     reminder_minutes: Number.isFinite(reminder) ? reminder : undefined,
-    team_id: Number.isFinite(team) ? team : undefined
+    team_id: Number.isFinite(team) ? team : undefined,
+    category_id: Number.isFinite(category) ? category : undefined
   }
 }
 
@@ -503,6 +581,27 @@ async function cancelEvent(eventId: number) {
   }
 }
 
+function requestCancelEvent(eventId: number) {
+  selectedEventForCancel.value = eventId
+  isCancelConfirmOpen.value = true
+}
+
+async function confirmCancelEvent() {
+  if (!selectedEventForCancel.value) {
+    isCancelConfirmOpen.value = false
+    return
+  }
+  const eventId = selectedEventForCancel.value
+  selectedEventForCancel.value = null
+  isCancelConfirmOpen.value = false
+  await cancelEvent(eventId)
+}
+
+function closeCancelConfirm() {
+  isCancelConfirmOpen.value = false
+  selectedEventForCancel.value = null
+}
+
 async function duplicateEvent(eventId: number) {
   try {
     const event = await calendarResource.getEvent(eventId)
@@ -514,6 +613,7 @@ async function duplicateEvent(eventId: number) {
       timezone: event.timezone,
       visibility: event.visibility,
       team_id: event.team_id ?? undefined,
+      category_id: event.category_id ?? undefined,
       location: event.location ?? undefined,
       url: event.url ?? undefined
     }
@@ -536,8 +636,7 @@ async function duplicateEvent(eventId: number) {
 
 async function copyEventLink(eventId: number) {
   try {
-    const baseUrl = window.location.origin
-    const eventUrl = `${baseUrl}/dashboard/calendar?event=${eventId}`
+    const eventUrl = getEventLink(eventId)
     await navigator.clipboard.writeText(eventUrl)
     toast.add({
       title: 'Skopiowano',
@@ -550,6 +649,133 @@ async function copyEventLink(eventId: number) {
       description: 'Nie udalo sie skopiowac linku.',
       color: 'error'
     })
+  }
+}
+
+function getEventLink(eventId: number) {
+  const baseUrl = window.location.origin
+  return `${baseUrl}/dashboard/calendar?event=${eventId}`
+}
+
+async function resolveEventForCopy(eventId: number) {
+  const listItem = events.value.find(item => item.id === eventId)
+  if (listItem) return listItem
+  try {
+    return await calendarResource.getEvent(eventId)
+  } catch {
+    return null
+  }
+}
+
+async function copyEventTitle(eventId: number) {
+  const event = await resolveEventForCopy(eventId)
+  if (!event) {
+    toast.add({ title: 'Blad', description: 'Nie udalo sie znalezc wydarzenia.', color: 'error' })
+    return
+  }
+  try {
+    await navigator.clipboard.writeText(event.title)
+    toast.add({ title: 'Skopiowano', description: 'Tytul wydarzenia zostal skopiowany.', color: 'success' })
+  } catch {
+    toast.add({ title: 'Blad', description: 'Nie udalo sie skopiowac tytulu.', color: 'error' })
+  }
+}
+
+async function copyEventDate(eventId: number) {
+  const event = await resolveEventForCopy(eventId)
+  if (!event) {
+    toast.add({ title: 'Blad', description: 'Nie udalo sie znalezc wydarzenia.', color: 'error' })
+    return
+  }
+  const start = new Date(event.start_at)
+  const end = new Date(event.end_at)
+  const startDate = start.toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const endDate = end.toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const startTime = start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const endTime = end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const value = startDate === endDate
+    ? `${startDate}, ${startTime} - ${endTime}`
+    : `${startDate} ${startTime} - ${endDate} ${endTime}`
+
+  try {
+    await navigator.clipboard.writeText(value)
+    toast.add({ title: 'Skopiowano', description: 'Termin wydarzenia zostal skopiowany.', color: 'success' })
+  } catch {
+    toast.add({ title: 'Blad', description: 'Nie udalo sie skopiowac terminu.', color: 'error' })
+  }
+}
+
+async function copyEventId(eventId: number) {
+  try {
+    await navigator.clipboard.writeText(String(eventId))
+    toast.add({ title: 'Skopiowano', description: 'ID wydarzenia zostalo skopiowane.', color: 'success' })
+  } catch {
+    toast.add({ title: 'Blad', description: 'Nie udalo sie skopiowac ID.', color: 'error' })
+  }
+}
+
+async function copyEventDescription(eventId: number) {
+  const event = await resolveEventForCopy(eventId)
+  if (!event) {
+    toast.add({ title: 'Blad', description: 'Nie udalo sie znalezc wydarzenia.', color: 'error' })
+    return
+  }
+  const description = 'description' in event && typeof event.description === 'string' ? event.description : ''
+  if (!description) {
+    toast.add({ title: 'Brak opisu', description: 'To wydarzenie nie ma opisu.', color: 'info' })
+    return
+  }
+  try {
+    await navigator.clipboard.writeText(description)
+    toast.add({ title: 'Skopiowano', description: 'Opis wydarzenia zostal skopiowany.', color: 'success' })
+  } catch {
+    toast.add({ title: 'Blad', description: 'Nie udalo sie skopiowac opisu.', color: 'error' })
+  }
+}
+
+async function shareEventLinkInChat(eventId: number) {
+  try {
+    const response = await $fetch<{ thread_id: number }>(`/api/calendar/events/${eventId}/chat-thread`, {
+      method: 'POST'
+    })
+
+    if (!response.thread_id) return
+
+    chatStore.ensureInitialized()
+    const eventUrl = getEventLink(eventId)
+    const event = await resolveEventForCopy(eventId)
+    const title = event?.title ? `Udostepniam wydarzenie: ${event.title}` : 'Udostepniam wydarzenie:'
+    const message = `${title}\n${eventUrl}`
+
+    chatStore.setDraft(response.thread_id, message)
+    await navigateTo(`/dashboard/chat?thread=${response.thread_id}`)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Nie udalo sie przygotowac wiadomosci w czacie'
+    toast.add({ title: 'Blad', description: message, color: 'error' })
+  }
+}
+
+async function changeCategoryFor(eventId: number, categoryId: number | null) {
+  try {
+    await calendarResource.updateEvent(eventId, { category_id: categoryId ?? undefined })
+    await loadEvents()
+    if (categoryId) {
+      const category = categories.value.find(cat => cat.id === categoryId)
+      toast.add({
+        title: 'Zaktualizowano',
+        description: category ? `Kategoria zmieniona na "${category.label}"` : 'Kategoria zaktualizowana',
+        color: 'success'
+      })
+    } else {
+      toast.add({
+        title: 'Zaktualizowano',
+        description: 'Kategoria usunięta',
+        color: 'success'
+      })
+    }
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Nie udało się zmienić kategorii'
+    toast.add({ title: 'Błąd', description: message, color: 'error' })
   }
 }
 
@@ -628,6 +854,16 @@ async function openEventChat(eventId: number) {
 }
 
 async function updateEventTiming(payload: { id: number, start: Date, end: Date }, actionLabel: string) {
+  const event = events.value.find(item => item.id === payload.id)
+  if (event?.team_id && !canMoveTeamEvents.value) {
+    toast.add({
+      title: 'Brak uprawnień',
+      description: 'Nie masz uprawnień do przenoszenia tego wydarzenia.',
+      color: 'error'
+    })
+    return
+  }
+
   try {
     await calendarResource.updateEvent(payload.id, {
       start_at: payload.start.toISOString(),
@@ -662,6 +898,15 @@ function setupSocket() {
 watch([selectedDate, scope, teamId, viewMode], () => {
   loadEvents()
 })
+
+watch([scope, teamId], () => {
+  loadCategories()
+}, { immediate: true })
+
+watch(teamId, () => {
+  loadTeamRole()
+  loadTeamMembers()
+}, { immediate: true })
 
 watch(scope, (nextScope) => {
   if (nextScope !== 'team' && teamId.value !== undefined) {
@@ -800,18 +1045,31 @@ onBeforeUnmount(() => {
             v-if="viewMode === 'month'"
             :effective-date="effectiveDate"
             :events="visibleEvents"
+            :category-colors="categoryColors"
+            :categories="categories"
+            :team-members="teamMemberPreview"
+            :team-names="teamNameMap"
             :is-loading="isLoading"
             :show-weekends="prefs.showWeekends"
             :day-range="dayRange"
             :is-selecting-day="isSelectingDay"
+            :can-move-team-events="canMoveTeamEvents"
             @refresh="loadEvents"
             @select-date="setDateParts"
             @edit="openEditModal"
             @cancel="cancelEvent"
+            @request-cancel="requestCancelEvent"
             @duplicate="duplicateEvent"
             @copy-link="copyEventLink"
+            @copy-title="copyEventTitle"
+            @copy-date="copyEventDate"
+            @copy-id="copyEventId"
+            @copy-description="copyEventDescription"
             @open-chat="openEventChat"
+            @share-chat-link="shareEventLinkInChat"
+            @change-category-for="changeCategoryFor"
             @move-scope="openMoveToTeamModal"
+            @move-event="handleMoveEvent"
             @day-start="selection.startDaySelection($event.date, $event.shiftKey)"
             @day-hover="selection.updateDaySelection($event)"
             @day-end="finalizeDaySelection"
@@ -821,6 +1079,10 @@ onBeforeUnmount(() => {
             v-else-if="viewMode === 'week'"
             :effective-date="effectiveDate"
             :events="visibleEvents"
+            :category-colors="categoryColors"
+            :categories="categories"
+            :team-members="teamMemberPreview"
+            :team-names="teamNameMap"
             :is-loading="isLoading"
             :show-weekends="prefs.showWeekends"
             :show-work-hours-only="prefs.showWorkHoursOnly"
@@ -828,12 +1090,20 @@ onBeforeUnmount(() => {
             :workday-end-hour="prefs.workdayEndHour"
             :time-range="timeRange"
             :is-selecting-time="isSelectingTime"
+            :can-move-team-events="canMoveTeamEvents"
             @refresh="loadEvents"
             @edit="openEditModal"
             @cancel="cancelEvent"
+            @request-cancel="requestCancelEvent"
             @duplicate="duplicateEvent"
             @copy-link="copyEventLink"
+            @copy-title="copyEventTitle"
+            @copy-date="copyEventDate"
+            @copy-id="copyEventId"
+            @copy-description="copyEventDescription"
             @open-chat="openEventChat"
+            @share-chat-link="shareEventLinkInChat"
+            @change-category-for="changeCategoryFor"
             @move-scope="openMoveToTeamModal"
             @move-event="handleMoveEvent"
             @resize-event="handleResizeEvent"
@@ -848,6 +1118,7 @@ onBeforeUnmount(() => {
             :year-months="yearMonths"
             :is-loading="isLoading"
             :events="visibleEvents"
+            :category-colors="categoryColors"
             :day-range="dayRange"
             @refresh="loadEvents"
             @open-month="(month: number) => setDateParts({ month, day: 1 })"
@@ -858,17 +1129,30 @@ onBeforeUnmount(() => {
             v-else-if="viewMode === 'schedule'"
             :effective-date="effectiveDate"
             :events="visibleEvents"
+            :category-colors="categoryColors"
+            :categories="categories"
+            :team-members="teamMemberPreview"
+            :team-names="teamNameMap"
             :is-loading="isLoading"
             :show-weekends="prefs.showWeekends"
             :day-range="dayRange"
             :is-selecting-day="isSelectingDay"
+            :can-move-team-events="canMoveTeamEvents"
             @refresh="loadEvents"
             @edit="openEditModal"
             @cancel="cancelEvent"
+            @request-cancel="requestCancelEvent"
             @duplicate="duplicateEvent"
             @copy-link="copyEventLink"
+            @copy-title="copyEventTitle"
+            @copy-date="copyEventDate"
+            @copy-id="copyEventId"
+            @copy-description="copyEventDescription"
             @open-chat="openEventChat"
+            @share-chat-link="shareEventLinkInChat"
+            @change-category-for="changeCategoryFor"
             @move-scope="openMoveToTeamModal"
+            @move-event="handleMoveEvent"
             @day-start="selection.startDaySelection($event.date, $event.shiftKey)"
             @day-hover="selection.updateDaySelection($event)"
             @day-end="finalizeDaySelection"
@@ -878,18 +1162,30 @@ onBeforeUnmount(() => {
             v-else-if="viewMode === 'four-day'"
             :effective-date="effectiveDate"
             :events="visibleEvents"
+            :category-colors="categoryColors"
+            :categories="categories"
+            :team-members="teamMemberPreview"
+            :team-names="teamNameMap"
             :is-loading="isLoading"
             :show-work-hours-only="prefs.showWorkHoursOnly"
             :workday-start-hour="prefs.workdayStartHour"
             :workday-end-hour="prefs.workdayEndHour"
             :time-range="timeRange"
             :is-selecting-time="isSelectingTime"
+            :can-move-team-events="canMoveTeamEvents"
             @refresh="loadEvents"
             @edit="openEditModal"
             @cancel="cancelEvent"
+            @request-cancel="requestCancelEvent"
             @duplicate="duplicateEvent"
             @copy-link="copyEventLink"
+            @copy-title="copyEventTitle"
+            @copy-date="copyEventDate"
+            @copy-id="copyEventId"
+            @copy-description="copyEventDescription"
             @open-chat="openEventChat"
+            @share-chat-link="shareEventLinkInChat"
+            @change-category-for="changeCategoryFor"
             @move-scope="openMoveToTeamModal"
             @move-event="handleMoveEvent"
             @resize-event="handleResizeEvent"
@@ -902,18 +1198,30 @@ onBeforeUnmount(() => {
             v-else
             :effective-date="effectiveDate"
             :events="selectedDayEvents"
+            :category-colors="categoryColors"
+            :categories="categories"
+            :team-members="teamMemberPreview"
+            :team-names="teamNameMap"
             :is-loading="isLoading"
             :show-work-hours-only="prefs.showWorkHoursOnly"
             :workday-start-hour="prefs.workdayStartHour"
             :workday-end-hour="prefs.workdayEndHour"
             :time-range="timeRange"
             :is-selecting-time="isSelectingTime"
+            :can-move-team-events="canMoveTeamEvents"
             @refresh="loadEvents"
             @edit="openEditModal"
             @cancel="cancelEvent"
+            @request-cancel="requestCancelEvent"
             @duplicate="duplicateEvent"
             @copy-link="copyEventLink"
+            @copy-title="copyEventTitle"
+            @copy-date="copyEventDate"
+            @copy-id="copyEventId"
+            @copy-description="copyEventDescription"
             @open-chat="openEventChat"
+            @share-chat-link="shareEventLinkInChat"
+            @change-category-for="changeCategoryFor"
             @move-scope="openMoveToTeamModal"
             @move-event="handleMoveEvent"
             @resize-event="handleResizeEvent"
@@ -923,377 +1231,66 @@ onBeforeUnmount(() => {
           />
         </div>
 
-        <UModal
+        <CalendarModalsCreateEventModal
           v-model:open="isCreateOpen"
-          title="Nowe wydarzenie"
-        >
-          <template #body>
-            <UCard @keydown.enter="handleCreateKeydown">
-              <UForm
-                :schema="CreateCalendarEventInputSchema"
-                :state="form.values.value"
-                @submit="form.handleSubmit(submitCreate)"
-              >
-                <div class="grid gap-4">
-                  <UFormField
-                    label="Tytul"
-                    name="title"
-                    :error="form.errors.value?.title"
-                    class="w-full"
-                  >
-                    <UInput
-                      v-model="form.values.value.title"
-                      class="w-full"
-                    />
-                  </UFormField>
+          :form="form"
+          :categories="categories"
+          :on-submit="submitCreate"
+          :on-submit-manual="submitCreateManual"
+          :on-keydown="handleCreateKeydown"
+        />
 
-                  <UFormField
-                    label="Opis"
-                    name="description"
-                    :error="form.errors.value?.description"
-                    class="w-full"
-                  >
-                    <UTextarea
-                      v-model="form.values.value.description"
-                      class="w-full"
-                    />
-                  </UFormField>
-
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <UFormField
-                      label="Start"
-                      name="start_at"
-                      :error="form.errors.value?.start_at"
-                      class="w-full"
-                    >
-                      <UInput
-                        v-model="form.values.value.start_at"
-                        type="datetime-local"
-                        class="w-full"
-                      />
-                    </UFormField>
-                    <UFormField
-                      label="Koniec"
-                      name="end_at"
-                      :error="form.errors.value?.end_at"
-                      class="w-full"
-                    >
-                      <UInput
-                        v-model="form.values.value.end_at"
-                        type="datetime-local"
-                        class="w-full"
-                      />
-                    </UFormField>
-                  </div>
-
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <UFormField
-                      label="Strefa czasowa"
-                      name="timezone"
-                      :error="form.errors.value?.timezone"
-                      class="w-full"
-                    >
-                      <UInput
-                        v-model="form.values.value.timezone"
-                        class="w-full"
-                      />
-                    </UFormField>
-                    <UFormField
-                      label="Widocznosc"
-                      name="visibility"
-                      :error="form.errors.value?.visibility"
-                      class="w-full"
-                    >
-                      <USelect
-                        v-model="form.values.value.visibility"
-                        :items="[
-                          { label: 'Prywatne', value: 'private' },
-                          { label: 'Zespol', value: 'team' }
-                        ]"
-                        class="w-full"
-                      />
-                    </UFormField>
-                  </div>
-
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <UFormField
-                      label="Lokalizacja"
-                      name="location"
-                      :error="form.errors.value?.location"
-                      class="w-full"
-                    >
-                      <UInput
-                        v-model="form.values.value.location"
-                        class="w-full"
-                      />
-                    </UFormField>
-                    <UFormField
-                      label="URL"
-                      name="url"
-                      :error="form.errors.value?.url"
-                      class="w-full"
-                    >
-                      <UInput
-                        v-model="form.values.value.url"
-                        class="w-full"
-                      />
-                    </UFormField>
-                  </div>
-
-                  <UFormField
-                    label="Przypomnienie (min)"
-                    name="reminder_minutes"
-                    :error="form.errors.value?.reminder_minutes"
-                    class="w-full"
-                  >
-                    <UInput
-                      :model-value="form.values.value.reminder_minutes"
-                      type="number"
-                      class="w-full"
-                      @update:model-value="form.setField('reminder_minutes', $event === null ? undefined : Number($event))"
-                    />
-                  </UFormField>
-
-                  <UAlert
-                    v-if="form.formError.value"
-                    color="error"
-                    variant="soft"
-                    :title="form.formError.value"
-                    class="w-full"
-                  />
-                </div>
-              </UForm>
-            </UCard>
-          </template>
-
-          <template #footer>
-            <div class="w-full flex justify-end gap-2">
-              <UButton
-                variant="ghost"
-                color="neutral"
-                @click="isCreateOpen = false"
-              >
-                Anuluj
-              </UButton>
-              <UButton
-                color="primary"
-                type="button"
-                :loading="form.pending.value"
-                @click="submitCreateManual"
-              >
-                Zapisz
-              </UButton>
-            </div>
-          </template>
-        </UModal>
-
-        <UModal
+        <CalendarModalsEditEventModal
           v-model:open="isEditOpen"
-          :title="selectedEvent ? `Edytuj: ${selectedEvent.title}` : 'Edytuj wydarzenie'"
-        >
-          <template #body>
-            <UCard @keydown.enter="handleEditKeydown">
-              <UForm
-                :schema="CreateCalendarEventInputSchema"
-                :state="form.values.value"
-                @submit="form.handleSubmit(submitUpdate)"
-              >
-                <div class="grid gap-4">
-                  <UFormField
-                    label="Tytul"
-                    name="title"
-                    :error="form.errors.value?.title"
-                    class="w-full"
-                  >
-                    <UInput
-                      v-model="form.values.value.title"
-                      class="w-full"
-                    />
-                  </UFormField>
+          :form="form"
+          :selected-event="selectedEvent"
+          :categories="categories"
+          :on-submit="submitUpdate"
+          :on-submit-manual="submitUpdateManual"
+          :on-keydown="handleEditKeydown"
+        />
 
-                  <UFormField
-                    label="Opis"
-                    name="description"
-                    :error="form.errors.value?.description"
-                    class="w-full"
-                  >
-                    <UTextarea
-                      v-model="form.values.value.description"
-                      class="w-full"
-                    />
-                  </UFormField>
+        <CalendarModalsMoveEventModal
+          v-model:open="isMoveToTeamOpen"
+          :teams="teams"
+          :on-move="moveEventToTeam"
+        />
 
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <UFormField
-                      label="Start"
-                      name="start_at"
-                      :error="form.errors.value?.start_at"
-                      class="w-full"
-                    >
-                      <UInput
-                        v-model="form.values.value.start_at"
-                        type="datetime-local"
-                        class="w-full"
-                      />
-                    </UFormField>
-                    <UFormField
-                      label="Koniec"
-                      name="end_at"
-                      :error="form.errors.value?.end_at"
-                      class="w-full"
-                    >
-                      <UInput
-                        v-model="form.values.value.end_at"
-                        type="datetime-local"
-                        class="w-full"
-                      />
-                    </UFormField>
-                  </div>
-
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <UFormField
-                      label="Strefa czasowa"
-                      name="timezone"
-                      :error="form.errors.value?.timezone"
-                      class="w-full"
-                    >
-                      <UInput
-                        v-model="form.values.value.timezone"
-                        class="w-full"
-                      />
-                    </UFormField>
-                    <UFormField
-                      label="Widocznosc"
-                      name="visibility"
-                      :error="form.errors.value?.visibility"
-                      class="w-full"
-                    >
-                      <USelect
-                        v-model="form.values.value.visibility"
-                        :items="[
-                          { label: 'Prywatne', value: 'private' },
-                          { label: 'Zespol', value: 'team' }
-                        ]"
-                        class="w-full"
-                      />
-                    </UFormField>
-                  </div>
-
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <UFormField
-                      label="Lokalizacja"
-                      name="location"
-                      :error="form.errors.value?.location"
-                      class="w-full"
-                    >
-                      <UInput
-                        v-model="form.values.value.location"
-                        class="w-full"
-                      />
-                    </UFormField>
-                    <UFormField
-                      label="URL"
-                      name="url"
-                      :error="form.errors.value?.url"
-                      class="w-full"
-                    >
-                      <UInput
-                        v-model="form.values.value.url"
-                        class="w-full"
-                      />
-                    </UFormField>
-                  </div>
-
-                  <UFormField
-                    label="Reminder (min)"
-                    name="reminder_minutes"
-                    :error="form.errors.value?.reminder_minutes"
-                    class="w-full"
-                  >
-                    <UInput
-                      :model-value="form.values.value.reminder_minutes"
-                      type="number"
-                      class="w-full"
-                      @update:model-value="form.setField('reminder_minutes', $event === null ? undefined : Number($event))"
-                    />
-                  </UFormField>
-                </div>
-              </UForm>
-            </UCard>
-          </template>
-          <template #footer>
-            <div class="w-full flex justify-end gap-2">
+        <UModal v-model:open="isCancelConfirmOpen">
+          <template #header>
+            <div class="flex items-center justify-between">
+              <h3 class="text-base font-semibold">
+                Anuluj wydarzenie
+              </h3>
               <UButton
+                icon="i-lucide-x"
                 variant="ghost"
                 color="neutral"
-                @click="isEditOpen = false"
-              >
-                Zamknij
-              </UButton>
-              <UButton
-                color="primary"
-                type="button"
-                :loading="form.pending.value"
-                @click="submitUpdateManual"
-              >
-                Zapisz zmiany
-              </UButton>
+                @click="closeCancelConfirm"
+              />
             </div>
           </template>
-        </UModal>
-
-        <UModal
-          v-model:open="isMoveToTeamOpen"
-          title="Przenieś wydarzenie"
-        >
           <template #body>
             <UCard>
-              <div class="space-y-4">
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                  Wybierz docelowy zespół lub przenieś do wydarzeń prywatnych.
-                </p>
-
-                <div class="space-y-2">
-                  <UButton
-                    variant="outline"
-                    color="neutral"
-                    block
-                    @click="moveEventToTeam(null, 'private')"
-                  >
-                    <div class="flex items-center gap-2">
-                      <UIcon name="i-lucide-user" />
-                      <span>Prywatne</span>
-                    </div>
-                  </UButton>
-
-                  <UButton
-                    v-for="team in teams"
-                    :key="team.id"
-                    variant="outline"
-                    color="neutral"
-                    block
-                    @click="moveEventToTeam(team.id, 'team')"
-                  >
-                    <div class="flex items-center gap-2">
-                      <UIcon name="i-lucide-users" />
-                      <span>{{ team.name }}</span>
-                    </div>
-                  </UButton>
-                </div>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                Czy na pewno chcesz anulowac to wydarzenie? Uczestnicy zostana poinformowani.
+              </p>
+              <div class="mt-4 flex justify-end gap-2">
+                <UButton
+                  variant="ghost"
+                  color="neutral"
+                  @click="closeCancelConfirm"
+                >
+                  Zamknij
+                </UButton>
+                <UButton
+                  color="error"
+                  @click="confirmCancelEvent"
+                >
+                  Anuluj wydarzenie
+                </UButton>
               </div>
             </UCard>
-          </template>
-
-          <template #footer>
-            <div class="w-full flex justify-end">
-              <UButton
-                variant="ghost"
-                color="neutral"
-                @click="isMoveToTeamOpen = false"
-              >
-                Anuluj
-              </UButton>
-            </div>
           </template>
         </UModal>
       </template>

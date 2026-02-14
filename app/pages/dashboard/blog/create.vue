@@ -20,7 +20,7 @@ const authorAvatarSrc = useAvatarSrc(() => user.value?.avatarUrl ?? undefined)
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: 'auth'
+  middleware: ['auth', 'content-manage']
 })
 
 useSeoMeta({

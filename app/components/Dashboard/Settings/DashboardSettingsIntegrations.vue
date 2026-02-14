@@ -205,6 +205,14 @@ async function saveSystemPrompt() {
           <p class="text-sm text-muted">
             Google Calendar bedzie dostepny jako pierwsza integracja.
           </p>
+          <div class="mt-4 rounded-lg border border-default bg-default-50 p-4">
+            <h3 class="text-sm font-semibold text-basic-900 dark:text-basic-100">
+              Automatyczna synchronizacja wydarzen
+            </h3>
+            <p class="mt-1 text-sm text-muted">
+              TODO: ustawienia czestotliwosci, kierunku sync i zakresu kalendarzy.
+            </p>
+          </div>
           <ul class="mt-3 space-y-1 text-sm text-muted">
             <li>TODO: OAuth + uprawnienia do kalendarza</li>
             <li>TODO: Automatyczna synchronizacja wydarzen</li>

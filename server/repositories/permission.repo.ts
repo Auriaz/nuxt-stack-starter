@@ -1,5 +1,5 @@
 import { prisma } from '../services/prisma'
-import type { Permission } from '../../prisma/generated/client.js'
+import type { Permission } from '@prisma/client'
 
 export interface PermissionRepository {
   findAll(): Promise<Permission[]>

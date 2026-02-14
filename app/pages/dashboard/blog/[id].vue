@@ -13,7 +13,7 @@ import AuthorAbout from '~/components/content/author_about.vue'
 
 definePageMeta({
   layout: 'dashboard',
-  middleware: 'auth'
+  middleware: ['auth', 'content-manage']
 })
 
 const { locale } = useI18n()

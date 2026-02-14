@@ -1,5 +1,5 @@
 import { prisma } from '../services/prisma'
-import type { PasswordResetToken } from '../../prisma/generated/client.js'
+import type { PasswordResetToken } from '@prisma/client'
 
 export interface PasswordResetTokenRepository {
   create(data: {

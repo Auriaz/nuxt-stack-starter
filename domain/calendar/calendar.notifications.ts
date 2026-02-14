@@ -75,6 +75,8 @@ export async function notifyCalendarEventChange(params: {
   actorId: number
   participants: CalendarEventParticipantRecord[]
   teamsRepository?: TeamsRepository
+  titleOverride?: string
+  messageOverride?: string
 }) {
   let teamMemberIds: number[] = []
 
@@ -92,7 +94,9 @@ export async function notifyCalendarEventChange(params: {
     event: params.event,
     actorId: params.actorId,
     participants: params.participants,
-    teamMemberIds
+    teamMemberIds,
+    titleOverride: params.titleOverride,
+    messageOverride: params.messageOverride
   })
 
   // Always broadcast WebSocket event to event owner for real-time updates

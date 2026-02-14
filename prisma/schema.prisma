@@ -5,8 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "./generated"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -58,6 +57,7 @@ model User {
   calendarEventsOwned       CalendarEvent[]            @relation("CalendarEventOwner")
   calendarEventParticipants CalendarEventParticipant[] @relation("CalendarEventParticipantUser")
   calendarEventInvitesSent  CalendarEventParticipant[] @relation("CalendarEventParticipantInviter")
+  eventCategories           EventCategory[]            @relation("EventCategoryUser")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -126,6 +126,37 @@ enum CalendarEventRsvpStatus {
 
 enum CalendarEventReminderChannel {
   in_app
+}
+
+model EventCategory {
+  id     Int  @id @default(autoincrement())
+  userId Int? // null = global/system category
+  teamId Int? // null = personal/global
+
+  label       String // "Spotkanie", "Deadline", "Personal"
+  slug        String // "meeting", "deadline", "personal"
+  description String? @db.Text
+
+  color String @default("#3b82f6") // hex color
+  icon  String @default("i-lucide-calendar") // Nuxt UI icon
+
+  isSystem  Boolean @default(false) // nieusuwalne, seedowane
+  isDefault Boolean @default(false) // domyślna dla scope
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacje
+  user           User?           @relation("EventCategoryUser", fields: [userId], references: [id], onDelete: Cascade)
+  team           Team?           @relation("EventCategoryTeam", fields: [teamId], references: [id], onDelete: Cascade)
+  calendarEvents CalendarEvent[] @relation("CalendarEventCategory")
+
+  @@unique([slug, userId, teamId]) // slug unikalny w scope (global/user/team)
+  @@index([userId])
+  @@index([teamId])
+  @@index([isSystem])
+  @@map("event_categories")
 }
 
 model ChatThread {
@@ -347,11 +378,12 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  owner          User            @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  members        TeamMember[]
-  invites        TeamInvite[]
-  chatThreads    ChatThread[]
-  calendarEvents CalendarEvent[] @relation("CalendarEventTeam")
+  owner           User            @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members         TeamMember[]
+  invites         TeamInvite[]
+  chatThreads     ChatThread[]
+  calendarEvents  CalendarEvent[] @relation("CalendarEventTeam")
+  eventCategories EventCategory[] @relation("EventCategoryTeam")
 
   @@unique([slug])
   @@index([ownerId])
@@ -398,6 +430,7 @@ model CalendarEvent {
   id           Int                     @id @default(autoincrement())
   ownerId      Int
   teamId       Int?
+  categoryId   Int?
   title        String
   description  String?
   startAt      DateTime
@@ -412,8 +445,9 @@ model CalendarEvent {
   createdAt    DateTime                @default(now())
   updatedAt    DateTime                @updatedAt
 
-  owner User  @relation("CalendarEventOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  team  Team? @relation("CalendarEventTeam", fields: [teamId], references: [id], onDelete: SetNull)
+  owner    User           @relation("CalendarEventOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  team     Team?          @relation("CalendarEventTeam", fields: [teamId], references: [id], onDelete: SetNull)
+  category EventCategory? @relation("CalendarEventCategory", fields: [categoryId], references: [id], onDelete: SetNull)
 
   participants CalendarEventParticipant[]
   reminders    CalendarEventReminder[]
@@ -421,6 +455,7 @@ model CalendarEvent {
   @@index([ownerId, startAt])
   @@index([teamId, startAt])
   @@index([status, startAt])
+  @@index([categoryId])
 }
 
 model CalendarEventParticipant {

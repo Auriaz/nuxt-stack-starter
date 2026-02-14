@@ -7,6 +7,7 @@ import { blogPostRepository } from '~~/server/repositories/blogPost.repo'
 import { DomainError } from '~~/domain/shared/errors'
 import { PERMISSIONS } from '~~/shared/permissions'
 import { requirePermission } from '~~/server/utils/access'
+import { hasPermission, hasRole } from '~~/domain/access/access.service'
 
 function parseId(value: unknown): number | null {
   const n = Number(value)
@@ -14,7 +15,10 @@ function parseId(value: unknown): number | null {
 }
 
 export default defineEventHandler(async (event) => {
-  await requirePermission(event, PERMISSIONS.CONTENT_READ)
+  const user = await requirePermission(event, PERMISSIONS.CONTENT_READ)
+  const canViewAll = hasRole(user, 'admin')
+    || hasPermission(user, PERMISSIONS.ADMIN_ACCESS)
+    || hasPermission(user, PERMISSIONS.CONTENT_MANAGE)
 
   const idParam = getRouterParam(event, 'id')
   const id = parseId(idParam)
@@ -24,6 +28,19 @@ export default defineEventHandler(async (event) => {
 
   try {
     const post = await getBlogPostByIdUseCase({ id }, blogPostRepository)
+    if (!canViewAll && post.authorId !== user.id) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Forbidden',
+        data: {
+          error: {
+            code: 'FORBIDDEN',
+            message: 'Insufficient permissions',
+            status: 403
+          }
+        }
+      })
+    }
     return { data: post }
   } catch (error) {
     if (error instanceof DomainError) {

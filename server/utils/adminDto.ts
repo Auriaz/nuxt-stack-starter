@@ -2,7 +2,7 @@ import type { PermissionKey } from '~~/shared/permissions'
 import type { RoleDTO, UserDTO, PermissionDTO } from '~~/shared/types/auth'
 import type { RoleWithPermissions } from '~~/server/repositories/role.repo'
 import type { UserWithRolePermissions } from '~~/server/repositories/user.repo'
-import type { Permission } from '../../prisma/generated/client.js'
+import type { Permission } from '@prisma/client'
 
 export function toRoleDTO(role: RoleWithPermissions): RoleDTO {
   const permissions = role.permissions.map(rolePermission => rolePermission.permission.key as PermissionKey)

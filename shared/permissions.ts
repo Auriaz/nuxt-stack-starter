@@ -36,7 +36,13 @@ export const PERMISSIONS = {
   CALENDAR_TEAM_READ: 'calendar.team.read',
   CALENDAR_TEAM_WRITE: 'calendar.team.write',
   CALENDAR_INVITE: 'calendar.invite',
-  CALENDAR_ADMIN: 'calendar.admin'
+  CALENDAR_ADMIN: 'calendar.admin',
+  CATEGORY_READ: 'category.read',
+  CATEGORY_CREATE: 'category.create',
+  CATEGORY_EDIT: 'category.edit',
+  CATEGORY_DELETE: 'category.delete',
+  CATEGORY_TEAM_MANAGE: 'category.team.manage',
+  CATEGORY_SYSTEM_MANAGE: 'category.system.manage'
 } as const
 
 export type PermissionKey = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]
@@ -79,5 +85,11 @@ export const PERMISSION_META: Record<PermissionKey, { label: string, group: stri
   'calendar.team.read': { label: 'Podgląd kalendarza zespołu', group: 'Calendar' },
   'calendar.team.write': { label: 'Edycja wydarzeń zespołowych', group: 'Calendar' },
   'calendar.invite': { label: 'Zapraszanie do wydarzeń', group: 'Calendar' },
-  'calendar.admin': { label: 'Administracja kalendarzem', group: 'Calendar' }
+  'calendar.admin': { label: 'Administracja kalendarzem', group: 'Calendar' },
+  'category.read': { label: 'Podgląd kategorii', group: 'Categories' },
+  'category.create': { label: 'Tworzenie kategorii', group: 'Categories' },
+  'category.edit': { label: 'Edycja kategorii', group: 'Categories' },
+  'category.delete': { label: 'Usuwanie kategorii', group: 'Categories' },
+  'category.team.manage': { label: 'Zarządzanie kategoriami zespołu', group: 'Categories' },
+  'category.system.manage': { label: 'Zarządzanie kategoriami systemowymi', group: 'Categories' }
 }

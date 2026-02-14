@@ -44,7 +44,13 @@ const permissionsSeed: Array<{ key: PermissionKey, label: string, group: string 
   { key: PERMISSIONS.CALENDAR_TEAM_READ, label: 'Podgląd kalendarza zespołu', group: 'Calendar' },
   { key: PERMISSIONS.CALENDAR_TEAM_WRITE, label: 'Edycja wydarzeń zespołowych', group: 'Calendar' },
   { key: PERMISSIONS.CALENDAR_INVITE, label: 'Zapraszanie do wydarzeń', group: 'Calendar' },
-  { key: PERMISSIONS.CALENDAR_ADMIN, label: 'Administracja kalendarzem', group: 'Calendar' }
+  { key: PERMISSIONS.CALENDAR_ADMIN, label: 'Administracja kalendarzem', group: 'Calendar' },
+  { key: PERMISSIONS.CATEGORY_READ, label: 'Podgląd kategorii', group: 'Categories' },
+  { key: PERMISSIONS.CATEGORY_CREATE, label: 'Tworzenie kategorii', group: 'Categories' },
+  { key: PERMISSIONS.CATEGORY_EDIT, label: 'Edycja kategorii', group: 'Categories' },
+  { key: PERMISSIONS.CATEGORY_DELETE, label: 'Usuwanie kategorii', group: 'Categories' },
+  { key: PERMISSIONS.CATEGORY_TEAM_MANAGE, label: 'Zarządzanie kategoriami zespołu', group: 'Categories' },
+  { key: PERMISSIONS.CATEGORY_SYSTEM_MANAGE, label: 'Zarządzanie kategoriami systemowymi', group: 'Categories' }
 ]
 
 const rolePermissionsSeed: Record<string, PermissionKey[]> = {
@@ -86,7 +92,13 @@ const rolePermissionsSeed: Record<string, PermissionKey[]> = {
     PERMISSIONS.CALENDAR_TEAM_READ,
     PERMISSIONS.CALENDAR_TEAM_WRITE,
     PERMISSIONS.CALENDAR_INVITE,
-    PERMISSIONS.CALENDAR_ADMIN
+    PERMISSIONS.CALENDAR_ADMIN,
+    PERMISSIONS.CATEGORY_READ,
+    PERMISSIONS.CATEGORY_CREATE,
+    PERMISSIONS.CATEGORY_EDIT,
+    PERMISSIONS.CATEGORY_DELETE,
+    PERMISSIONS.CATEGORY_TEAM_MANAGE,
+    PERMISSIONS.CATEGORY_SYSTEM_MANAGE
   ],
   user: [
     PERMISSIONS.PORTFOLIO_READ,
@@ -111,7 +123,11 @@ const rolePermissionsSeed: Record<string, PermissionKey[]> = {
     PERMISSIONS.CALENDAR_WRITE,
     PERMISSIONS.CALENDAR_TEAM_READ,
     PERMISSIONS.CALENDAR_TEAM_WRITE,
-    PERMISSIONS.CALENDAR_INVITE
+    PERMISSIONS.CALENDAR_INVITE,
+    PERMISSIONS.CATEGORY_READ,
+    PERMISSIONS.CATEGORY_CREATE,
+    PERMISSIONS.CATEGORY_EDIT,
+    PERMISSIONS.CATEGORY_DELETE
   ]
 }
 
@@ -168,6 +184,31 @@ async function main() {
       data: { roleId: userRole.id, role: 'user' }
     })
   }
+
+  // Seed systemowych kategorii
+  const systemCategories = [
+    { label: 'Spotkanie', slug: 'meeting', color: '#3b82f6', icon: 'i-lucide-users', sortOrder: 1 },
+    { label: 'Deadline', slug: 'deadline', color: '#ef4444', icon: 'i-lucide-alert-circle', sortOrder: 2 },
+    { label: 'Prywatne', slug: 'personal', color: '#8b5cf6', icon: 'i-lucide-user', sortOrder: 3, isDefault: true },
+    { label: 'Zespołowe', slug: 'team', color: '#10b981', icon: 'i-lucide-users-2', sortOrder: 4 },
+    { label: 'Projekt', slug: 'project', color: '#f59e0b', icon: 'i-lucide-folder', sortOrder: 5 },
+    { label: 'Przypomnienie', slug: 'reminder', color: '#06b6d4', icon: 'i-lucide-bell', sortOrder: 6 }
+  ]
+
+  await prisma.eventCategory.createMany({
+    data: systemCategories.map(cat => ({
+      userId: null,
+      teamId: null,
+      label: cat.label,
+      slug: cat.slug,
+      color: cat.color,
+      icon: cat.icon,
+      isSystem: true,
+      isDefault: cat.isDefault ?? false,
+      sortOrder: cat.sortOrder
+    })),
+    skipDuplicates: true
+  })
 }
 
 main()

@@ -5,13 +5,27 @@ import { getDashboardMenuItems } from '~/utils/dashboardNavigation'
 export const useDashboardNavigation = () => {
   const route = useRoute()
   const config = useRuntimeConfig()
-  const { isLoggedIn, can } = useAccess()
+  const { isLoggedIn, can, hasRole } = useAccess()
 
   const menuItems = computed<NavigationMenuItem[][]>(() => {
-    const hasAdminRole = isLoggedIn.value && can(PERMISSIONS.ADMIN_ACCESS)
+    const hasAdminRole = isLoggedIn.value && (hasRole('admin') || can(PERMISSIONS.ADMIN_ACCESS))
     const showAnalytics = config.public.analyticsEnabled === true && can(PERMISSIONS.ANALYTICS_READ)
-    const hasContentManage = isLoggedIn.value && can(PERMISSIONS.CONTENT_MANAGE)
-    const itemsGroups = getDashboardMenuItems({ hasAdminRole, showAnalytics, hasContentManage })
+    const hasContentManage = isLoggedIn.value && (
+      can(PERMISSIONS.CONTENT_MANAGE)
+      || can(PERMISSIONS.ADMIN_ACCESS)
+      || hasRole('admin')
+    )
+    const hasCategoryManage = isLoggedIn.value && (
+      can(PERMISSIONS.CATEGORY_SYSTEM_MANAGE)
+      || can(PERMISSIONS.ADMIN_ACCESS)
+      || hasRole('admin')
+    )
+    const itemsGroups = getDashboardMenuItems({
+      hasAdminRole,
+      showAnalytics,
+      hasContentManage,
+      hasCategoryManage
+    })
 
     // Ustaw aktywny element na podstawie aktualnej trasy
     const setActive = (items: NavigationMenuItem[]): NavigationMenuItem[] => {

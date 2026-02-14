@@ -4,6 +4,7 @@ export interface CalendarEventRecord {
   id: number
   ownerId: number
   teamId: number | null
+  categoryId: number | null
   title: string
   description: string | null
   startAt: Date
@@ -40,6 +41,7 @@ export interface CalendarEventReminderRecord {
 export interface CalendarEventCreateInput {
   ownerId: number
   teamId?: number | null
+  categoryId?: number | null
   title: string
   description?: string | null
   startAt: Date
@@ -58,6 +60,7 @@ export interface CalendarEventUpdateInput {
   endAt?: Date
   timezone?: string
   teamId?: number | null
+  categoryId?: number | null
   visibility?: string
   location?: string | null
   url?: string | null
@@ -177,6 +180,7 @@ export const calendarRepository: CalendarRepository = {
       data: {
         ownerId: input.ownerId,
         teamId: input.teamId ?? undefined,
+        categoryId: typeof input.categoryId === 'number' ? input.categoryId : input.categoryId === null ? null : undefined,
         title: input.title,
         description: input.description ?? undefined,
         startAt: input.startAt,
@@ -201,6 +205,7 @@ export const calendarRepository: CalendarRepository = {
         endAt: data.endAt ?? undefined,
         timezone: data.timezone ?? undefined,
         teamId: typeof data.teamId === 'number' ? data.teamId : data.teamId === null ? null : undefined,
+        categoryId: typeof data.categoryId === 'number' ? data.categoryId : data.categoryId === null ? null : undefined,
         visibility: data.visibility ?? undefined,
         location: data.location ?? undefined,
         url: data.url ?? undefined,

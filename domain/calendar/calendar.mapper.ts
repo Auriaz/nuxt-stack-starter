@@ -41,6 +41,7 @@ export function toCalendarEventDTO(
     id: record.id,
     owner_id: record.ownerId,
     team_id: record.teamId ?? undefined,
+    category_id: record.categoryId ?? undefined,
     title: record.title,
     description: record.description ?? undefined,
     start_at: record.startAt.toISOString(),
@@ -64,7 +65,10 @@ export function toCalendarEventListItemDTO(record: CalendarEventRecord): Calenda
     id: record.id,
     owner_id: record.ownerId,
     team_id: record.teamId ?? undefined,
+    category_id: record.categoryId ?? undefined,
     title: record.title,
+    description: record.description ?? undefined,
+    location: record.location ?? undefined,
     start_at: record.startAt.toISOString(),
     end_at: record.endAt.toISOString(),
     status: record.status as CalendarEventListItemDTO['status']

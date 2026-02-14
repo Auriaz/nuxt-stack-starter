@@ -1,5 +1,5 @@
 import { prisma } from '../services/prisma'
-import type { EmailVerificationToken } from '../../prisma/generated/client.js'
+import type { EmailVerificationToken } from '@prisma/client'
 
 export interface EmailVerificationTokenRepository {
   create(data: {

@@ -34,6 +34,9 @@ export async function updateEventUseCase(
     throw new ValidationError('Invalid date range')
   }
 
+  const didMove = nextStart.getTime() !== event.startAt.getTime()
+    || nextEnd.getTime() !== event.endAt.getTime()
+
   if (typeof params.input.team_id === 'number' && params.input.team_id !== event.teamId) {
     const member = await deps.teamsRepository.findMember(params.input.team_id, params.userId)
     if (!member) {
@@ -48,6 +51,7 @@ export async function updateEventUseCase(
     endAt: params.input.end_at ? nextEnd : undefined,
     timezone: params.input.timezone,
     teamId: typeof params.input.team_id === 'number' ? params.input.team_id : undefined,
+    categoryId: typeof params.input.category_id === 'number' ? params.input.category_id : params.input.category_id === null ? null : undefined,
     visibility: params.input.visibility,
     location: params.input.location ?? undefined,
     url: params.input.url ?? undefined
@@ -77,7 +81,10 @@ export async function updateEventUseCase(
     event: updated,
     actorId: params.userId,
     participants,
-    teamsRepository: deps.teamsRepository
+    teamsRepository: deps.teamsRepository,
+    messageOverride: didMove && updated.teamId
+      ? `Wydarzenie "${updated.title}" zostalo przeniesione.`
+      : undefined
   })
   return toCalendarEventDTO(updated, participants, reminders)
 }

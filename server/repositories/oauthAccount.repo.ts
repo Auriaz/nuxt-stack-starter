@@ -1,5 +1,5 @@
 import { prisma } from '../services/prisma'
-import type { OAuthAccount, User } from '../../prisma/generated/client.js'
+import type { OAuthAccount, User } from '@prisma/client'
 
 export interface OAuthAccountWithUser extends OAuthAccount {
   user: User

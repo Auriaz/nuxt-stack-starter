@@ -113,7 +113,7 @@ function updatePrefs(patch: Partial<CalendarPrefs>) {
               Ukryj soboty i niedziele.
             </p>
           </div>
-          <UToggle
+          <USwitch
             :model-value="preferences.showWeekends"
             @update:model-value="updatePrefs({ showWeekends: $event })"
           />
@@ -128,7 +128,7 @@ function updatePrefs(patch: Partial<CalendarPrefs>) {
               Widocznosc wydarzen z anulowanym statusem.
             </p>
           </div>
-          <UToggle
+          <USwitch
             :model-value="preferences.showCancelled"
             @update:model-value="updatePrefs({ showCancelled: $event })"
           />
@@ -153,7 +153,7 @@ function updatePrefs(patch: Partial<CalendarPrefs>) {
               Skroc widok do zadanych godzin.
             </p>
           </div>
-          <UToggle
+          <USwitch
             :model-value="preferences.showWorkHoursOnly"
             @update:model-value="updatePrefs({ showWorkHoursOnly: $event })"
           />
@@ -179,6 +179,31 @@ function updatePrefs(patch: Partial<CalendarPrefs>) {
             />
           </UFormField>
         </div>
+      </div>
+    </UCard>
+
+    <UCard variant="soft">
+      <template #header>
+        <h3 class="text-sm font-semibold">
+          Kategorie i kolory
+        </h3>
+        <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+          Wspolne kategorie dla kalendarza i zadan.
+        </p>
+      </template>
+
+      <div class="flex items-center justify-between gap-3">
+        <p class="text-sm text-muted">
+          Zarzadzaj listami, kolorami i regułami uzycia.
+        </p>
+        <UButton
+          to="/dashboard/categories?context=calendar"
+          size="sm"
+          color="primary"
+          variant="soft"
+        >
+          Zarzadzaj kategoriami
+        </UButton>
       </div>
     </UCard>
 

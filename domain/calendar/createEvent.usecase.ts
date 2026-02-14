@@ -60,6 +60,7 @@ export async function createEventUseCase(
   const event = await deps.calendarRepository.createEvent({
     ownerId: params.userId,
     teamId,
+    categoryId: typeof input.category_id === 'number' ? input.category_id : null,
     title: input.title,
     description: input.description ?? null,
     startAt,

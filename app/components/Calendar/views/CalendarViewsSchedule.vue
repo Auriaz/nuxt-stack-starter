@@ -1,20 +1,29 @@
 <script lang="ts" setup>
 import { CalendarDate } from '@internationalized/date'
 import type { CalendarEventListItemDTO } from '#shared/types/calendar'
+import type { EventCategoryDTO } from '#shared/types/event-category'
+import { hexToRgba } from '~/utils/color'
 import type { DayRange } from '~/composables/useCalendarSelection'
 
 const props = defineProps<{
   effectiveDate: CalendarDate
   events: CalendarEventListItemDTO[]
+  categoryColors: Record<number, string>
+  categories: EventCategoryDTO[]
+  teamMembers?: Array<{ id: number | string, name: string, role?: string, avatarUrl?: string }>
+  teamNames?: Record<number, string>
   isLoading: boolean
   showWeekends: boolean
   dayRange: DayRange | null
   isSelectingDay: boolean
+  canMoveTeamEvents: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'refresh' | 'dayEnd'): void
-  (e: 'edit' | 'cancel' | 'duplicate' | 'copyLink' | 'openChat' | 'moveScope', id: number): void
+  (e: 'edit' | 'cancel' | 'requestCancel' | 'duplicate' | 'copyLink' | 'copyTitle' | 'copyDate' | 'copyId' | 'copyDescription' | 'openChat' | 'shareChatLink' | 'moveScope', id: number): void
+  (e: 'changeCategoryFor', id: number, categoryId: number | null): void
+  (e: 'moveEvent', value: { id: number, start: Date, end: Date }): void
   (e: 'dayStart', value: { date: CalendarDate, shiftKey: boolean }): void
   (e: 'dayHover', value: CalendarDate): void
 }>()
@@ -63,6 +72,92 @@ const groups = computed(() => {
       : key
   }))
 })
+
+function getCategoryColor(event: CalendarEventListItemDTO) {
+  if (!event.category_id) return null
+  return props.categoryColors[event.category_id] ?? null
+}
+
+function getCategoryStyle(event: CalendarEventListItemDTO) {
+  const color = getCategoryColor(event)
+  if (!color) return undefined
+  return {
+    borderLeftColor: color,
+    backgroundColor: hexToRgba(color, 0.08) ?? undefined
+  }
+}
+
+function canMoveEvent(eventItem: CalendarEventListItemDTO) {
+  if (!eventItem.team_id) return true
+  return props.canMoveTeamEvents
+}
+
+function getMoveTooltip(eventItem: CalendarEventListItemDTO) {
+  return canMoveEvent(eventItem)
+    ? ''
+    : 'Wydarzenie zespolowe nie jest przesuwalne dla roli member.'
+}
+
+function buildMovedTimes(targetDate: Date, payload: { start_at: string, end_at: string }) {
+  const start = new Date(payload.start_at)
+  const end = new Date(payload.end_at)
+  const durationMs = Math.max(0, end.getTime() - start.getTime())
+  const nextStart = new Date(targetDate)
+  nextStart.setHours(start.getHours(), start.getMinutes(), start.getSeconds(), start.getMilliseconds())
+  const nextEnd = new Date(nextStart.getTime() + durationMs)
+  return { start: nextStart, end: nextEnd }
+}
+
+function handleDragStart(eventItem: CalendarEventListItemDTO, event: DragEvent) {
+  if (!canMoveEvent(eventItem)) return
+  if (!event.dataTransfer) return
+  const payload = {
+    id: eventItem.id,
+    start_at: eventItem.start_at,
+    end_at: eventItem.end_at
+  }
+  event.dataTransfer.setData('application/json', JSON.stringify(payload))
+  event.dataTransfer.setData('text/plain', String(eventItem.id))
+  event.dataTransfer.effectAllowed = 'move'
+}
+
+function handleDrop(targetDate: Date, event: DragEvent) {
+  const raw = event.dataTransfer?.getData('application/json')
+  if (!raw) return
+  try {
+    const payload = JSON.parse(raw) as { id: number, start_at: string, end_at: string }
+    const eventItem = props.events.find(item => item.id === payload.id)
+    if (eventItem && !canMoveEvent(eventItem)) return
+    const { start, end } = buildMovedTimes(targetDate, payload)
+    emit('moveEvent', { id: payload.id, start, end })
+  } catch {
+    return
+  }
+}
+
+function createEventForDay(date: Date) {
+  emit('dayStart', { date: toCalendarDate(date), shiftKey: false })
+  emit('dayEnd')
+}
+
+function getDayMenuItems(date: Date) {
+  return [
+    [
+      {
+        label: 'Nowe wydarzenie',
+        icon: 'i-lucide-plus',
+        onClick: () => createEventForDay(date)
+      }
+    ],
+    [
+      {
+        label: 'Odswiez',
+        icon: 'i-lucide-rotate-cw',
+        onClick: () => emit('refresh')
+      }
+    ]
+  ]
+}
 </script>
 
 <template>
@@ -120,21 +215,30 @@ const groups = computed(() => {
         :key="group.key"
         class="space-y-3"
       >
-        <div
-          class="sticky top-0 z-10 rounded-md bg-neutral-100 px-3 py-2 text-sm font-semibold text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
-          :class="isInRange(new Date(group.key)) ? 'ring-1 ring-primary-300' : ''"
-          @mousedown.prevent="emit('dayStart', { date: toCalendarDate(new Date(group.key)), shiftKey: $event.shiftKey })"
-          @mouseenter="isSelectingDay ? emit('dayHover', toCalendarDate(new Date(group.key))) : null"
-          @mouseup="emit('dayEnd')"
+        <UContextMenu
+          :items="getDayMenuItems(new Date(group.key))"
         >
-          {{ group.label }}
-        </div>
+          <div
+            class="sticky top-0 z-10 rounded-md bg-neutral-100 px-3 py-2 text-sm font-semibold text-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
+            :class="isInRange(new Date(group.key)) ? 'ring-1 ring-primary-300' : ''"
+            @dragover.prevent
+            @drop="handleDrop(new Date(group.key), $event)"
+            @mousedown.prevent="emit('dayStart', { date: toCalendarDate(new Date(group.key)), shiftKey: $event.shiftKey })"
+            @mouseenter="isSelectingDay ? emit('dayHover', toCalendarDate(new Date(group.key))) : null"
+            @mouseup="emit('dayEnd')"
+          >
+            {{ group.label }}
+          </div>
+        </UContextMenu>
 
         <div class="space-y-2">
           <CalendarEventPopover
             v-for="event in group.items"
             :key="event.id"
             :event="event"
+            :categories="categories"
+            :team-members="teamMembers"
+            :team-name="event.team_id ? teamNames?.[event.team_id] : undefined"
             :open="openEventId === event.id"
             @update:open="setOpen(event.id, $event)"
             @edit="emit('edit', $event)"
@@ -144,17 +248,42 @@ const groups = computed(() => {
             @open-chat="emit('openChat', $event)"
             @move-scope="emit('moveScope', $event)"
           >
-            <button
-              type="button"
-              class="flex w-full items-center justify-between rounded-md border border-neutral-200 bg-white px-4 py-3 text-left text-sm shadow-sm hover:border-primary-300 dark:border-neutral-800 dark:bg-neutral-900"
-              @click="setOpen(event.id, true)"
+            <UTooltip
+              :text="getMoveTooltip(event)"
+              :disabled="canMoveEvent(event)"
             >
-              <span class="font-medium">{{ event.title }}</span>
-              <span class="text-xs text-neutral-500">
-                {{ new Date(event.start_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }} -
-                {{ new Date(event.end_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}
-              </span>
-            </button>
+              <CalendarContextMenu
+                :event="event"
+                :categories="categories"
+                @edit="emit('edit', event.id)"
+                @request-cancel="emit('requestCancel', event.id)"
+                @duplicate="emit('duplicate', event.id)"
+                @change-category-for="emit('changeCategoryFor', $event[0], $event[1])"
+                @copy-id="emit('copyId', event.id)"
+                @copy-title="emit('copyTitle', event.id)"
+                @copy-date="emit('copyDate', event.id)"
+                @copy-description="emit('copyDescription', event.id)"
+                @copy-link="emit('copyLink', event.id)"
+                @share-chat-link="emit('shareChatLink', event.id)"
+                @open-chat="emit('openChat', event.id)"
+                @move-scope="emit('moveScope', event.id)"
+              >
+                <button
+                  type="button"
+                  class="flex w-full items-center justify-between rounded-md border border-neutral-200 border-l-4 bg-white px-4 py-3 text-left text-sm shadow-sm hover:border-primary-300 dark:border-neutral-800 dark:bg-neutral-900"
+                  :style="getCategoryStyle(event)"
+                  :draggable="canMoveEvent(event)"
+                  @dragstart="handleDragStart(event, $event)"
+                  @click="setOpen(event.id, true)"
+                >
+                  <span class="font-medium">{{ event.title }}</span>
+                  <span class="text-xs text-neutral-500">
+                    {{ new Date(event.start_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }} -
+                    {{ new Date(event.end_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}
+                  </span>
+                </button>
+              </CalendarContextMenu>
+            </UTooltip>
           </CalendarEventPopover>
         </div>
       </div>

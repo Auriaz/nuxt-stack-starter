@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { CalendarDate, getLocalTimeZone } from '@internationalized/date'
+import { CalendarDate, getLocalTimeZone, type DateValue } from '@internationalized/date'
 import type { CalendarEventListItemDTO } from '#shared/types/calendar'
 import type { DayRange } from '~/composables/useCalendarSelection'
 
@@ -8,6 +8,7 @@ const props = defineProps<{
   selectedYear: number
   isLoading: boolean
   events: CalendarEventListItemDTO[]
+  categoryColors: Record<number, string>
   dayRange: DayRange | null
 }>()
 
@@ -31,6 +32,27 @@ const eventKeys = computed(() => {
   return set
 })
 
+const eventColorMap = computed(() => {
+  const map = new Map<string, Set<string>>()
+  for (const event of props.events) {
+    if (!event.category_id) continue
+    const color = props.categoryColors[event.category_id]
+    if (!color) continue
+    const date = new Date(event.start_at)
+    const key = toDateKey(date)
+    const bucket = map.get(key) ?? new Set<string>()
+    bucket.add(color)
+    map.set(key, bucket)
+  }
+  return map
+})
+
+function getDayDotColor(date: Date) {
+  const colors = eventColorMap.value.get(toDateKey(date))
+  if (!colors || colors.size !== 1) return null
+  return [...colors][0]
+}
+
 const rangeValue = computed({
   get: () => props.dayRange ?? { start: undefined, end: undefined },
   set: (value: DayRange | null) => {
@@ -44,6 +66,30 @@ const rangeValue = computed({
 
 function getMonthPlaceholder(month: number) {
   return new CalendarDate(props.selectedYear, month, 1)
+}
+
+function getDayMenuItems(day: DateValue) {
+  return [
+    [
+      {
+        label: 'Nowe wydarzenie',
+        icon: 'i-lucide-plus',
+        onClick: () => emit('rangeChange', { start: day, end: day })
+      },
+      {
+        label: 'Otworz miesiac',
+        icon: 'i-lucide-calendar-days',
+        onClick: () => emit('openMonth', day.month)
+      }
+    ],
+    [
+      {
+        label: 'Odswiez',
+        icon: 'i-lucide-rotate-cw',
+        onClick: () => emit('refresh')
+      }
+    ]
+  ]
 }
 </script>
 
@@ -91,7 +137,7 @@ function getMonthPlaceholder(month: number) {
         </div>
 
         <UCalendar
-          v-model="rangeValue"
+          v-model:open="rangeValue"
           range
           size="sm"
           :month-controls="false"
@@ -103,13 +149,16 @@ function getMonthPlaceholder(month: number) {
           class="rounded-md border border-neutral-200 p-2 dark:border-neutral-800"
         >
           <template #day="{ day }">
-            <div class="relative flex items-center justify-center">
-              <span>{{ day.day }}</span>
-              <span
-                v-if="eventKeys.has(toDateKey(day.toDate(getLocalTimeZone())))"
-                class="absolute -bottom-1 h-1 w-1 rounded-full bg-primary-500"
-              />
-            </div>
+            <UContextMenu :items="getDayMenuItems(day)">
+              <div class="relative flex items-center justify-center">
+                <span>{{ day.day }}</span>
+                <span
+                  v-if="eventKeys.has(toDateKey(day.toDate(getLocalTimeZone())))"
+                  class="absolute -bottom-1 h-1 w-1 rounded-full bg-primary-500"
+                  :style="{ backgroundColor: getDayDotColor(day.toDate(getLocalTimeZone())) ?? undefined }"
+                />
+              </div>
+            </UContextMenu>
           </template>
         </UCalendar>
       </UCard>

@@ -1,5 +1,5 @@
 import { prisma } from '../services/prisma'
-import type { MediaAsset } from '../../prisma/generated/client.js'
+import type { MediaAsset } from '@prisma/client'
 
 export interface MediaAssetCreateInput {
   id: string
